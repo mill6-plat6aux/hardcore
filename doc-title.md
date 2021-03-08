@@ -20,6 +20,10 @@ var Sample = (function(self) {
 }({}));
 ```
 
+## Source
+
+[GitHub](https://github.com/mill6-plat6aux/hardcore)
+
 ## License
 
 [MIT](LICENSE)
