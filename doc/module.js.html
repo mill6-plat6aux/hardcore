@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>module.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Color.html">Color</a><ul class='methods'><li data-type='method'><a href="Color.html#colorWithAlpha">colorWithAlpha</a></li><li data-type='method'><a href="Color.html#toString">toString</a></li><li data-type='method'><a href="Color.html#toStringWithAlpha">toStringWithAlpha</a></li></ul></li><li><a href="FunctionalAnimation.html">FunctionalAnimation</a><ul class='methods'><li data-type='method'><a href="FunctionalAnimation.html#finish">finish</a></li><li data-type='method'><a href="FunctionalAnimation.html#start">start</a></li></ul></li><li><a href="Point.html">Point</a></li><li><a href="Polygon.html">Polygon</a><ul class='methods'><li data-type='method'><a href="Polygon.html#contains">contains</a></li></ul></li><li><a href="Rect.html">Rect</a><ul class='methods'><li data-type='method'><a href="Rect.html#contains">contains</a></li><li data-type='method'><a href="Rect.html#intersect">intersect</a></li></ul></li><li><a href="Size.html">Size</a></li><li><a href="StyleAnimation.html">StyleAnimation</a><ul class='methods'><li data-type='method'><a href="StyleAnimation.html#finish">finish</a></li><li data-type='method'><a href="StyleAnimation.html#start">start</a></li></ul></li><li><a href="TextDrawingAttributes.html">TextDrawingAttributes</a></li><li><a href="ViewController.html">ViewController</a></li></ul><h3>Namespaces</h3><ul><li><a href="CanvasUtil.html">CanvasUtil</a><ul class='methods'><li data-type='method'><a href="CanvasUtil.html#.initCanvas">initCanvas</a></li></ul></li><li><a href="Controls.html">Controls</a><ul class='methods'><li data-type='method'><a href="Controls.html#.Balloon">Balloon</a></li><li data-type='method'><a href="Controls.html#.ContextMenu">ContextMenu</a></li><li data-type='method'><a href="Controls.html#.Draggable">Draggable</a></li><li data-type='method'><a href="Controls.html#.Message">Message</a></li><li data-type='method'><a href="Controls.html#.Popup">Popup</a></li><li data-type='method'><a href="Controls.html#.Select">Select</a></li></ul></li><li><a href="DateUtil.html">DateUtil</a><ul class='methods'><li data-type='method'><a href="DateUtil.html#.format">format</a></li><li data-type='method'><a href="DateUtil.html#.getDateByAdding">getDateByAdding</a></li><li data-type='method'><a href="DateUtil.html#.getDateBySlicingTime">getDateBySlicingTime</a></li></ul></li><li><a href="DrawUtil.html">DrawUtil</a><ul class='methods'><li data-type='method'><a href="DrawUtil.html#.drawLine">drawLine</a></li><li data-type='method'><a href="DrawUtil.html#.drawRoundRect">drawRoundRect</a></li><li data-type='method'><a href="DrawUtil.html#.drawRoundRectBalloon">drawRoundRectBalloon</a></li><li data-type='method'><a href="DrawUtil.html#.drawText">drawText</a></li><li data-type='method'><a href="DrawUtil.html#.drawTextByCharacterWrap">drawTextByCharacterWrap</a></li><li data-type='method'><a href="DrawUtil.html#.drawTextByTruncatingTail">drawTextByTruncatingTail</a></li><li data-type='method'><a href="DrawUtil.html#.getBoundingRectOfTextByCharacterWrap">getBoundingRectOfTextByCharacterWrap</a></li><li data-type='method'><a href="DrawUtil.html#.sizeOfText">sizeOfText</a></li></ul></li><li><a href="HtmlElementUtil.html">HtmlElementUtil</a></li><li><a href="HttpConnection.html">HttpConnection</a><ul class='methods'><li data-type='method'><a href="HttpConnection.html#.globalServerErrorHandler">globalServerErrorHandler</a></li><li data-type='method'><a href="HttpConnection.html#.request">request</a></li></ul></li><li><a href="ImageUtil.html">ImageUtil</a><ul class='methods'><li data-type='method'><a href="ImageUtil.html#.convertCanvasToBinary">convertCanvasToBinary</a></li><li data-type='method'><a href="ImageUtil.html#.convertImageToBase64String">convertImageToBase64String</a></li><li data-type='method'><a href="ImageUtil.html#.drawImage">drawImage</a></li><li data-type='method'><a href="ImageUtil.html#.loadImage">loadImage</a></li><li data-type='method'><a href="ImageUtil.html#.loadImageData">loadImageData</a></li><li data-type='method'><a href="ImageUtil.html#.loadImages">loadImages</a></li></ul></li><li><a href="Module.html">Module</a><ul class='methods'><li data-type='method'><a href="Module.html#.load">load</a></li><li data-type='method'><a href="Module.html#.loadLogic">loadLogic</a></li><li data-type='method'><a href="Module.html#.loadLogics">loadLogics</a></li><li data-type='method'><a href="Module.html#.loadStyleSheet">loadStyleSheet</a></li><li data-type='method'><a href="Module.html#.loadView">loadView</a></li><li data-type='method'><a href="Module.html#.loadViewComponent">loadViewComponent</a></li></ul></li><li><a href="StorageUtil.html">StorageUtil</a><ul class='methods'><li data-type='method'><a href="StorageUtil.html#.restoreJson">restoreJson</a></li><li data-type='method'><a href="StorageUtil.html#.storeJson">storeJson</a></li></ul></li><li><a href="StringUtil.html">StringUtil</a><ul class='methods'><li data-type='method'><a href="StringUtil.html#.currencyString">currencyString</a></li><li data-type='method'><a href="StringUtil.html#.getNullable">getNullable</a></li><li data-type='method'><a href="StringUtil.html#.padding">padding</a></li></ul></li><li><a href="UIEventUtil.html">UIEventUtil</a><ul class='methods'><li data-type='method'><a href="UIEventUtil.html#.getLocation">getLocation</a></li><li data-type='method'><a href="UIEventUtil.html#.handleTouch">handleTouch</a></li><li data-type='method'><a href="UIEventUtil.html#.setEnterKeyChain">setEnterKeyChain</a></li></ul></li><li><a href="ValidationUtil.html">ValidationUtil</a><ul class='methods'><li data-type='method'><a href="ValidationUtil.html#.validate">validate</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#Button">Button</a></li><li><a href="global.html#Canvas">Canvas</a></li><li><a href="global.html#Checkbox">Checkbox</a></li><li><a href="global.html#FileSelector">FileSelector</a></li><li><a href="global.html#HtmlTag">HtmlTag</a></li><li><a href="global.html#InlineImage">InlineImage</a></li><li><a href="global.html#Input">Input</a></li><li><a href="global.html#InputComposite">InputComposite</a></li><li><a href="global.html#ListItem">ListItem</a></li><li><a href="global.html#MailField">MailField</a></li><li><a href="global.html#NumericField">NumericField</a></li><li><a href="global.html#OrderedList">OrderedList</a></li><li><a href="global.html#PasswordField">PasswordField</a></li><li><a href="global.html#ScrollView">ScrollView</a></li><li><a href="global.html#Select">Select</a></li><li><a href="global.html#Slider">Slider</a></li><li><a href="global.html#Table">Table</a></li><li><a href="global.html#TableBody">TableBody</a></li><li><a href="global.html#TableCell">TableCell</a></li><li><a href="global.html#TableHeader">TableHeader</a></li><li><a href="global.html#TableRow">TableRow</a></li><li><a href="global.html#TextArea">TextArea</a></li><li><a href="global.html#TextField">TextField</a></li><li><a href="global.html#UnorderedList">UnorderedList</a></li><li><a href="global.html#View">View</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">module.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*!
+ * Hardcore.js
+ * Copyright 2017-2021 Takuro Okada.
+ * Released under the MIT License.
+ */
+
+/**
+ * Provide dynamic module loading.
+ * @namespace
+ */
+var Module = {
+
+    /**
+     * Load modules from the remote server.
+     * @param {!object} definition 
+     * @param {?string} definition.view HTML request path
+     * @param {?string} definition.styleSheet CSS request path
+     * @param {?string} definition.logic JavaScript request path
+     * @param {?string|?HTMLElement} definition.bindingTarget Target element to insert the HTML root element. (CSS selector or HTMLElement)
+     * @param {?function(string): void} definition.completed:Return HTML as a string when loading is complete.
+     */
+    load: function(definition) {
+        var self = this;
+
+        if(definition == null || typeof definition != "object") {
+            if(definition.completed != undefined) {
+                definition.completed();
+            }
+            return;
+        }
+
+        var processes = [];
+        if(definition.view != undefined) {
+            processes.push(new Promise(function(resolve) {
+                self.loadView(definition.view, definition.bindingTarget, function(contents) {
+                    resolve(contents);
+                });
+            }));
+        }
+        if(definition.styleSheet != undefined) {
+            processes.push(new Promise(function(resolve) {
+                self.loadStyleSheet(definition.styleSheet, function() {
+                    resolve();
+                });
+            }));
+        }
+        if(definition.logic != undefined) {
+            processes.push(new Promise(function(resolve) {
+                self.loadLogic(definition.logic, function() {
+                    resolve();
+                });
+            }));
+        }
+        Promise.all(processes).then(function(results) {
+            var contents = definition.view != undefined &amp;&amp; results.length > 0 ? results[0] : null;
+            if(definition.completed != undefined) {
+                definition.completed(contents);
+            }
+        });
+    },
+
+    /**
+     * Load contents of the HTML file from the remote server.
+     * @param {!string} filePath HTML request path
+     * @param {?string|?HTMLElement} bindingTarget Target element to insert the HTML root element. (CSS selector or HTMLElement)
+     * @param {?function(string): void} completionHandler Return HTML as a string when loading is complete.
+     */
+    loadView: function(filePath, bindingTarget, completionHandler) {
+        if(filePath == null || filePath.length == 0) {
+            if(completionHandler != undefined) {
+                completionHandler(null);
+            }
+            return;
+        }
+        fetch(filePath, {
+            method: "GET",
+            headers: {
+                "Content-Type": "text/html; charset=utf-8"
+            },
+            cache: "no-store",
+            mode: "same-origin",
+            credentials: "same-origin"
+        }).then(function(response) {
+            if(response.ok) {
+                response.text().then(function(data) {
+                    if(bindingTarget != null) {
+                        if(bindingTarget instanceof HTMLElement) {
+                            bindingTarget.innerHTML = data;
+                        }else if(typeof bindingTarget == "string") {
+                            var element = document.querySelector(bindingTarget);
+                            if(element != null) {
+                                element.innerHTML = data;
+                            }
+                        }
+                    }
+                    if(completionHandler != undefined) {
+                        completionHandler(data);
+                    }
+                });
+            }else {
+                if(completionHandler != undefined) {
+                    completionHandler(response);
+                }
+            }
+        });
+    },
+
+    /**
+     * Acquire contents of the HTML file from the remote server and load only the specified element.
+     * @param {!string} filePath HTML request path
+     * @param {?string} selector selector of the loading element
+     * @param {?function(HTMLElement): void} completionHandler 
+     */
+    loadViewComponent: function(filePath, selector, completionHandler) {
+        if(filePath == null || filePath.length == 0) {
+            if(completionHandler != undefined) {
+                completionHandler();
+            }
+            return;
+        }
+        fetch(filePath, {
+            method: "GET",
+            headers: {
+                "Content-Type": "text/html; charset=utf-8"
+            },
+            cache: "no-store",
+            mode: "same-origin",
+            credentials: "same-origin"
+        }).then(function(response) {
+            if(response.ok) {
+                response.text().then(function(data) {
+                    var wrapper = document.createElement("div");
+                    wrapper.insertAdjacentHTML("afterbegin", data);
+                    var element;
+                    if(selector != null) {
+                        element = wrapper.querySelector(selector);
+                    }else {
+                        element = wrapper.children.item(0);
+                    }
+                    if(completionHandler != undefined) {
+                        completionHandler(element);
+                    }
+                });
+            }else {
+                if(completionHandler != undefined) {
+                    completionHandler();
+                }
+            }
+        });
+    },
+
+    /**
+     * Load contents of the Javascript file from the remote server.
+     * @param {!string} filePath JavaScript request path
+     * @param {?function(): void} completionHandler 
+     */
+    loadLogic: function(filePath, completionHandler) {
+        if(filePath == null || filePath.length == 0) {
+            if(completionHandler != undefined) {
+                completionHandler();
+            }
+            return;
+        }
+        var headElements = document.getElementsByTagName("head");
+        var headElement = headElements[0];
+        function checkLoaded() {
+            for(var i=0; i&lt;headElement.childNodes.length; i++) {
+                var node = headElement.childNodes[i];
+                if(node.nodeName.toLowerCase() == 'script') {
+                    if(node.src == location.origin+"/"+filePath) {
+                        return true;
+                    }
+                }
+            }
+        }
+        if(checkLoaded()) {
+            if(completionHandler != undefined) {
+                completionHandler();
+            }
+            return;
+        }
+        var scriptElement = document.createElement("script");
+        scriptElement.type = "text/javascript";
+        scriptElement.src = filePath;
+        scriptElement.setAttribute("defer", "defer");
+        headElement.appendChild(scriptElement);
+        scriptElement.onload = function() {
+            if(completionHandler != undefined) {
+                completionHandler();
+            }
+        };
+    },
+
+    /**
+     * Load contents of Javascript files from the remote server.
+     * @param {!array.&lt;string>} filePathes JavaScript request pathes
+     * @param {?function(): void} completionHandler 
+     */
+    loadLogics: function(filePathes, completionHandler) {
+        var self = this;
+
+        if(filePathes == null || filePathes.length == 0) {
+            if(completionHandler != undefined) {
+                completionHandler();
+            }
+            return;
+        }
+        var processes = [];
+        for(var i=0; i&lt;filePathes.length; i++) {
+            var filePath = filePathes[i];
+            processes.push(new Promise(function(resolve, reject) {
+                self.loadLogic(filePath, function() {
+                    resolve();
+                });
+            }));
+        }
+        Promise.all(processes).then(function() {
+            if(completionHandler != undefined) {
+                completionHandler();
+            }
+        });
+    },
+
+    /**
+     * Load contents of the CSS file from the remote server.
+     * @param {!string} filePath CSS request path
+     * @param {?function(): void} completionHandler 
+     */
+    loadStyleSheet: function(filePath, completionHandler) {
+        if(filePath == null || filePath.length == 0) {
+            if(completionHandler != undefined) {
+                completionHandler();
+            }
+            return;
+        }
+        var headElements = document.getElementsByTagName("head");
+        var headElement = headElements[0];
+        for(var i=0; i&lt;headElement.childNodes.length; i++) {
+            var node = headElement.childNodes[i];
+            if(node.nodeName.toLowerCase() == 'link') {
+                if(node.href == location.origin+"/"+filePath) {
+                    if(completionHandler != undefined) {
+                        completionHandler();
+                    }
+                    return;
+                }
+            }
+        }
+        var linkElement = document.createElement("link");
+        linkElement.rel = "stylesheet";
+        linkElement.type = "text/css";
+        linkElement.href = filePath;
+        headElement.appendChild(linkElement);
+        linkElement.onload = function() {
+            if(completionHandler != undefined) {
+                completionHandler();
+            }
+        };
+    }
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a> on Mon Mar 08 2021 14:21:46 GMT+0900 (日本標準時) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>

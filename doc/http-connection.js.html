@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>http-connection.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Color.html">Color</a><ul class='methods'><li data-type='method'><a href="Color.html#colorWithAlpha">colorWithAlpha</a></li><li data-type='method'><a href="Color.html#toString">toString</a></li><li data-type='method'><a href="Color.html#toStringWithAlpha">toStringWithAlpha</a></li></ul></li><li><a href="FunctionalAnimation.html">FunctionalAnimation</a><ul class='methods'><li data-type='method'><a href="FunctionalAnimation.html#finish">finish</a></li><li data-type='method'><a href="FunctionalAnimation.html#start">start</a></li></ul></li><li><a href="Point.html">Point</a></li><li><a href="Polygon.html">Polygon</a><ul class='methods'><li data-type='method'><a href="Polygon.html#contains">contains</a></li></ul></li><li><a href="Rect.html">Rect</a><ul class='methods'><li data-type='method'><a href="Rect.html#contains">contains</a></li><li data-type='method'><a href="Rect.html#intersect">intersect</a></li></ul></li><li><a href="Size.html">Size</a></li><li><a href="StyleAnimation.html">StyleAnimation</a><ul class='methods'><li data-type='method'><a href="StyleAnimation.html#finish">finish</a></li><li data-type='method'><a href="StyleAnimation.html#start">start</a></li></ul></li><li><a href="TextDrawingAttributes.html">TextDrawingAttributes</a></li><li><a href="ViewController.html">ViewController</a></li></ul><h3>Namespaces</h3><ul><li><a href="CanvasUtil.html">CanvasUtil</a><ul class='methods'><li data-type='method'><a href="CanvasUtil.html#.initCanvas">initCanvas</a></li></ul></li><li><a href="Controls.html">Controls</a><ul class='methods'><li data-type='method'><a href="Controls.html#.Balloon">Balloon</a></li><li data-type='method'><a href="Controls.html#.ContextMenu">ContextMenu</a></li><li data-type='method'><a href="Controls.html#.Draggable">Draggable</a></li><li data-type='method'><a href="Controls.html#.Message">Message</a></li><li data-type='method'><a href="Controls.html#.Popup">Popup</a></li><li data-type='method'><a href="Controls.html#.Select">Select</a></li></ul></li><li><a href="DateUtil.html">DateUtil</a><ul class='methods'><li data-type='method'><a href="DateUtil.html#.format">format</a></li><li data-type='method'><a href="DateUtil.html#.getDateByAdding">getDateByAdding</a></li><li data-type='method'><a href="DateUtil.html#.getDateBySlicingTime">getDateBySlicingTime</a></li></ul></li><li><a href="DrawUtil.html">DrawUtil</a><ul class='methods'><li data-type='method'><a href="DrawUtil.html#.drawLine">drawLine</a></li><li data-type='method'><a href="DrawUtil.html#.drawRoundRect">drawRoundRect</a></li><li data-type='method'><a href="DrawUtil.html#.drawRoundRectBalloon">drawRoundRectBalloon</a></li><li data-type='method'><a href="DrawUtil.html#.drawText">drawText</a></li><li data-type='method'><a href="DrawUtil.html#.drawTextByCharacterWrap">drawTextByCharacterWrap</a></li><li data-type='method'><a href="DrawUtil.html#.drawTextByTruncatingTail">drawTextByTruncatingTail</a></li><li data-type='method'><a href="DrawUtil.html#.getBoundingRectOfTextByCharacterWrap">getBoundingRectOfTextByCharacterWrap</a></li><li data-type='method'><a href="DrawUtil.html#.sizeOfText">sizeOfText</a></li></ul></li><li><a href="HtmlElementUtil.html">HtmlElementUtil</a></li><li><a href="HttpConnection.html">HttpConnection</a><ul class='methods'><li data-type='method'><a href="HttpConnection.html#.globalServerErrorHandler">globalServerErrorHandler</a></li><li data-type='method'><a href="HttpConnection.html#.request">request</a></li></ul></li><li><a href="ImageUtil.html">ImageUtil</a><ul class='methods'><li data-type='method'><a href="ImageUtil.html#.convertCanvasToBinary">convertCanvasToBinary</a></li><li data-type='method'><a href="ImageUtil.html#.convertImageToBase64String">convertImageToBase64String</a></li><li data-type='method'><a href="ImageUtil.html#.drawImage">drawImage</a></li><li data-type='method'><a href="ImageUtil.html#.loadImage">loadImage</a></li><li data-type='method'><a href="ImageUtil.html#.loadImageData">loadImageData</a></li><li data-type='method'><a href="ImageUtil.html#.loadImages">loadImages</a></li></ul></li><li><a href="Module.html">Module</a><ul class='methods'><li data-type='method'><a href="Module.html#.load">load</a></li><li data-type='method'><a href="Module.html#.loadLogic">loadLogic</a></li><li data-type='method'><a href="Module.html#.loadLogics">loadLogics</a></li><li data-type='method'><a href="Module.html#.loadStyleSheet">loadStyleSheet</a></li><li data-type='method'><a href="Module.html#.loadView">loadView</a></li><li data-type='method'><a href="Module.html#.loadViewComponent">loadViewComponent</a></li></ul></li><li><a href="StorageUtil.html">StorageUtil</a><ul class='methods'><li data-type='method'><a href="StorageUtil.html#.restoreJson">restoreJson</a></li><li data-type='method'><a href="StorageUtil.html#.storeJson">storeJson</a></li></ul></li><li><a href="StringUtil.html">StringUtil</a><ul class='methods'><li data-type='method'><a href="StringUtil.html#.currencyString">currencyString</a></li><li data-type='method'><a href="StringUtil.html#.getNullable">getNullable</a></li><li data-type='method'><a href="StringUtil.html#.padding">padding</a></li></ul></li><li><a href="UIEventUtil.html">UIEventUtil</a><ul class='methods'><li data-type='method'><a href="UIEventUtil.html#.getLocation">getLocation</a></li><li data-type='method'><a href="UIEventUtil.html#.handleTouch">handleTouch</a></li><li data-type='method'><a href="UIEventUtil.html#.setEnterKeyChain">setEnterKeyChain</a></li></ul></li><li><a href="ValidationUtil.html">ValidationUtil</a><ul class='methods'><li data-type='method'><a href="ValidationUtil.html#.validate">validate</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#Button">Button</a></li><li><a href="global.html#Canvas">Canvas</a></li><li><a href="global.html#Checkbox">Checkbox</a></li><li><a href="global.html#FileSelector">FileSelector</a></li><li><a href="global.html#HtmlTag">HtmlTag</a></li><li><a href="global.html#InlineImage">InlineImage</a></li><li><a href="global.html#Input">Input</a></li><li><a href="global.html#InputComposite">InputComposite</a></li><li><a href="global.html#ListItem">ListItem</a></li><li><a href="global.html#MailField">MailField</a></li><li><a href="global.html#NumericField">NumericField</a></li><li><a href="global.html#OrderedList">OrderedList</a></li><li><a href="global.html#PasswordField">PasswordField</a></li><li><a href="global.html#ScrollView">ScrollView</a></li><li><a href="global.html#Select">Select</a></li><li><a href="global.html#Slider">Slider</a></li><li><a href="global.html#Table">Table</a></li><li><a href="global.html#TableBody">TableBody</a></li><li><a href="global.html#TableCell">TableCell</a></li><li><a href="global.html#TableHeader">TableHeader</a></li><li><a href="global.html#TableRow">TableRow</a></li><li><a href="global.html#TextArea">TextArea</a></li><li><a href="global.html#TextField">TextField</a></li><li><a href="global.html#UnorderedList">UnorderedList</a></li><li><a href="global.html#View">View</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">http-connection.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*!
+ * Hardcore.js
+ * Copyright 2017-2021 Takuro Okada.
+ * Released under the MIT License.
+ */
+
+/**
+ * Provide HTTP connection method for standard web applications.
+ * @namespace
+ */
+var HttpConnection = {
+
+    /**
+     * @type {string}
+     */
+    defaultCharacterSet: "utf-8",
+
+    /**
+     * @type {string}
+     */
+    defaultContentType: "application/json",
+
+    /**
+     * @type {string}
+     */
+    defaultMethod: "POST",
+
+    /**
+     * Default cache policy
+     * @type {default|no-store|reload|no-cache|force-cache|only-if-cached}
+     */
+    defaultCachePolicy: "no-cache",
+
+    /**
+     * Default acccess policy
+     * @type {same-origin|no-cors|cors|navigate}
+     */
+    defaultAccessPolicy: "same-origin",
+
+    /**
+     * Send a request to the specified URL.
+     * @param {!string} path 
+     * @param {?object|?FromData} request body data
+     * @param {?string} contentType 
+     * @param {?string} method HTTP method
+     * @returns {!Promise} Receive the response data by Promise#then, and Promise#catch is called when a response other than HTTP status code 200 is received.
+     */
+    request: function(path, request, contentType, method) {
+        var self = this;
+
+        if(path == undefined || typeof path != "string") {
+            console.error("The request path is not set.");
+            return;
+        }
+        if(contentType == undefined &amp;&amp; !(request instanceof FormData)) {
+            contentType = self.defaultContentType;
+        }
+        if(method == undefined) {
+            method = self.defaultMethod;
+        }
+
+        var _request = {
+            method: method,
+            cache: self.defaultCachePolicy,
+            mode: self.defaultAccessPolicy,
+            credentials: self.defaultAccessPolicy
+        };
+        if(request !== undefined) {
+            if(contentType !== undefined) {
+                if(contentType == "application/json" &amp;&amp; typeof request == "object") {
+                    _request.body = JSON.stringify(request);
+                }else {
+                    _request.body = request;
+                }
+            }else {
+                _request.body = request;
+            }
+        }
+        if(contentType !== undefined) {
+            _request.headers = { "Content-Type": contentType+"; charset="+self.defaultCharacterSet };
+        }
+        return fetch(path, _request).then(function(response) {
+            if(response.ok) {
+                var contentType = response.headers.get("Content-Type");
+                if(contentType != null) {
+                    if(contentType == "application/json") {
+                        return response.json();
+                    }
+                }
+            }else {
+                return response.text().then(function(message) {
+                    var responseBody = {
+                        status: response.status,
+                        responseText: message
+                    };
+                    self.handleServerError(responseBody);
+                    return Promise.reject(responseBody);
+                });
+            }
+        }, function(error) {
+            var response = {};
+            if(navigator.language != null &amp;&amp; navigator.language.includes("ja")) {
+                response.responseText = "サーバに接続できません。ネットワークをご確認ください。";
+            }else {
+                response.responseText = "Unable to connect to the server. Please check your network.";
+            }
+            self.globalServerErrorHandler(response);
+            return Promise.reject(response);
+        });
+    },
+
+    /**
+     * Common handling process for server errors. Displays a dialog by default.
+     * @param {?object} response
+     * @param {?number} response.statusCode
+     * @param {?number} response.responseText
+     */
+    globalServerErrorHandler: function(response) {
+        Controls.Message(response.responseText, "warning", function() {});
+    },
+
+    /**
+     * @access private
+     */
+    handleServerError: function(response) {
+        var message;
+        // Bad Request
+        if(response.status == 400) {
+            this.globalServerErrorHandler(response);
+        }
+        // Forbidden
+        else if(response.status == 403) {
+            location.href = "";
+        }
+        // Payload Too Large
+        else if(response.status == 413) {
+            if(navigator.language != null &amp;&amp; navigator.language.includes("ja")) {
+                message = "ファイルのサイズが大きすぎます。お手数ですがファイルを編集の上再度アクセスをお願いします。";
+            }else {
+                message = "The file is too large. Please edit the file and access it again.";
+            }
+            this.globalServerErrorHandler({statusCode: 413, responseText: message});
+        }
+        // Internal Server Error
+        else if(response.status == 500) {
+            if(navigator.language != null &amp;&amp; navigator.language.includes("ja")) {
+                message = "サーバでエラーが発生しました。お手数ですが管理者にお問合せください。";
+            }else {
+                message = "An error has occurred on the server. Please contact the administrator for assistance.";
+            }
+            this.globalServerErrorHandler({statusCode: 500, responseText: message});
+        }
+        // Service Unavailable
+        else if(response.status == 503) {
+            if(navigator.language != null &amp;&amp; navigator.language.includes("ja")) {
+                message =  "ただいまシステムが混み合っています。しばらく待ってから再度アクセスをお願いいたします。";
+            }else {
+                message = "The system is currently busy. Please wait for a while and access again.";
+            }
+            this.globalServerErrorHandler({statusCode: 503, responseText: message});
+        }
+    }
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a> on Mon Mar 08 2021 14:21:46 GMT+0900 (日本標準時) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>
