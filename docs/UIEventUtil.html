@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>FunctionalAnimation - Documentation</title>
+    <title>UIEventUtil - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -32,7 +32,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">FunctionalAnimation</h1>
+    <h1 class="page-title">UIEventUtil</h1>
     
 
     
@@ -45,7 +45,7 @@
 <header>
     
         <h2>
-        FunctionalAnimation
+        UIEventUtil
         </h2>
         
     
@@ -57,21 +57,12 @@
         
             
 
-    
-
-    <h4 class="name" id="FunctionalAnimation"><span class="type-signature"></span>new FunctionalAnimation<span class="signature">(animationFunction, method, duration)</span><span class="type-signature"> &rarr; {<a href="FunctionalAnimation.html">FunctionalAnimation</a>}</span></h4>
-
-    
-
-
-
-
 <dl class="details">
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line1546">line 1546</a>
+        <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line3187">line 3187</a>
     </li></ul></dd>
     
 
@@ -109,151 +100,11 @@
 
 
 
-
-<div class="description usertext">
-    Animation that executes a function every frame.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
             
-                <td class="name"><code>animationFunction</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
+                <div class="description usertext">UI event utility</div>
             
 
             
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>method</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">FunctionalAnimation.methods</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>duration</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="FunctionalAnimation.html">FunctionalAnimation</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
         
         </div>
     
@@ -280,7 +131,7 @@
 
     
 
-    <h4 class="name" id="finish"><span class="type-signature"></span>finish<span class="signature">(finishHandler)</span><span class="type-signature"> &rarr; {<a href="FunctionalAnimation.html">FunctionalAnimation</a>}</span></h4>
+    <h4 class="name" id=".getLocation"><span class="type-signature">(static) </span>getLocation<span class="signature">(event)</span><span class="type-signature"> &rarr; {<a href="Point.html">Point</a>}</span></h4>
 
     
 
@@ -292,7 +143,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line1666">line 1666</a>
+        <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line3194">line 3194</a>
     </li></ul></dd>
     
 
@@ -332,7 +183,7 @@
 
 
 <div class="description usertext">
-    Set finish handler.
+    Obtaining the position of mouse or touch occurrence from UI events
 </div>
 
 
@@ -370,13 +221,13 @@
 
         <tr>
             
-                <td class="name"><code>finishHandler</code></td>
+                <td class="name"><code>event</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">function</span>
+<span class="param-type">UIEvent</span>
 
 
             
@@ -411,6 +262,10 @@
 <h5>Returns:</h5>
 
         
+<div class="param-desc">
+    Pointer position in case of mouse event, array of this object in case of touch event
+</div>
+
 
 
 <dl class="param-type">
@@ -419,7 +274,7 @@
     </dt>
     <dd>
         
-<span class="param-type"><a href="FunctionalAnimation.html">FunctionalAnimation</a></span>
+<span class="param-type"><a href="Point.html">Point</a></span>
 
 
     </dd>
@@ -434,7 +289,7 @@
 
     
 
-    <h4 class="name" id="start"><span class="type-signature"></span>start<span class="signature">(delay)</span><span class="type-signature"> &rarr; {<a href="FunctionalAnimation.html">FunctionalAnimation</a>}</span></h4>
+    <h4 class="name" id=".handleTouch"><span class="type-signature">(static) </span>handleTouch<span class="signature">(element, settings)</span><span class="type-signature"></span></h4>
 
     
 
@@ -446,7 +301,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line1613">line 1613</a>
+        <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line3231">line 3231</a>
     </li></ul></dd>
     
 
@@ -486,7 +341,7 @@
 
 
 <div class="description usertext">
-    Start an animation.
+    Set a tap handler for a specified HTML element (PC/tablet compatible)
 </div>
 
 
@@ -524,13 +379,13 @@
 
         <tr>
             
-                <td class="name"><code>delay</code></td>
+                <td class="name"><code>element</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type"><a href="HTMLElement.html">HTMLElement</a></span>
 
 
             
@@ -540,7 +395,256 @@
 
             
 
-            <td class="description last">milliseconds</td>
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>settings</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>touchBegan</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The second argument is Object that can be set arbitrarily.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>touchMove</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The second argument is Object that can be set arbitrarily.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>touchEnd</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The second argument is Object that can be set arbitrarily. The third argument is whether or not the touch event has completed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>touchBeganCancellable</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Whether or not the touch began event can be cancell by UIEvent#preventDefault.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>touchMoveCancellable</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Whether or not the touch began event can be cancell by UIEvent#preventDefault.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>touchEndCancellable</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Whether or not the touch began event can be cancell by UIEvent#preventDefault.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
         </tr>
 
     
@@ -562,24 +666,142 @@
 
 
 
-<h5>Returns:</h5>
+
+
 
         
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="FunctionalAnimation.html">FunctionalAnimation</a></span>
-
-
-    </dd>
-</dl>
+            
 
     
+
+    <h4 class="name" id=".setEnterKeyChain"><span class="type-signature">(static) </span>setEnterKeyChain<span class="signature">(element)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line3284">line 3284</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    Configure the ENTER key to move between input UIs.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>element</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="HTMLElement.html">HTMLElement</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -603,7 +825,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a> on Mon Mar 08 2021 14:21:46 GMT+0900 (日本標準時) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a> on Mon Mar 08 2021 14:32:42 GMT+0900 (日本標準時) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

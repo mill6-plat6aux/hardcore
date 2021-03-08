@@ -22,7 +22,7 @@
     "build:core": "node build",
     "test": "npm run test:static & mocha --recursive",
     "test:static": "eslint src/*.js",
-    "doc": "jsdoc -d doc -t node_modules/docdash -r doc-title.md src"
+    "doc": "jsdoc -d docs -t node_modules/docdash -r doc-title.md src"
   },
   "devDependencies": {
     "docdash": "^1.2.0",
