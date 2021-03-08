@@ -8,6 +8,7 @@
     "Framework"
   ],
   "author": "Takuro Okada",
+  "repository": "mill6-plat6aux/hardcore",
   "license": "MIT",
   "main": "dist/hardcore.es6.js",
   "files": [
