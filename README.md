@@ -1,4 +1,4 @@
-![Hardcore.js](https://github.com/mill6-plat6aux/hardcore/blob/main/hardcore.png)
+![Hardcore.js](https://raw.github.com/mill6-plat6aux/hardcore/main/hardcore.png)
 
 Front-end components for Pure JavaScript lovers❤️
 
@@ -22,7 +22,7 @@ var Sample = (function(self) {
 
 ## Documents
 
-* [API Reference](https://github.com/mill6-plat6aux/hardcore/blob/main/doc/index.html)
+* [API Reference](https://mill6-plat6aux.github.io/hardcore/index.html)
 * [Motivation (ja)](https://github.com/mill6-plat6aux/hardcore/blob/main/Motivation.md)
 
 ## License
