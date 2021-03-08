@@ -1,0 +1,38 @@
+{
+  "name": "hardcore-client",
+  "version": "1.0.0",
+  "description": "View components for Pure JavaScript lovers❤️",
+  "keywords": [
+    "Front-end",
+    "Client",
+    "Framework"
+  ],
+  "author": "Takuro Okada",
+  "license": "MIT",
+  "main": "dist/hardcore.es6.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "npm run build:all & npm run build:all-es6 & npm run build:all-minify & npm run build:all-minify-es6",
+    "build:all": "node build --crean --minify=false module http-connection storage-utils",
+    "build:all-es6": "node build --minify=false --es6 module http-connection storage-utils",
+    "build:all-minify": "node build module http-connection storage-utils",
+    "build:all-minify-es6": "node build --es6 module http-connection storage-utils",
+    "build:core": "node build",
+    "test": "npm run test:static & mocha --recursive",
+    "test:static": "eslint src/*.js",
+    "doc": "jsdoc -d doc -t node_modules/docdash -r doc-title.md src"
+  },
+  "devDependencies": {
+    "docdash": "^1.2.0",
+    "eslint": "*",
+    "eslint-plugin-es5": "*",
+    "jsdoc": "^3.6.6",
+    "jsdom-global": "^3.0.2",
+    "mocha": "^8.2.1",
+    "polyfill-library": "^3.103.0",
+    "rewire": "^5.0.0",
+    "uglify-es": "^3.3.10"
+  }
+}

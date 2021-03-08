@@ -1,0 +1,20 @@
+[
+    "Number.isNaN",
+    "Array.isArray",
+    "Array.prototype.includes",
+    "Array.prototype.includes",
+    "Array.prototype.indexOf",
+    "Object.keys",
+    "Object.getOwnPropertyDescriptor",
+    "Element.prototype.append",
+    "Element.prototype.classList",
+    "Element.prototype.prepend",
+    "Element.prototype.remove",
+    "JSON",
+    "Promise",
+    "MutationObserver",
+    "ResizeObserver",
+    "fetch",
+    "performance.now",
+    "requestAnimationFrame"
+]

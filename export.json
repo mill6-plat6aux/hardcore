@@ -1,0 +1,50 @@
+{
+    "hardcore": [
+        "ViewController",
+        "HtmlTag",
+        "View",
+        "Input",
+        "TextField",
+        "TextArea",
+        "PasswordField",
+        "MailField",
+        "FileSelector",
+        "Table",
+        "TableHeader",
+        "TableBody",
+        "TableRow",
+        "TableCell",
+        "Canvas",
+        "InlineImage",
+        "Button",
+        "NumericField",
+        "Select",
+        "Slider",
+        "Checkbox",
+        "InputComposite",
+        "StringUtil",
+        "ImageUtil",
+        "CanvasUtil",
+        "DrawUtil",
+        "DateUtil",
+        "HtmlElementUtil",
+        "UIEventUtil",
+        "ValidationUtil",
+        "Controls",
+        "Rect",
+        "Polygon",
+        "Size",
+        "Point",
+        "FunctionalAnimation",
+        "StyleAnimation"
+    ],
+    "http-connection": [
+        "HttpConnection"
+    ],
+    "module": [
+        "Module"
+    ],
+    "storage-utils": [
+        "StorageUtil"
+    ]
+}

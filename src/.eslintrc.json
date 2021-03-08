@@ -1,0 +1,61 @@
+{
+    "env": {
+        "browser": true
+    },
+    "plugins": [
+        "es5"
+    ],
+    "extends": [
+        "eslint:recommended"
+    ],
+    "rules": {
+        "no-unused-vars": "off",
+        "no-redeclare": ["error", { "builtinGlobals": false }]
+    },
+    "globals": {
+        "Uint8Array": false,
+        "Promise": false,
+
+        "ViewController": false,
+        "HtmlTag": false,
+        "View": false,
+        "Input": false,
+        "TextField": false,
+        "TextArea": false,
+        "PasswordField": false,
+        "MailField": false,
+        "FileSelector": false,
+        "Table": false,
+        "TableHeader": false,
+        "TableBody": false,
+        "TableRow": false,
+        "TableCell": false,
+        "Canvas": false,
+        "InlineImage": false,
+        "Button": false,
+        "NumericField": false,
+        "Select": false,
+        "Slider": false,
+        "Checkbox": false,
+        "InputComposite": false,
+
+        "Module": false,
+        "HttpConnection": true,
+        "StorageUtil": false,
+        "StringUtil": false,
+        "ImageUtil": false,
+        "CanvasUtil": false,
+        "DrawUtil": false,
+        "DateUtil": false,
+        "HtmlElementUtil": false,
+        "UIEventUtil": false,
+        "ValidationUtil": false,
+        "Controls": false,
+        "Rect": true,
+        "Polygon": true,
+        "Size": true,
+        "Point": true,
+        "FunctionalAnimation": true,
+        "StyleAnimation": true
+    }
+}
