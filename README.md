@@ -10,10 +10,8 @@ var Sample = (function(self) {
         TextField({label: "Address", dataKey: "address"}),
         TextField({label: "Phone number", dataKey: "phoneNumber"}),
         Button({label: "JOIN", tapHandler: function() {
-            fetch("storeData", {
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(self.view.data)
-            });
+            var data = self.view.data;
+            // Do as you like.
         }})
     ]);
     return self;
@@ -22,6 +20,8 @@ var Sample = (function(self) {
 
 ## Documents
 
+* [Sample for ES5](https://github.com/mill6-plat6aux/hardcore/blob/main/Impl-ES5.md)
+* [Sample for ES6](https://github.com/mill6-plat6aux/hardcore/blob/main/Impl-ES6.md)
 * [API Reference](https://mill6-plat6aux.github.io/hardcore/index.html)
 * [Motivation (ja)](https://github.com/mill6-plat6aux/hardcore/blob/main/Motivation.md)
 

@@ -15,8 +15,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "npm run build:all & npm run build:all-es6 & npm run build:all-minify & npm run build:all-minify-es6",
-    "build:all": "node build --crean --minify=false module http-connection storage-utils",
+    "build": "npm run build:clean ; npm run build:all & npm run build:all-es6 & npm run build:all-minify & npm run build:all-minify-es6",
+    "build:clean": "node build --crean",
+    "build:all": "node build --minify=false module http-connection storage-utils",
     "build:all-es6": "node build --minify=false --es6 module http-connection storage-utils",
     "build:all-minify": "node build module http-connection storage-utils",
     "build:all-minify-es6": "node build --es6 module http-connection storage-utils",

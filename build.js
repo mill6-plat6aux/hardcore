@@ -16,6 +16,7 @@ let minifySuffix = ".min";
 let minify = true;
 let clean = false;
 let es6 = false;
+let polyfill = false;
 let sourceFileNames = [];
 process.argv.slice(2).forEach(function(argument) {
     if(argument.startsWith("-")) {
@@ -28,6 +29,8 @@ process.argv.slice(2).forEach(function(argument) {
             clean = true;
         }else if(argument.startsWith("--es6")) {
             es6 = true;
+        }else if(argument.startsWith("--polyfill")) {
+            polyfill = true;
         }
     }else {
         sourceFileNames.push(argument);
@@ -38,6 +41,10 @@ if(clean) {
     if(FileSystem.existsSync(distDirectory)) {
         FileSystem.rmdirSync(distDirectory, {recursive: true});
     }
+    if(!FileSystem.existsSync(distDirectory)) {
+        FileSystem.mkdirSync(distDirectory);
+    }
+    process.exit(0);
 }
 if(!FileSystem.existsSync(distDirectory)) {
     FileSystem.mkdirSync(distDirectory);
@@ -90,33 +97,35 @@ if(es6) {
     }
 }
 
-let polyfillSettings;
-if(FileSystem.existsSync("polyfill.json")) {
-    polyfillSettings = JSON.parse(FileSystem.readFileSync("polyfill.json", "utf8"));
-}
-
-if(polyfillSettings != null && Array.isArray(polyfillSettings)) {
-    Polyfill.getPolyfillString({
-        minify: false, 
-        features: Object.assign(...polyfillSettings.map(entry => ({ [entry]: {flags:["gated"]} })))
-    }).then((polyfillSource) => {
-        if(minify) {
-            let minifiedFile = UglifyJS.minify(polyfillSource);
-            if(minifiedFile.error != null) {
-                console.error(minifiedFile.error);
+if(polyfill) {
+    let polyfillSettings;
+    if(FileSystem.existsSync("polyfill.json")) {
+        polyfillSettings = JSON.parse(FileSystem.readFileSync("polyfill.json", "utf8"));
+    }
+    if(polyfillSettings != null && Array.isArray(polyfillSettings)) {
+        Polyfill.getPolyfillString({
+            minify: false, 
+            features: Object.assign(...polyfillSettings.map(entry => ({ [entry]: {flags:["gated"]} })))
+        }).then((polyfillSource) => {
+            if(minify) {
+                let minifiedFile = UglifyJS.minify(polyfillSource);
+                if(minifiedFile.error != null) {
+                    console.error(minifiedFile.error);
+                }else {
+                    distributionFile.write(minifiedFile.code);
+                }
             }else {
-                distributionFile.write(minifiedFile.code);
+                distributionFile.write("\n");
+                distributionFile.write("////////////////////////////////////// Polyfill //////////////////////////////////////\n");
+                distributionFile.write("\n");
+                distributionFile.write(polyfillSource);
+                distributionFile.write("\n");
             }
-        }else {
-            distributionFile.write("\n");
-            distributionFile.write("////////////////////////////////////// Polyfill //////////////////////////////////////\n");
-            distributionFile.write("\n");
-            distributionFile.write(polyfillSource);
-            distributionFile.write("\n");
-        }
+            distributionFile.end();
+        });
+    }else {
         distributionFile.end();
-        process.exit(0);
-    });
+    }
 }else {
-    process.exit(0);
+    distributionFile.end();
 }
