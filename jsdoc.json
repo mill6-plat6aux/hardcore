@@ -1,0 +1,15 @@
+{
+    "source": {
+        "include": ["src"]
+    },
+    "opts": {
+        "encoding": "utf8",
+        "readme": "doc-title.md",
+        "destination": "docs",
+        "template": "node_modules/clean-jsdoc-theme",
+        "theme_opts": {
+            "theme": "light",
+            "title": "Hardcore.js"
+        }
+    }
+}

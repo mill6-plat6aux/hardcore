@@ -1,3 +1,5 @@
+<div style="height:16px"></div>
+
 ![Hardcore.js](https://raw.github.com/mill6-plat6aux/hardcore/main/hardcore.png)
 
 Front-end components for Pure JavaScript lovers❤️
@@ -10,10 +12,8 @@ var Sample = (function(self) {
         TextField({label: "Address", dataKey: "address"}),
         TextField({label: "Phone number", dataKey: "phoneNumber"}),
         Button({label: "JOIN", tapHandler: function() {
-            fetch("storeData", {
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(self.view.data)
-            });
+            var data = self.view.data;
+            // Do as you like.
         }})
     ]);
     return self;

@@ -1,6 +1,6 @@
 {
   "name": "hardcore-client",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "View components for Pure JavaScript lovers❤️",
   "keywords": [
     "Front-end",
@@ -24,10 +24,10 @@
     "build:core": "node build",
     "test": "npm run test:static & mocha --recursive",
     "test:static": "eslint src/*.js",
-    "doc": "jsdoc -d docs -t node_modules/docdash -r doc-title.md src"
+    "doc": "jsdoc -c jsdoc.json"
   },
   "devDependencies": {
-    "docdash": "^1.2.0",
+    "clean-jsdoc-theme": "^3.0.8",
     "eslint": "*",
     "eslint-plugin-es5": "*",
     "jsdoc": "^3.6.6",
