@@ -44,6 +44,7 @@ function ViewController(parent, view) {
                 return;
             }
             if(newValue instanceof HTMLElement) {
+                this.parent.removeAll();
                 this.parent.appendChild(newValue);
                 this.contents = newValue;
             }else {
@@ -3506,7 +3507,6 @@ var HtmlElementUtil = {
 /**
  * Apply multiple styles to an HTMLElement.
  * @memberof HTMLElement
- * @type {function(Object): HTMLElement}
  * @param {Object} styles 
  * @returns {HTMLElement}
  */
@@ -3518,7 +3518,6 @@ HTMLElement.prototype.defineStyles = function(styles) {
 /**
  * Delete all HTMLElement child elements and replace them with the specified child elements.
  * @memberof HTMLElement
- * @type {function(HTMLElement): HTMLElement}
  * @param {HTMLElement} childNode 
  * @returns {HTMLElement}
  */
@@ -3528,9 +3527,21 @@ HTMLElement.prototype.replaceChildren = function(childNode) {
 };
 
 /**
+ * Delete all child nodes
+ * @memberof Node
+ * @returns {Node}
+ */
+Node.prototype.removeAll = function() {
+    while(this.firstChild) {
+        this.removeChild(this.firstChild);
+    }
+    return this;
+};
+
+
+/**
  * Get the index of a Node in a NodeList
  * @memberof NodeList
- * @type {function(Node): number}
  * @param {Node} childNode 
  * @returns {number}
  */
