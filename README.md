@@ -3,19 +3,20 @@
 Front-end components for Pure JavaScript lovers❤️
 
 ```js
-var Sample = (function(self) {
-    ViewController.call(self, "body");
-    self.view = View({data: {}}, [
+var Sample = ViewController(function(self) {
+    self.parent = "body";
+    self.view = View([
         TextField({label: "Name", dataKey: "name"}),
         TextField({label: "Address", dataKey: "address"}),
         TextField({label: "Phone number", dataKey: "phoneNumber"}),
         Button({label: "JOIN", tapHandler: function() {
-            var data = self.view.data;
+            var data = self.data;
             // Do as you like.
         }})
     ]);
-    return self;
-}({}));
+});
+var sample = new Sample();
+sample.data = {};
 ```
 
 ## Documents

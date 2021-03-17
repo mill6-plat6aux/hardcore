@@ -1,6 +1,7 @@
 {
     "hardcore": [
         "ViewController",
+        "PopoverViewController",
         "HtmlTag",
         "View",
         "Input",

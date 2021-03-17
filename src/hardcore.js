@@ -6,55 +6,396 @@
 
 "use strict";
 
+
 ////////////////////////////////////// View Controller //////////////////////////////////////
 
 /**
  * View Controller
  * @class
- * @param {HTMLElement|string} parent HTMLElement object or selector for parent element
- * @param {HTMLElement} view 
+ * @example
+ *     // Define subclass of ViewController in ECMAScript 5
+ *     var MyViewController = ViewController(function(self) {
+ *         self.parent = "body";
+ *         self.view = View({dataKey: "key"});
+ *     });
+ *     var instance = new MyViewController();
+ *     instance.data = {key: "value"};
+ * @example
+ *     // Define subclass of ViewController in ECMAScript 6
+ *     class MyViewController extends ViewController {
+ *         constructor() {
+ *             super();
+ *             this.parent = "body";
+ *             this.view = View({dataKey: "key"});
+ *         }
+ *     }
+ *     var instance = new MyViewController();
+ *     instance.data = {key: "value"};
  */
-function ViewController(parent, view) {
+function ViewController() {
     if(this === undefined) {
-        var _arguments = Array.prototype.slice.call(arguments);
-        _arguments.splice(0, 0, null);
-        return new (Function.prototype.bind.apply(ViewController, _arguments));
-    }
-    if(parent !== undefined) {
-        if(parent instanceof HTMLElement) {
-            this.parent = parent;
-        }else if(typeof parent == "string") {
-            var _parent = document.querySelector(parent);
-            if(_parent != null && _parent instanceof HTMLElement) {
-                this.parent = _parent;
-            }else {
-                console.error("The parent can not be loaded.");
-            }
-        }else {
-            console.error("The parent can not be loaded.");
+        if(arguments.length == 1 && typeof arguments[0] == "function") {
+            var initializer = arguments[0];
+            var subClass = function() {
+                ViewController.apply(this);
+                initializer(this);
+            };
+            subClass.prototype = Object.create(ViewController.prototype);
+            return subClass;
         }
+        console.error("ViewController is must be create with the new keyword.");
+        return;
     }
-    Object.defineProperty(this, "view", {
-        get: function() {
-            return this.contents;
-        },
-        set: function(newValue) {
-            if(this.parent == null) {
-                console.error("The parent is not found.");
+
+    /**
+     * Whether or not to replace the child elements with the specified View.
+     * @type {boolean}
+     */
+    this.replace = true;
+}
+
+/**
+ * @name ViewController#parent
+ * @type {HTMLElement|string}
+ */
+ Object.defineProperty(ViewController.prototype, "parent", {
+    get: function() {
+        return this._parent;
+    },
+    set: function(newValue) {
+        if(newValue instanceof HTMLElement) {
+            this._parent = newValue;
+        }else if(typeof newValue == "string") {
+            var parentElement = document.querySelector(newValue);
+            if(parentElement != null && parentElement instanceof HTMLElement) {
+                this._parent = parentElement;
+            }else {
+                console.error("The parent can not be loaded. selector="+newValue);
                 return;
             }
-            if(newValue instanceof HTMLElement) {
+        }else {
+            console.error("The parent must be HTMLElement or selector string.");
+            return;
+        }
+        if(this.view != undefined) {
+            if(this.replace) {
                 this.parent.removeAll();
-                this.parent.appendChild(newValue);
-                this.contents = newValue;
-            }else {
-                console.error("The view can not be loaded.");
+            }
+            this.parent.appendChild(this._view);
+            if(this.viewHandler != undefined) {
+                this.viewHandler();
             }
         }
-    });
-    if(view !== undefined) {
-        this.view = view;
     }
+});
+
+/**
+ * @name ViewController#view
+ * @type {HTMLElement} 
+ */
+Object.defineProperty(ViewController.prototype, "view", {
+    get: function() {
+        return this._view;
+    },
+    set: function(newValue) {
+        if(!(newValue instanceof HTMLElement)) {
+            console.error("The view must be HTMLElement.");
+            return;
+        }
+        this._view = newValue;
+        if(this.parent != undefined) {
+            if(this.replace) {
+                this.parent.removeAll();
+            }
+            this.parent.appendChild(this._view);
+            if(this.viewHandler != undefined) {
+                this.viewHandler();
+            }
+        }
+        if(this.data != null) {
+            this._data = bindData(this.data, this.view);
+        }
+    }
+});
+
+/**
+ * @name ViewController#data
+ * @type {Object|Array}
+ */
+Object.defineProperty(ViewController.prototype, "data", {
+    get: function() {
+        return this._data;
+    },
+    set: function(newValue) {
+        if(!(Array.isArray(newValue) || typeof newValue == "object")) {
+            console.error("The data must be Object or Array.");
+            return;
+        }
+        this._data = newValue;
+        if(this.view != null) {
+            this._data = bindData(this.data, this.view);
+        }
+    }
+});
+
+/**
+ * @memberof ViewController
+ * @protected
+ */
+ViewController.prototype.viewHandler = function() {
+}
+
+/**
+ * Popover View Controller
+ * @class
+ * @extends ViewController
+ */
+function PopoverViewController() {
+    if(this === undefined) {
+        if(arguments.length == 1 && typeof arguments[0] == "function") {
+            var initializer = arguments[0];
+            var subClass = function() {
+                PopoverViewController.apply(this);
+                initializer(this);
+            };
+            subClass.prototype = Object.create(PopoverViewController.prototype);
+            return subClass;
+        }
+        console.error("PopoverViewController is must be create with the new keyword.");
+        return;
+    }
+
+    ViewController.call(this);
+
+    this.replace = false;
+
+    /**
+     * Display layout of Popover.
+     * @type {string}
+     */
+    this.layout = "center";
+
+    /**
+     * CSS styles of Popover.
+     * @type {object}
+     */
+    this.popoverStyle = {
+        "position": "absolute", 
+        "border": "1px solid darkgray", 
+        "box-shadow": "3px 3px 6px rgba(0,0,0,0.3)"
+    };
+
+    /**
+     * Whether popover is modal or not.
+     * @type {boolean}
+     */
+    this.modal = false;
+}
+PopoverViewController.prototype = Object.create(ViewController.prototype);
+
+PopoverViewController.prototype.viewHandler = function() {
+    this.view.styles = this.popoverStyle;
+
+    if(!this.modal) {
+        var maskStyle = {
+            "position": "absolute", 
+            "width": "100%",
+            "height": "100%",
+            "top": "0",
+            "left": "0"
+        }
+        var contentView = this.view;
+        var mask = View({style: maskStyle, tapHandler: function(event) {
+            var mask = event.currentTarget;
+            contentView.remove();
+            mask.remove();
+        }});
+        this.mask = mask;
+        this.view.before(mask);
+    }
+
+    function lauout(parent, view, layout) {
+        var parentWidth = parent.clientWidth;
+        var parentHeight = parent.clientHeight;
+        var width = view.clientWidth;
+        var height = view.clientHeight;
+        if(width == undefined) {
+            width = view.style.getPropertyValue("width");
+            if(typeof width == "string" && width.endsWith("px") && width.length > 2) {
+                width = Number(width.substr(0, width.length-2));
+            }else {
+                width = undefined;
+            }
+        }
+        if(height == undefined) {
+            height = view.style.getPropertyValue("height");
+            if(typeof height == "string" && height.endsWith("px") && height.length > 2) {
+                height = Number(height.substr(0, height.length-2));
+            }else {
+                height = undefined;
+            }
+        }
+        var x;
+        var y;
+        if(layout == "center") {
+            x = parentWidth/2 - width/2;
+            y = parentHeight/2 - height/2;
+        }else if(layout == "topLeft") {
+            x = 0;
+            y = 0;
+        }else if(layout == "topRight") {
+            x = parentWidth - width;
+            y = 0;
+        }else if(layout == "bottomLeft") {
+            x = 0;
+            y = parentHeight - height;
+        }else if(layout == "bottomRight") {
+            x = parentWidth - width;
+            y = parentHeight - height;
+        }
+        if(x != undefined) {
+            view.style.setProperty("left", x+"px");
+        }
+        if(y != undefined) {
+            view.style.setProperty("top", y+"px");
+        }
+    }
+
+    if(ResizeObserver !== undefined) {
+        var layout = this.layout;
+        var resizeObserver = new ResizeObserver(function(observations) {
+            if(observations.length == 0) return;
+            var element = observations[0].target;
+            resizeObserver.disconnect();
+            lauout(element.parentElement, element, layout);
+        });
+        resizeObserver.observe(this.view);
+    }
+    lauout(this.parent, this.view, this.layout);
+}
+
+/**
+ * Dismiss the view.
+ * @memberof PopoverViewController
+ * @type {function(void): void}
+ */
+ PopoverViewController.prototype.dismiss = function() {
+    if(this.mask != undefined) {
+        this.mask.remove();
+    }
+    this.view.remove();
+}
+
+/**
+ * @ignore
+ */
+function bindData(data, element) {
+    if(data == null) return null;
+
+    var i;
+
+    function getValue(data, dataKey) {
+        var value = data[dataKey];
+        value = value !== undefined ? value : null;
+        return value;
+    }
+    function setValue(data, dataKey, value) {
+        data[dataKey] = value !== undefined ? value : null;
+    }
+
+    var inputElements = element.querySelectorAll("input,textarea,select");
+    for(i=0; i<inputElements.length; i++) {
+        var inputElement = inputElements[i];
+        if(inputElement.dataKey != null) {
+            inputElement.value = getValue(data, inputElement.dataKey);
+            // autocomplete support
+            inputElement.addEventListener("input", function(event) {
+                setValue(data, event.currentTarget.dataKey, event.currentTarget.value);
+            });
+            // general input completion
+            inputElement.addEventListener("blur", function(event) {
+                setValue(data, event.currentTarget.dataKey, event.currentTarget.value);
+            });
+        }
+    }
+
+    var selectElements = element.querySelectorAll("._hardcore-select");
+    for(i=0; i<selectElements.length; i++) {
+        var selectElement = selectElements[i];
+        if(selectElement.items != null && selectElement.dataKey != null) {
+            var items = selectElement.items;
+            var dataKey = selectElement.dataKey;
+            var valueKey = selectElement.valueKey;
+            if(valueKey == null) {
+                valueKey = dataKey;
+            }
+            var selectedValue = getValue(data, dataKey);
+            var selectedIndex = -1;
+            for(var j=0; j<items.length; j++) {
+                var item = items[j];
+                if(item[valueKey] == selectedValue) {
+                    selectedIndex = j;
+                    break;
+                }
+            }
+            selectElement.selectedIndex = selectedIndex;
+            selectElement.dataBindHandler = function(selectedIndex, _element) {
+                if(_element.items != null && selectedIndex < _element.items.length) {
+                    var selectedItem = _element.items[selectedIndex];
+                    if(selectedItem != null && typeof selectedItem == "object") {
+                        setValue(data, _element.dataKey, selectedItem[_element.valueKey]);
+                    }
+                }
+            };
+        }
+    }
+
+    var sliderElements = element.querySelectorAll("._hardcore-slider");
+    for(i=0; i<sliderElements.length; i++) {
+        var sliderElement = sliderElements[i];
+        if(sliderElement.dataKey != null) {
+            sliderElement.value = getValue(data, sliderElement.dataKey);
+            sliderElement.dataBindHandler = function(value, dataKey) {
+                setValue(data, dataKey, value);
+            };
+        }
+    }
+
+    var checkboxElements = element.querySelectorAll("._hardcore-checkbox");
+    for(i=0; i<checkboxElements.length; i++) {
+        var checkboxElement = checkboxElements[i];
+        if(checkboxElement.dataKey != null) {
+            checkboxElement.checked = getValue(data, checkboxElement.dataKey);
+            checkboxElement.addEventListener("click", function(event) {
+                setValue(data, event.currentTarget.dataKey, event.currentTarget.checked);
+            });
+        }
+    }
+    
+    var tableElements = element.querySelectorAll("._hardcore-table");
+    for(i=0; i<tableElements.length; i++) {
+        var tableElement = tableElements[i];
+        if(tableElement.dataKey != null) {
+            // replace the table biding data with proxy object.
+            if(tableElement.dataKey == ".") {
+                tableElement.data = data;
+                data = tableElement.data;
+            }else {
+                tableElement.data = getValue(data, tableElement.dataKey);
+                setValue(data, tableElement.dataKey, tableElement.data);
+            }
+        }
+    }
+    
+    var displayElements = element.querySelectorAll("._hardcore-label");
+    for(i=0; i<displayElements.length; i++) {
+        var displayElement = displayElements[i];
+        if(displayElement.dataKey != null) {
+            displayElement.innerText = getValue(data, displayElement.dataKey);
+        }
+    }
+
+    return data;
 }
 
 
@@ -65,6 +406,12 @@ function ViewController(parent, view) {
  * @param {string} tagName 
  * @param {string} [identifier] element ID (If CSS selector prefix is not included, register it as CSS class.)
  * @param {Object} [attributes] 
+ * @param {Object} [attributes.style] 
+ * @param {Object|Array} [attributes.data] 
+ * @param {function(UIEvent): void} [attributes.tapHandler] 
+ * @param {number} [attributes.width] 
+ * @param {number} [attributes.height] 
+ * @param {left|center|right} [attributes.contentsAlign] 
  * @param {Array} [children] child elements
  * @returns {HTMLElement}
  */
@@ -154,6 +501,12 @@ function HtmlTag() {
             var value = attributes[key];
             if(key == "style" && typeof value == "object") {
                 element.defineStyles(value);
+            }else if(key == "width" && typeof value == "number") {
+                element.style.setProperty("width", value+"px");
+            }else if(key == "height" && typeof value == "number") {
+                element.style.setProperty("height", value+"px");
+            }else if(key == "contentsAlign" && typeof value == "string") {
+                element.style.setProperty("text-align", value);
             }else if(key == "data") {
                 data = value;
             }else if(key == "tapHandler" && typeof value == "function") {
@@ -176,112 +529,16 @@ function HtmlTag() {
     }
 
     // data binding
-    var bindData;
     if(data != null) {
-        bindData = function(element) {
-            if(element.data == null) return;
-    
-            var i;
-    
-            var inputElements = element.querySelectorAll("input,textarea,select");
-            for(i=0; i<inputElements.length; i++) {
-                var inputElement = inputElements[i];
-                if(inputElement.dataKey != null) {
-                    value = element.data[inputElement.dataKey];
-                    value = value !== undefined ? value : null;
-                    inputElement.value = value;
-                    // autocomplete support
-                    inputElement.addEventListener("input", function(event) {
-                        var value = event.currentTarget.value;
-                        value = value !== undefined ? value : null;
-                        element.data[event.currentTarget.dataKey] = value;
-                    });
-                    // general input completion
-                    inputElement.addEventListener("blur", function(event) {
-                        var value = event.currentTarget.value;
-                        value = value !== undefined ? value : null;
-                        element.data[event.currentTarget.dataKey] = value;
-                    });
-                }
-            }
-    
-            var selectElements = element.querySelectorAll("._hardcore-select");
-            for(i=0; i<selectElements.length; i++) {
-                var selectElement = selectElements[i];
-                if(selectElement.items != null && selectElement.dataKey != null) {
-                    var items = selectElement.items;
-                    var dataKey = selectElement.dataKey;
-                    var valueKey = selectElement.valueKey;
-                    if(valueKey == null) {
-                        valueKey = dataKey;
-                    }
-                    value = element.data[dataKey];
-                    value = value !== undefined ? value : null;
-                    var index = -1;
-                    for(var j=0; j<items.length; j++) {
-                        var item = items[j];
-                        if(item[valueKey] == value) {
-                            index = j;
-                            break;
-                        }
-                    }
-                    selectElement.selectedIndex = index;
-                    selectElement.dataBindHandler = function(selectedIndex, _element) {
-                        element.data[_element.dataKey] = _element.items[selectedIndex][_element.valueKey];
-                    };
-                }
-            }
-    
-            var sliderElements = element.querySelectorAll("._hardcore-slider");
-            for(i=0; i<sliderElements.length; i++) {
-                var sliderElement = sliderElements[i];
-                if(sliderElement.dataKey != null) {
-                    value = element.data[sliderElement.dataKey];
-                    value = value !== undefined ? value : null;
-                    sliderElement.value = value;
-                    sliderElement.dataBindHandler = function(value, dataKey) {
-                        element.data[dataKey] = value;
-                    };
-                }
-            }
-    
-            var checkboxElements = element.querySelectorAll("._hardcore-checkbox");
-            for(i=0; i<checkboxElements.length; i++) {
-                var checkboxElement = checkboxElements[i];
-                if(checkboxElement.dataKey != null) {
-                    value = element.data[checkboxElement.dataKey];
-                    value = value !== undefined ? value : null;
-                    checkboxElement.checked = value;
-                    checkboxElement.addEventListener("click", function(event) {
-                        var value = event.currentTarget.checked;
-                        value = value !== undefined ? value : null;
-                        element.data[event.currentTarget.dataKey] = value;
-                    });
-                }
-            }
-            
-            var displayElements = element.querySelectorAll("._hardcore-data-bind");
-            for(i=0; i<displayElements.length; i++) {
-                var displayElement = displayElements[i];
-                if(displayElement.dataKey != null) {
-                    value = element.data[displayElement.dataKey];
-                    value = value !== undefined ? value : null;
-                    displayElement.innerText = value;
-                }
-            }
-        }
-
         Object.defineProperty(element, "data", {
             configurable: true,
             get: function() {
-                return element.bindingData;
+                return this.bindingData;
             },
             set: function(newValue) {
-                element.bindingData = newValue;
-                bindData(element);
+                this.bindingData = bindData(newValue, this);
             }
         });
-
         element.data = data;
     }
 
@@ -292,6 +549,7 @@ function HtmlTag() {
  * Create DIV element.
  * @param {string} [identifier] 
  * @param {Object} [attributes] 
+ * @param {string} [dataKey] The key for object set in the ViewController or parent View. 
  * @param {Array} [children] 
  * @returns {HTMLDivElement}
  */
@@ -319,7 +577,7 @@ function View() {
 
     if(dataKey != undefined) {
         element.dataKey = dataKey;
-        element.classList.add("_hardcore-data-bind");
+        element.classList.add("_hardcore-label");
     }
 
     return element;
@@ -330,7 +588,7 @@ function View() {
  * @param {string} [identifier] 
  * @param {Object} [attributes] 
  * @param {boolean} [attributes.leaveWithEnter] Element applies the edited contents by ENTER key.
- * @param {string} [attributes.dataKey] 
+ * @param {string} [attributes.dataKey] The key for object set in the ViewController or parent View. 
  * @returns {HTMLInputElement}
  */
 function Input() {
@@ -391,7 +649,7 @@ function Input() {
  * Create INPUT type=text element.
  * @param {string} [identifier] 
  * @param {Object} [attributes] 
- * @param {string} [attributes.dataKey] 
+ * @param {string} [attributes.dataKey] The key for object set in the ViewController or parent View. 
  * @returns {HTMLInputElement|HTMLDivElement}
  */
 function TextField() {
@@ -426,9 +684,9 @@ function TextField() {
 
 /**
  * Create TEXTAREA element.
- * @param {string} [identifier] 要素ID
- * @param {Object} [attributes] 属性
- * @param {string} [attributes.dataKey] データキー
+ * @param {string} [identifier] 
+ * @param {Object} [attributes] 
+ * @param {string} [attributes.dataKey] The key for object set in the ViewController or parent View. 
  * @returns {HTMLTextAreaElement}
  */
 function TextArea() {
@@ -464,7 +722,7 @@ function TextArea() {
  * Create INPUT type=password element.
  * @param {string} [identifier] 
  * @param {Object} [attributes] 
- * @param {string} [attributes.dataKey] 
+ * @param {string} [attributes.dataKey] The key for object set in the ViewController or parent View. 
  * @returns {HTMLInputElement}
  */
 function PasswordField() {
@@ -477,7 +735,7 @@ function PasswordField() {
  * Create INPUT type=mail element.
  * @param {string} [identifier] 
  * @param {Object} [attributes] 
- * @param {string} [attributes.dataKey] 
+ * @param {string} [attributes.dataKey] The key for object set in the ViewController or parent View. 
  * @returns {HTMLInputElement}
  */
 function MailField() {
@@ -499,11 +757,11 @@ function FileSelector() {
 }
 
 /**
- * @typedef {object} TableColumnDefinition
- * @property {string} label
- * @property {object} style
- * @property {string} dataKey
- * @property {function(HTMLTableDataCellElement, any, any): void} dataHandler
+ * @typedef {Object} TableColumnDefinition
+ * @property {string} [label] Label of table header
+ * @property {Object} [style] Column styles
+ * @property {string} [dataKey] The key for each record of the Array object set in the Table.
+ * @property {function(HTMLTableDataCellElement, any, any): void} [dataHandler] Use this callback if you want to set data directly in a cell.
  * @param {HTMLTableDataCellElement} dataHandler.cell
  * @param {*} dataHandler.value
  * @param {*} dataHandler.record
@@ -513,31 +771,79 @@ function FileSelector() {
  * Create TABLE element.
  * @param {string} [identifier] 
  * @param {Object} [attributes] 
+ * @param {Array.<TableColumnDefinition>} [attributes.data] 
+ * @param {Array.<TableColumnDefinition>} [attributes.dataKey] The key for object set in the ViewController or parent View. "." points to the root of the data set in the ViewController or parent View.
  * @param {Array.<TableColumnDefinition>} [attributes.columns] 
  * @param {function(any): void} [attributes.tapHandler] Select a row handler
+ * @param {number} [attributes.rowHeight]
+ * @param {boolean} [attributes.animate=false]
+ * @param {Object} [attributes.headerStyle]
+ * @param {boolean} [attributes.rowBorder=true]
+ * @param {string} [attributes.rowBorderStyle]
+ * @param {boolean} [attributes.rowHighlight=true]
+ * @param {string} [attributes.rowHighlightStyle]
  * @param {Array} [children] 
  * @returns {HTMLTableElement}
  */
 function Table() {
     var _arguments = Array.prototype.slice.call(arguments);
 
+    var data;
+    var dataKey;
     var columns;
+    var rowHeight;
     var tapHandler;
-    var animate;
+    var animate = false;
+    var headerStyle = {
+        "color": "gray",
+        "font-size": "small",
+        "height": "20px",
+        "line-height": "20px"
+    };
+    var rowBorderStyle = "1px solid darkgray";
+    var rowHighlightStyle = "whitesmoke";
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
         if(!Array.isArray(argument) && typeof argument == "object") {
             var keys = Object.keys(argument);
             for(var j=0; j<keys.length; j++) {
                 var key = keys[j];
-                if(key == "columns" && Array.isArray(argument[key])) {
+                if(key == "data" && Array.isArray(argument[key])) {
+                    data = argument[key];
+                    delete argument[key];
+                }else if(key == "dataKey" && typeof argument[key] == "string") {
+                    dataKey = argument[key];
+                    delete argument[key];
+                }else if(key == "columns" && Array.isArray(argument[key])) {
                     columns = argument[key];
+                    delete argument[key];
+                }else if(key == "rowHeight" && typeof argument[key] == "number") {
+                    rowHeight = argument[key];
                     delete argument[key];
                 }else if(key == "tapHandler" && typeof argument[key] == "function") {
                     tapHandler = argument[key];
                     delete argument[key];
                 }else if(key == "animate" && typeof argument[key] == "boolean") {
                     animate = argument[key];
+                    delete argument[key];
+                }else if(key == "headerStyle" && typeof argument[key] == "object") {
+                    headerStyle = argument[key];
+                    delete argument[key];
+                }else if(key == "rowBorder" && typeof argument[key] == "boolean") {
+                    if(!argument[key]) {
+                        rowBorderStyle = undefined;
+                    }
+                    delete argument[key];
+                }else if(key == "rowBorderStyle" && typeof argument[key] == "string") {
+                    rowBorderStyle = argument[key];
+                    delete argument[key];
+                }else if(key == "rowHighlight" && typeof argument[key] == "boolean") {
+                    if(!argument[key]) {
+                        rowHighlightStyle = undefined;
+                    }
+                    delete argument[key];
+                }else if(key == "rowHighlightStyle" && typeof argument[key] == "string") {
+                    rowHighlightStyle = argument[key];
                     delete argument[key];
                 }
             }
@@ -549,10 +855,22 @@ function Table() {
     var element = HtmlTag.apply(this, _arguments);
     element.style.setProperty("display", "block");
 
+    if(dataKey != null) {
+        element.dataKey = dataKey;
+        element.classList.add("_hardcore-table");
+    }
+
     // header
     if(columns != undefined) {
         var header = TableHeader();
         var row = TableRow();
+        row.style.setProperty("cursor", "default");
+        if(headerStyle != undefined) {
+            row.defineStyles(headerStyle);
+        }
+        if(rowBorderStyle != undefined) {
+            row.style.setProperty("border-bottom", rowBorderStyle);
+        }
         for(i=0; i<columns.length; i++) {
             var column = columns[i];
             var cell = TableCell();
@@ -574,53 +892,165 @@ function Table() {
             return this.bindingData;
         },
         set: function(newValue) {
-            this.bindingData = newValue;
+            var element = this;
+            function createRow(record, columns, tapHandler, animate) {
+                var row = TableRow();
+                row.style.setProperty("cursor", "pointer");
+                if(rowHeight != undefined) {
+                    row.style.setProperty("height", rowHeight+"px");
+                    row.style.setProperty("line-height", rowHeight+"px");
+                }
+                if(rowBorderStyle != undefined) {
+                    row.style.setProperty("border-bottom", rowBorderStyle);
+                }
+                if(rowHighlightStyle != undefined) {
+                    row.addEventListener("mouseenter", function(event) {
+                        event.currentTarget.style.setProperty("background-color", rowHighlightStyle);
+                    });
+                    row.addEventListener("mouseleave", function(event) {
+                        event.currentTarget.style.setProperty("background-color", "inherit");
+                    });
+                }
+                function setValue(value, cell) {
+                    if(value == null) {
+                        // Safari bug fix
+                        cell.innerHTML = "&nbsp;";
+                    }else if(typeof value == "string") {
+                        if(value.length == 0) {
+                            // Safari bug fix
+                            cell.innerHTML = "&nbsp;";
+                        }else {
+                            cell.innerText = value;
+                        }
+                    }else {
+                        cell.innerText = value.toString();
+                    }
+                }
+                if(columns != undefined) {
+                    for(var i=0; i<columns.length; i++) {
+                        var column = columns[i];
+                        var cell = TableCell();
+                        if(column.style != undefined) {
+                            cell.defineStyles(column.style);
+                        }
+                        if(column.dataKey != null) {
+                            var value = record[column.dataKey];
+                            value = value !== undefined ? value : null;
+                            if(column.dataHandler != null) {
+                                column.dataHandler(cell, value, record);
+                            }else {
+                                setValue(value, cell);
+                            }
+                        }
+                        row.appendChild(cell);
+                    }
+                }
+                if(tapHandler != undefined) {
+                    row.addEventListener("click", function(event) {
+                        var row = event.currentTarget;
+                        var index = tableBody.querySelectorAll("tr").indexOf(row);
+                        tapHandler(data[index]);
+                    });
+                }
+                if(animate) {
+                    row.style.setProperty("opacity", "0");
+                    row.style.setProperty("margin-top", "16px");
+                }
+                return row;
+            }
 
-            var tableHeader = this.querySelector("thead");
-            var tableBody = this.querySelector("tbody");
+            function ObservedArray() {
+            }
+            ObservedArray.prototype = Object.create(Array.prototype);
+            ObservedArray.prototype.push = function(record) {
+                Array.prototype.push.call(this, record);
+                var container = element.querySelector("tbody");
+                if(container == null) return;
+                container.appendChild(createRow(record, columns, tapHandler, false));
+            };
+            ObservedArray.prototype.splice = function() {
+                Array.prototype.splice.apply(this, arguments);
+                var container = element.querySelector("tbody");
+                if(container == null) return;
+                var startIndex;
+                var endIndex;
+                var deleteCount;
+                var records = [];
+                var i;
+                for(i=0; i<arguments.length; i++) {
+                    if(i == 0) {
+                        startIndex = arguments[i];
+                    }else if(i == 1) {
+                        deleteCount = arguments[i];
+                    }else {
+                        records.push(arguments[i]);
+                    }
+                }
+                if(startIndex == undefined) {
+                    return;
+                }
+                var rows = element.querySelectorAll("tbody > tr");
+                if(deleteCount == undefined) {
+                    deleteCount = rows.length;
+                }
+                if(deleteCount > 0) {
+                    endIndex = startIndex+deleteCount;
+                    if(endIndex <= rows.length) {
+                        for(i=endIndex-1; i>=startIndex; i--) {
+                            rows[i].remove();
+                        }
+                    }
+                }
+                rows = element.querySelectorAll("tbody > tr");
+                if(records != undefined && records.length > 0 && deleteCount == records.length) {
+                    endIndex = startIndex+deleteCount;
+                    var recordIndex = 0;
+                    for(i=startIndex; i<endIndex; i++) {
+                        var row = createRow(records[recordIndex++], columns, tapHandler, false);
+                        if(i < rows.length) {
+                            rows[i].insertAdjacentElement("beforebegin", row);
+                        }else {
+                            container.appendChild(row);
+                        }
+                    }
+                }
+            };
+
+            var i;
+
+            var observedArray;
+            if(Array.isArray(newValue)) {
+                observedArray = new ObservedArray();
+                for(i=0; i<newValue.length; i++) {
+                    observedArray.push(newValue[i]);
+                }
+            }
+
+            element.bindingData = observedArray;
+
+            var tableHeader = element.querySelector("thead");
+            var tableBody = element.querySelector("tbody");
             if(tableBody != null) {
                 tableBody.remove();
             }
-            if(this.bindingData != null) {
-                var data = this.bindingData;
+            if(element.bindingData != null) {
+                var data = element.bindingData;
                 tableBody = TableBody();
-                tableBody.style.setProperty("height", (this.clientHeight-tableHeader.clientHeight)+"px");
-                for(var i=0; i<data.length; i++) {
-                    var record = data[i];
-                    var row = TableRow();
-                    if(columns != undefined) {
-                        for(var j=0; j<columns.length; j++) {
-                            var column = columns[j];
-                            var cell = TableCell();
-                            if(column.style != undefined) {
-                                cell.defineStyles(column.style);
-                            }
-                            if(column.dataKey != null) {
-                                var value = record[column.dataKey];
-                                value = value !== undefined ? value : null;
-                                if(column.dataHandler != null) {
-                                    column.dataHandler(cell, value, record);
-                                }else if(value != null) {
-                                    cell.innerText = value;
-                                }
-                            }
-                            row.appendChild(cell);
-                        }
-                    }
-                    if(tapHandler != undefined) {
-                        row.addEventListener("click", function(event) {
-                            var row = event.currentTarget;
-                            var index = tableBody.querySelectorAll("tr").indexOf(row);
-                            tapHandler(data[index]);
-                        });
-                    }
-                    if(animate) {
-                        row.style.setProperty("opacity", "0");
-                        row.style.setProperty("margin-top", "16px");
-                    }
-                    tableBody.appendChild(row);
+                if(ResizeObserver !== undefined) {
+                    var resizeObserver = new ResizeObserver(function(observations) {
+                        if(observations.length == 0) return;
+                        var element = observations[0].target;
+                        resizeObserver.disconnect();
+                        tableBody.style.setProperty("height", (element.clientHeight-tableHeader.clientHeight)+"px");
+                    });
+                    resizeObserver.observe(element);
                 }
-                this.appendChild(tableBody);
+                tableBody.style.setProperty("height", (this.clientHeight-tableHeader.clientHeight)+"px");
+                for(i=0; i<data.length; i++) {
+                    var record = data[i];
+                    tableBody.appendChild(createRow(record, columns, tapHandler, animate));
+                }
+                element.appendChild(tableBody);
 
                 var showRow;
                 if(animate) {
@@ -639,6 +1069,9 @@ function Table() {
             }
         }
     });
+    if(data != null) {
+        element.data = data;
+    }
 
     return element;
 }
@@ -784,6 +1217,7 @@ function Button() {
     var label;
     var tapHandler;
     var blocking = false;
+    var style;
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
         if(Array.isArray(argument)) {
@@ -801,6 +1235,8 @@ function Button() {
                 }else if(key == "blocking" && typeof argument[key] == "boolean") {
                     blocking = argument[key];
                     delete argument[key];
+                }else if(key == "style" && typeof argument[key] == "object") {
+                    style = argument[key];
                 }
             }
             break;
@@ -808,6 +1244,9 @@ function Button() {
     }
     if(label != null) {
         _arguments.push([label]);
+    }
+    if(style == undefined) {
+        _arguments.push({style:{"margin": "8px"}});
     }
 
     _arguments.splice(0, 0, "button");
@@ -900,6 +1339,13 @@ function InputComposite() {
             "font-size": "10px",
             "margin-left": "4px",
             "color": "darkgray"
+        }
+    });
+
+    element.addEventListener("click", function(event) {
+        var innerElement = event.currentTarget.querySelector("input,textarea,selector");
+        if(innerElement != null) {
+            innerElement.focus();
         }
     });
 
@@ -1037,7 +1483,7 @@ function NumericField() {
  * @param {number|string} [settings.fontSize] 
  * @param {string} [settings.boxColor=black] 
  * @param {string} [settings.checkColor=black] 
- * @param {string} [settings.dataKey] 
+ * @param {string} [settings.dataKey] The key for object set in the ViewController or parent View. 
  * @returns {HTMLDivElement}
  */
 function Checkbox() {
@@ -1232,6 +1678,7 @@ function Checkbox() {
  * @param {function(void): void} [settings.closeHandler] 
  * @param {boolean} [settings.selectedDrawing=true] 
  * @param {boolean} [settings.editable=true] 
+ * @param {string} [settings.dataKey] The key for object set in the ViewController or parent View. 
  * @returns {HTMLDivElement}
  */
 function Select() {
@@ -1325,6 +1772,7 @@ function Select() {
  * @param {string} [attributes.unit] Label suffix
  * @param {boolean} [attributes.editable=true] 
  * @param {function(number): void} [attributes.changeHandler] Called when the value is chnanged.
+ * @param {string} [settings.dataKey] The key for object set in the ViewController or parent View. 
  * @returns {HTMLDivElement}
  */
 function Slider() {
@@ -1532,6 +1980,152 @@ function Slider() {
 
     return element;
 }
+
+
+////////////////////////////////////// Web API extensions //////////////////////////////////////
+
+/**
+ * @interface Document
+ */
+
+/**
+ * Multiple and nested global styles of an Document.
+ * @name Document#globalStyles
+ * @property {Object|Array.<string>|string} globalStyles
+ */
+Object.defineProperty(Document.prototype, "globalStyles", {
+    set: function(newValue) {
+        var head = document.getElementsByTagName("head")[0];
+        var style = document.createElement("style");
+        head.appendChild(style);
+        var styleSheets = document.styleSheets;
+        if(styleSheets == null && styleSheets.length > 0) {
+            console.error("Could not access styleSheet of document.");
+            return;
+        }
+        var styleSheet = styleSheets[document.styleSheets.length-1];
+        var i;
+        if(typeof newValue == "string") {
+            styleSheet.insertRule(newValue);
+        }else if(Array.isArray(newValue)) {
+            for(i=0; i<newValue.length; i++) {
+                styleSheet.insertRule(newValue[i]);
+            }
+        }else if(typeof newValue == "object") {
+            var keys = Object.keys(newValue);
+            if(keys.length == 0) {
+                return;
+            }
+            for(i=0; i<keys.length; i++) {
+                var selector = keys[i];
+                var styles = newValue[selector];
+                if(typeof styles != "object") {
+                    continue;
+                }
+                var expression = "";
+                expression += selector;
+                expression += "{";
+                var styleKeys = Object.keys(styles);
+                for(var j=0; j<styleKeys.length; j++) {
+                    var styleKey = styleKeys[j];
+                    var styleValue = styles[styleKey];
+                    expression += styleKey + ":" + styleValue + ";";
+                }
+                expression += "}";
+                styleSheet.insertRule(expression);
+            }
+        }else {
+            return;
+        }
+    }
+});
+
+/**
+ * @interface HTMLElement
+ */
+
+/**
+ * Multiple and nested styles of an HTMLElement.
+ * @name HTMLElement#styles
+ * @property {Object} styles
+ */
+Object.defineProperty(HTMLElement.prototype, "styles", {
+    set: function(newValue) {
+        HtmlElementUtil.defineStyles(this, newValue);
+    }
+});
+
+/**
+ * @ignore 
+ */
+HTMLElement.prototype.defineStyles = function(styles) {
+    HtmlElementUtil.defineStyles(this, styles);
+    return this;
+};
+
+/**
+ * @ignore 
+ */
+HTMLElement.prototype.replaceChildren = function(childNode) {
+    HtmlElementUtil.replaceChildren(this, childNode);
+    return this;
+};
+
+/**
+ * Validates the input UI contained in the specified HTML element, and displays a browser-standard error if there is a validation error. The validation content follows the various attributes of the input tag.
+ * @memberof HTMLElement
+ * @type {function(void): boolean}
+ * @returns {boolean}
+ */
+HTMLElement.prototype.validate = function() {
+    return ValidationUtil.validate(this);
+}
+
+/**
+ * @interface Node
+ */
+
+/**
+ * Delete all child nodes
+ * @memberof Node
+ * @type {function(void): Node}
+ * @returns {Node}
+ */
+Node.prototype.removeAll = function() {
+    while(this.firstChild) {
+        this.removeChild(this.firstChild);
+    }
+    return this;
+};
+
+/**
+ * @interface NodeList
+ */
+
+/**
+ * Get the index of a Node in a NodeList
+ * @memberof NodeList
+ * @type {function(Node): number}
+ * @param {Node} childNode 
+ * @returns {number}
+ */
+NodeList.prototype.indexOf = function(childNode) {
+    return Array.prototype.slice.call(this).indexOf(childNode);
+};
+
+/**
+ * @ignore 
+ */
+NodeList.prototype.forEach = function(iteration) {
+    // Chrome bug fix
+    var nodeList = Array.prototype.slice.call(this);
+    if(nodeList != null && nodeList.length > 0) {
+        for(var i=0; i<nodeList.length; i++) {
+            iteration(nodeList[i], i, nodeList);
+        }
+    }
+    return this;
+};
 
 
 ////////////////////////////////////// Animations //////////////////////////////////////
@@ -1761,6 +2355,13 @@ function StyleAnimation() {
         if(typeof currentValue == "string") {
             if(currentValue.endsWith("px")) {
                 currentValue = Number(currentValue.substring(0, currentValue.length-2));
+            }else if(currentValue.endsWith("%")) {
+                currentValue = Number(currentValue.substring(0, currentValue.length-1));
+                if(key == "width") {
+                    currentValue = target.offsetWidth * (currentValue/100);
+                }else if(key == "height") {
+                    currentValue = target.offsetHeight * (currentValue/100);
+                }
             }else {
                 currentValue = Number(currentValue);
             }
@@ -3502,65 +4103,6 @@ var HtmlElementUtil = {
         }
         element.appendChild(childNode);
     }
-};
-
-/**
- * Apply multiple styles to an HTMLElement.
- * @memberof HTMLElement
- * @param {Object} styles 
- * @returns {HTMLElement}
- */
-HTMLElement.prototype.defineStyles = function(styles) {
-    HtmlElementUtil.defineStyles(this, styles);
-    return this;
-};
-
-/**
- * Delete all HTMLElement child elements and replace them with the specified child elements.
- * @memberof HTMLElement
- * @param {HTMLElement} childNode 
- * @returns {HTMLElement}
- */
-HTMLElement.prototype.replaceChildren = function(childNode) {
-    HtmlElementUtil.replaceChildren(this, childNode);
-    return this;
-};
-
-/**
- * Delete all child nodes
- * @memberof Node
- * @returns {Node}
- */
-Node.prototype.removeAll = function() {
-    while(this.firstChild) {
-        this.removeChild(this.firstChild);
-    }
-    return this;
-};
-
-
-/**
- * Get the index of a Node in a NodeList
- * @memberof NodeList
- * @param {Node} childNode 
- * @returns {number}
- */
-NodeList.prototype.indexOf = function(childNode) {
-    return Array.prototype.slice.call(this).indexOf(childNode);
-};
-
-/**
- * @ignore 
- */
-NodeList.prototype.forEach = function(iteration) {
-    // Chrome bug fix
-    var nodeList = Array.prototype.slice.call(this);
-    if(nodeList != null && nodeList.length > 0) {
-        for(var i=0; i<nodeList.length; i++) {
-            iteration(nodeList[i], i, nodeList);
-        }
-    }
-    return this;
 };
 
 /**
