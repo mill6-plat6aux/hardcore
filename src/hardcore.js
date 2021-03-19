@@ -54,6 +54,10 @@ function ViewController() {
     this.replace = true;
 }
 
+ViewController.prototype.showView = function() {
+    this.parent.appendChild(this.view);
+};
+
 /**
  * @name ViewController#parent
  * @type {HTMLElement|string}
@@ -81,10 +85,7 @@ function ViewController() {
             if(this.replace) {
                 this.parent.removeAll();
             }
-            this.parent.appendChild(this._view);
-            if(this.viewHandler != undefined) {
-                this.viewHandler();
-            }
+            this.showView();
         }
     }
 });
@@ -107,10 +108,7 @@ Object.defineProperty(ViewController.prototype, "view", {
             if(this.replace) {
                 this.parent.removeAll();
             }
-            this.parent.appendChild(this._view);
-            if(this.viewHandler != undefined) {
-                this.viewHandler();
-            }
+            this.showView();
         }
         if(this.data != null) {
             this._data = bindData(this.data, this.view);
@@ -137,13 +135,6 @@ Object.defineProperty(ViewController.prototype, "data", {
         }
     }
 });
-
-/**
- * @memberof ViewController
- * @protected
- */
-ViewController.prototype.viewHandler = function() {
-}
 
 /**
  * Popover View Controller
@@ -176,26 +167,25 @@ function PopoverViewController() {
     this.layout = "center";
 
     /**
-     * CSS styles of Popover.
-     * @type {object}
-     */
-    this.popoverStyle = {
-        "position": "absolute", 
-        "border": "1px solid darkgray", 
-        "box-shadow": "3px 3px 6px rgba(0,0,0,0.3)"
-    };
-
-    /**
      * Whether popover is modal or not.
      * @type {boolean}
      */
     this.modal = false;
+    
+    /**
+     * By changing the style of this view, you can change the way it pops over.
+     * @type {HTMLDivElement}
+     * @readonly
+     */
+    this.container = View({style: {
+        "position": "absolute", 
+        "border": "1px solid darkgray", 
+        "box-shadow": "3px 3px 6px rgba(0,0,0,0.3)"
+    }});
 }
 PopoverViewController.prototype = Object.create(ViewController.prototype);
 
-PopoverViewController.prototype.viewHandler = function() {
-    this.view.styles = this.popoverStyle;
-
+PopoverViewController.prototype.showView = function() {
     if(!this.modal) {
         var maskStyle = {
             "position": "absolute", 
@@ -204,15 +194,18 @@ PopoverViewController.prototype.viewHandler = function() {
             "top": "0",
             "left": "0"
         }
-        var contentView = this.view;
+        var contentView = this.container;
         var mask = View({style: maskStyle, tapHandler: function(event) {
             var mask = event.currentTarget;
             contentView.remove();
             mask.remove();
         }});
         this.mask = mask;
-        this.view.before(mask);
+        this.parent.appendChild(mask);
     }
+
+    this.container.appendChild(this.view);
+    this.parent.appendChild(this.container);
 
     function lauout(parent, view, layout) {
         var parentWidth = parent.clientWidth;
@@ -269,9 +262,9 @@ PopoverViewController.prototype.viewHandler = function() {
             resizeObserver.disconnect();
             lauout(element.parentElement, element, layout);
         });
-        resizeObserver.observe(this.view);
+        resizeObserver.observe(this.container);
     }
-    lauout(this.parent, this.view, this.layout);
+    lauout(this.parent, this.container, this.layout);
 }
 
 /**
@@ -283,7 +276,7 @@ PopoverViewController.prototype.viewHandler = function() {
     if(this.mask != undefined) {
         this.mask.remove();
     }
-    this.view.remove();
+    this.container.remove();
 }
 
 /**
@@ -759,6 +752,7 @@ function FileSelector() {
 /**
  * @typedef {Object} TableColumnDefinition
  * @property {string} [label] Label of table header
+ * @property {number} [width] Column width
  * @property {Object} [style] Column styles
  * @property {string} [dataKey] The key for each record of the Array object set in the Table.
  * @property {function(HTMLTableDataCellElement, any, any): void} [dataHandler] Use this callback if you want to set data directly in a cell.
@@ -876,6 +870,11 @@ function Table() {
             var cell = TableCell();
             if(column.label != undefined) {
                 cell.innerText = column.label;
+            }
+            if(column.width != undefined) {
+                if(column.style != undefined) {
+                    column.style["width"] = column.width+"px";
+                }
             }
             if(column.style != undefined) {
                 cell.defineStyles(column.style);
@@ -1205,7 +1204,7 @@ function Canvas() {
  * Create BUTTON element.
  * @param {string} [identifier] 
  * @param {Object} [attributes] 
- * @param {string} [lattributes.abel] 
+ * @param {string} [lattributes.label] 
  * @param {boolean} [attributes.blocking=true] Whether or not to block subsequent taps after a tap.
  * @param {function(HTMLButtonElement): void} [attributes.tapHandler] When the restore method in the function argument is executed, It makes itself tapable again.
  * @param {Array} [children] 
@@ -1291,6 +1290,7 @@ function InputComposite() {
 
     var identifierIndex = -1;
     var label;
+    var style;
     var children;
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
@@ -1304,6 +1304,9 @@ function InputComposite() {
                 var key = keys[j];
                 if(key == "label") {
                     label = argument[key];
+                    delete argument[key];
+                }else if(key == "style") {
+                    style = argument[key];
                     delete argument[key];
                 }
             }
@@ -1341,6 +1344,9 @@ function InputComposite() {
             "color": "darkgray"
         }
     });
+    if(style != undefined) {
+        element.defineStyles(style);
+    }
 
     element.addEventListener("click", function(event) {
         var innerElement = event.currentTarget.querySelector("input,textarea,selector");
@@ -1484,6 +1490,7 @@ function NumericField() {
  * @param {string} [settings.boxColor=black] 
  * @param {string} [settings.checkColor=black] 
  * @param {string} [settings.dataKey] The key for object set in the ViewController or parent View. 
+ * @param {function(boolean): void} [changeHandler]
  * @returns {HTMLDivElement}
  */
 function Checkbox() {
@@ -1493,7 +1500,7 @@ function Checkbox() {
     var checked = false;
     var boxColor = "black";
     var checkColor = "black";
-    var fontSize = "16px";
+    var fontSize = "1em";
     var dataKey;
     var changeHandler;
     for(var i=0; i<_arguments.length; i++) {
@@ -1542,6 +1549,7 @@ function Checkbox() {
     element.style.setProperty("height", "32px");
     element.style.setProperty("line-height", "32px");
     element.style.setProperty("font-size", fontSize);
+    element.style.setProperty("cursor", "pointer");
 
     var canvas = document.createElement("canvas");
     canvas.style.setProperty("vertical-align", "bottom");
@@ -1549,7 +1557,12 @@ function Checkbox() {
     CanvasUtil.initCanvas(canvas, {width: 24, height: 32});
     element.appendChild(canvas);
     if(label != null) {
-        element.appendChild(document.createTextNode(label));
+        var labelElement = document.createElement("span");
+        labelElement.defineStyles({
+            "user-select": "none"
+        })
+        labelElement.innerText = label;
+        element.appendChild(labelElement);
     }
     var context = canvas.getContext('2d');
 
@@ -1656,7 +1669,7 @@ function Checkbox() {
         drawBox(context);
         element.checked = !element.checked;
         if(changeHandler != undefined) {
-            changeHandler();
+            changeHandler(element.checked);
         }
     });
 
@@ -1985,6 +1998,11 @@ function Slider() {
 ////////////////////////////////////// Web API extensions //////////////////////////////////////
 
 /**
+ * @ignore
+ */
+var _hadcore_styleSheet;
+
+/**
  * @interface Document
  */
 
@@ -1995,21 +2013,23 @@ function Slider() {
  */
 Object.defineProperty(Document.prototype, "globalStyles", {
     set: function(newValue) {
-        var head = document.getElementsByTagName("head")[0];
-        var style = document.createElement("style");
-        head.appendChild(style);
-        var styleSheets = document.styleSheets;
-        if(styleSheets == null && styleSheets.length > 0) {
-            console.error("Could not access styleSheet of document.");
-            return;
+        if(_hadcore_styleSheet == undefined) {
+            var head = document.getElementsByTagName("head")[0];
+            var style = document.createElement("style");
+            head.appendChild(style);
+            var styleSheets = document.styleSheets;
+            if(styleSheets == null && styleSheets.length > 0) {
+                console.error("Could not access styleSheet of document.");
+                return;
+            }
+            _hadcore_styleSheet = styleSheets[document.styleSheets.length-1];
         }
-        var styleSheet = styleSheets[document.styleSheets.length-1];
         var i;
         if(typeof newValue == "string") {
-            styleSheet.insertRule(newValue);
+            _hadcore_styleSheet.insertRule(newValue);
         }else if(Array.isArray(newValue)) {
             for(i=0; i<newValue.length; i++) {
-                styleSheet.insertRule(newValue[i]);
+                _hadcore_styleSheet.insertRule(newValue[i]);
             }
         }else if(typeof newValue == "object") {
             var keys = Object.keys(newValue);
@@ -2029,10 +2049,26 @@ Object.defineProperty(Document.prototype, "globalStyles", {
                 for(var j=0; j<styleKeys.length; j++) {
                     var styleKey = styleKeys[j];
                     var styleValue = styles[styleKey];
+                    if(typeof styleValue == "number") {
+                        styleValue = styleValue + "px";
+                    }else if(Array.isArray(styleValue)) {
+                        var valueExp = "";
+                        for(var k=0; k<styleValue.length; k++) {
+                            if(k>0) {
+                                valueExp += " ";
+                            }
+                            if(typeof styleValue[k] == "number") {
+                                valueExp += styleValue[k]+"px";
+                            }else {
+                                valueExp += styleValue[k];
+                            }
+                        }
+                        styleValue = valueExp;
+                    }
                     expression += styleKey + ":" + styleValue + ";";
                 }
                 expression += "}";
-                styleSheet.insertRule(expression);
+                _hadcore_styleSheet.insertRule(expression);
             }
         }else {
             return;
@@ -3043,7 +3079,7 @@ var DrawUtil = {
     /**
      * @type {string}
      */
-    defaultFontSize: "16px",
+    defaultFontSize: "1em",
 
     /**
      * @type {string}
@@ -4072,18 +4108,34 @@ var HtmlElementUtil = {
             for(var i=0; i<keys.length; i++) {
                 var key = keys[i];
                 var value = styles[key];
-                if(typeof value == "string" || typeof value == "number") {
+                if(Array.isArray(value)) {
+                    var expression = "";
+                    for(var j=0; j<value.length; j++) {
+                        if(j>0) {
+                            expression += " ";
+                        }
+                        if(typeof value[j] == "number") {
+                            expression += value[j]+"px";
+                        }else {
+                            expression += value[j];
+                        }
+                    }
+                    element.style.setProperty(key, expression);
+                }else if(typeof value != "object") {
+                    if(typeof value == "number") {
+                        value = value+"px";
+                    }
                     element.style.setProperty(key, value);
                     if(key == "user-select") {
                         element.style.setProperty("-webkit-user-select", value);
                         element.style.setProperty("-moz-user-select", value);
                         element.style.setProperty("-ms-user-select", value);
                     }
-                }else if(typeof value == "object") {
+                }else {
                     var innerElements = element.querySelectorAll(key);
                     if(innerElements != null) {
-                        for(var j=0; j<innerElements.length; j++) {
-                            var innerElement = innerElements[j];
+                        for(var k=0; k<innerElements.length; k++) {
+                            var innerElement = innerElements[k];
                             setProperties(innerElement, value);
                         }
                     }
@@ -4259,17 +4311,13 @@ var Controls = {
                 itemElement.style.setProperty("height", itemHeight+"px");
                 itemElement.style.setProperty("line-height", itemHeight+"px");
                 itemElement.style.setProperty("white-space", "nowrap");
-                itemElement.style.setProperty("font-size", "16px");
+                itemElement.style.setProperty("font-size", "1em");
                 itemElement.style.setProperty("cursor", "pointer");
 
                 if(styleHandler != undefined) {
                     var styles = styleHandler(item, current);
                     if(styles != null && typeof styles == "object") {
-                        var keys = Object.keys(styles);
-                        for(var i=0; i<keys.length; i++) {
-                            var key = keys[i];
-                            itemElement.style.setProperty(key, styles[key]);
-                        }
+                        itemElement.styles = styles;
                     }
                 }
 
@@ -4277,8 +4325,8 @@ var Controls = {
                     var hoverStyles = hoverStyleHandler();
                     var originalStyles = {};
                     var hoverStyleKeys = Object.keys(hoverStyles);
-                    for(i=0; i<hoverStyleKeys.length; i++) {
-                        key = hoverStyleKeys[i];
+                    for(var i=0; i<hoverStyleKeys.length; i++) {
+                        var key = hoverStyleKeys[i];
                         originalStyles[key] = itemElement.style.getPropertyValue(key);
                     }
                     itemElement.addEventListener("mouseover", function() {
@@ -4686,6 +4734,7 @@ var Controls = {
      * @param {Point} [settings.location]
      * @param {HTMLElement} [settings.parent]
      * @param {function(HTMLElement): object} [settings.loadHandler]
+     * @param {function(void): void} [settings.dismissHandler]
      * @param {number} [settings.padding]
      * @param {top|bottom|left|right} [settings.direction]
      * @param {number} [settings.tipSize]
@@ -4711,6 +4760,7 @@ var Controls = {
         var location = Point(0, 0);
         var parent;
         var loadHandler;
+        var dismissHandler;
         var padding = 8;
         var margin = 8;
         var direction = "top";
@@ -4733,6 +4783,9 @@ var Controls = {
             }
             if(settings.loadHandler != undefined) {
                 loadHandler = settings.loadHandler;
+            }
+            if(settings.dismissHandler != undefined) {
+                dismissHandler = settings.dismissHandler;
             }
             if(settings.padding != undefined) {
                 padding = settings.padding;
@@ -4801,9 +4854,14 @@ var Controls = {
             CanvasUtil.initCanvas(canvasElement, canvasSize);
 
             var offset = HtmlElementUtil.offset(container, parent);
-            
             if(offset.left + container.offsetWidth > parent.clientWidth) {
                 container.style.setProperty("left", (parent.clientWidth-container.offsetWidth)+"px");
+                
+                if(tipOffset == undefined) {
+                    if(direction == "top" || direction == "bottom") {
+                        tipOffset = container.offsetWidth - margin*2 - (parent.clientWidth - location.x - margin);
+                    }
+                }
             }
 
             if(loadHandler != undefined) {
@@ -4884,6 +4942,9 @@ var Controls = {
         // Prevent close from being called in the event of Balloon call in Mobile Safari
         setTimeout(function() {
             mask.addEventListener("click", function() {
+                if(dismissHandler != undefined) {
+                    dismissHandler();
+                }
                 context.close();
             });
         }, 0);
