@@ -54,6 +54,13 @@ function ViewController() {
     this.replace = true;
 }
 
+/**
+ * Show the view.
+ * To change the display method, override it with a subclass. This method must not be called directly.
+ * @memberof ViewController
+ * @type {function(void): void}
+ * @protected
+ */
 ViewController.prototype.showView = function() {
     this.parent.appendChild(this.view);
 };
@@ -81,11 +88,18 @@ ViewController.prototype.showView = function() {
             console.error("The parent must be HTMLElement or selector string.");
             return;
         }
+
+        // Add the view to the parent if the view has been set.
         if(this.view != undefined) {
             if(this.replace) {
                 this.parent.removeAll();
             }
             this.showView();
+
+            // Bind the data to the view if the data has been set.
+            if(this.data != null) {
+                this._data = bindData(this.data, this.view);
+            }
         }
     }
 });
@@ -104,12 +118,16 @@ Object.defineProperty(ViewController.prototype, "view", {
             return;
         }
         this._view = newValue;
+
+        // Add the view to the parent if the parent has been set.
         if(this.parent != undefined) {
             if(this.replace) {
                 this.parent.removeAll();
             }
             this.showView();
         }
+
+        // Bind the data to the view if the data has been set.
         if(this.data != null) {
             this._data = bindData(this.data, this.view);
         }
@@ -130,6 +148,8 @@ Object.defineProperty(ViewController.prototype, "data", {
             return;
         }
         this._data = newValue;
+
+        // Bind the data to the view if the view has been set.
         if(this.view != null) {
             this._data = bindData(this.data, this.view);
         }
@@ -194,10 +214,10 @@ PopoverViewController.prototype.showView = function() {
             "top": "0",
             "left": "0"
         }
-        var contentView = this.container;
+        var self = this;
         var mask = View({style: maskStyle, tapHandler: function(event) {
             var mask = event.currentTarget;
-            contentView.remove();
+            self.dismissView();
             mask.remove();
         }});
         this.mask = mask;
@@ -231,20 +251,20 @@ PopoverViewController.prototype.showView = function() {
         var x;
         var y;
         if(layout == "center") {
-            x = parentWidth/2 - width/2;
-            y = parentHeight/2 - height/2;
+            x = parent.offsetLeft + parentWidth/2 - width/2;
+            y = parent.offsetTop + parentHeight/2 - height/2;
         }else if(layout == "topLeft") {
-            x = 0;
-            y = 0;
+            x = parent.offsetLeft;
+            y = parent.offsetTop;
         }else if(layout == "topRight") {
-            x = parentWidth - width;
-            y = 0;
+            x = parent.offsetLeft + parentWidth - width;
+            y = parent.offsetTop;
         }else if(layout == "bottomLeft") {
-            x = 0;
-            y = parentHeight - height;
+            x = parent.offsetLeft;
+            y = parent.offsetTop + parentHeight - height;
         }else if(layout == "bottomRight") {
-            x = parentWidth - width;
-            y = parentHeight - height;
+            x = parent.offsetLeft + parentWidth - width;
+            y = parent.offsetTop + parentHeight - height;
         }
         if(x != undefined) {
             view.style.setProperty("left", x+"px");
@@ -256,27 +276,42 @@ PopoverViewController.prototype.showView = function() {
 
     if(ResizeObserver !== undefined) {
         var layout = this.layout;
-        var resizeObserver = new ResizeObserver(function(observations) {
-            if(observations.length == 0) return;
-            var element = observations[0].target;
-            resizeObserver.disconnect();
-            lauout(element.parentElement, element, layout);
-        });
-        resizeObserver.observe(this.container);
+        if(layout != null) {
+            var resizeObserver = new ResizeObserver(function(observations) {
+                if(observations.length == 0) return;
+                var element = observations[0].target;
+                resizeObserver.disconnect();
+                lauout(element.parentElement, element, layout);
+            });
+            resizeObserver.observe(this.container);
+        }
     }
-    lauout(this.parent, this.container, this.layout);
+    if(this.layout != null) {
+        lauout(this.parent, this.container, this.layout);
+    }
 }
+
+/**
+ * Dismiss the view.
+ * To change the dismiss method, override it with a subclass. This method must not be called directly.
+ * @memberof ViewController
+ * @type {function(void): void}
+ * @protected
+ */
+ViewController.prototype.dismissView = function() {
+    this.container.remove();
+};
 
 /**
  * Dismiss the view.
  * @memberof PopoverViewController
  * @type {function(void): void}
  */
- PopoverViewController.prototype.dismiss = function() {
+PopoverViewController.prototype.dismiss = function() {
     if(this.mask != undefined) {
         this.mask.remove();
     }
-    this.container.remove();
+    this.dismissView();
 }
 
 /**
@@ -384,7 +419,12 @@ function bindData(data, element) {
     for(i=0; i<displayElements.length; i++) {
         var displayElement = displayElements[i];
         if(displayElement.dataKey != null) {
-            displayElement.innerText = getValue(data, displayElement.dataKey);
+            var value = getValue(data, displayElement.dataKey);
+            if(displayElement.dataHandler != null) {
+                displayElement.dataHandler(displayElement, value);
+            }else {
+                displayElement.innerText = value;
+            }
         }
     }
 
@@ -450,7 +490,7 @@ function HtmlTag() {
             "-webkit-appearance": "none",
             "appearance": "none",
             "vertical-align": "middle",
-            "background": "transparent",
+            "background-color": "transparent",
             "font-size": "1em"
         });
     }
@@ -494,10 +534,31 @@ function HtmlTag() {
             var value = attributes[key];
             if(key == "style" && typeof value == "object") {
                 element.defineStyles(value);
-            }else if(key == "width" && typeof value == "number") {
-                element.style.setProperty("width", value+"px");
-            }else if(key == "height" && typeof value == "number") {
-                element.style.setProperty("height", value+"px");
+            }else if(key == "width" || key == "height") {
+                if(typeof value == "number") {
+                    element.style.setProperty(key, value+"px");
+                }else if(typeof value == "string") {
+                    element.style.setProperty(key, value);
+                }
+            }else if(key == "margin" || key == "padding") {
+                if(typeof value == "number") {
+                    element.style.setProperty(key, value+"px");
+                }else if(typeof value == "string") {
+                    element.style.setProperty(key, value);
+                }else if(Array.isArray(value)) {
+                    var expression = "";
+                    for(var j=0; j<value.length; j++) {
+                        if(j > 0) {
+                            expression += " ";
+                        }
+                        if(typeof value == "number") {
+                            expression += value+"px";
+                        }else if(typeof value == "string") {
+                            expression += value;
+                        }
+                    }
+                    element.style.setProperty(key, expression);
+                }
             }else if(key == "contentsAlign" && typeof value == "string") {
                 element.style.setProperty("text-align", value);
             }else if(key == "data") {
@@ -543,6 +604,9 @@ function HtmlTag() {
  * @param {string} [identifier] 
  * @param {Object} [attributes] 
  * @param {string} [dataKey] The key for object set in the ViewController or parent View. 
+ * @param {function(HTMLDivElement, any): void} [dataHandler] Use this callback if you want to set data directly in a element.
+ * @param {HTMLDivElement} dataHandler.element
+ * @param {*} dataHandler.value
  * @param {Array} [children] 
  * @returns {HTMLDivElement}
  */
@@ -550,6 +614,7 @@ function View() {
     var _arguments = Array.prototype.slice.call(arguments);
 
     var dataKey;
+    var dataHandler;
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
         if(!Array.isArray(argument) && typeof argument == "object") {
@@ -558,6 +623,9 @@ function View() {
                 var key = keys[j];
                 if(key == "dataKey" && typeof argument[key] == "string") {
                     dataKey = argument[key];
+                    delete argument[key];
+                }else if(key == "dataHandler" && typeof argument[key] == "function") {
+                    dataHandler = argument[key];
                     delete argument[key];
                 }
             }
@@ -571,6 +639,9 @@ function View() {
     if(dataKey != undefined) {
         element.dataKey = dataKey;
         element.classList.add("_hardcore-label");
+    }
+    if(dataHandler != undefined) {
+        element.dataHandler = dataHandler;
     }
 
     return element;
@@ -684,8 +755,8 @@ function TextField() {
  */
 function TextArea() {
     var _arguments = Array.prototype.slice.call(arguments);
-    _arguments.splice(0, 0, "textarea");
 
+    var label;
     var dataKey;
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
@@ -693,7 +764,10 @@ function TextArea() {
             var keys = Object.keys(argument);
             for(var j=0; j<keys.length; j++) {
                 var key = keys[j];
-                if(key == "dataKey" && typeof argument[key] == "string") {
+                if(key == "label" && typeof argument[key] == "string") {
+                    label = argument[key];
+                    delete argument[key];
+                }else if(key == "dataKey" && typeof argument[key] == "string") {
                     dataKey = argument[key];
                     delete argument[key];
                 }
@@ -702,13 +776,23 @@ function TextArea() {
         }
     }
 
-    var elememt = HtmlTag.apply(this, _arguments);
-    
-    if(dataKey != undefined) {
-        elememt.dataKey = dataKey;
+    var element;
+    if(label == null) {
+        _arguments.splice(0, 0, "textarea");
+        element = HtmlTag.apply(this, _arguments);
+        if(dataKey != undefined) {
+            element.dataKey = dataKey;
+        }
+        return element;
+    }else {
+        _arguments.splice(0, 0, "textarea");
+        element = HtmlTag.apply(this, _arguments);
+        if(dataKey != undefined) {
+            element.dataKey = dataKey;
+        }
+        var inputComposite = InputComposite({label: label}, [element]);
+        return inputComposite;
     }
-
-    return elememt;
 }
 
 /**
@@ -720,8 +804,32 @@ function TextArea() {
  */
 function PasswordField() {
     var _arguments = Array.prototype.slice.call(arguments);
-    _arguments.splice(0, 0, "password");
-    return Input.apply(this, _arguments);
+
+    var label;
+    for(var i=0; i<_arguments.length; i++) {
+        var argument = _arguments[i];
+        if(!Array.isArray(argument) && typeof argument == "object") {
+            var keys = Object.keys(argument);
+            for(var j=0; j<keys.length; j++) {
+                var key = keys[j];
+                if(key == "label" && typeof argument[key] == "string") {
+                    label = argument[key];
+                    delete argument[key];
+                }
+            }
+            break;
+        }
+    }
+
+    if(label == null) {
+        _arguments.splice(0, 0, "password");
+        return Input.apply(this, _arguments);
+    }else {
+        _arguments.splice(0, 0, "password");
+        var element = Input.apply(this, _arguments);
+        var inputComposite = InputComposite({label: label}, [element]);
+        return inputComposite;
+    }
 }
 
 /**
@@ -733,8 +841,62 @@ function PasswordField() {
  */
 function MailField() {
     var _arguments = Array.prototype.slice.call(arguments);
-    _arguments.splice(0, 0, "email");
-    return Input.apply(this, _arguments);
+
+    var label;
+    for(var i=0; i<_arguments.length; i++) {
+        var argument = _arguments[i];
+        if(!Array.isArray(argument) && typeof argument == "object") {
+            var keys = Object.keys(argument);
+            for(var j=0; j<keys.length; j++) {
+                var key = keys[j];
+                if(key == "label" && typeof argument[key] == "string") {
+                    label = argument[key];
+                    delete argument[key];
+                }
+            }
+            break;
+        }
+    }
+
+    if(label == null) {
+        _arguments.splice(0, 0, "email");
+        return Input.apply(this, _arguments);
+    }else {
+        _arguments.splice(0, 0, "email");
+        var element = Input.apply(this, _arguments);
+        var inputComposite = InputComposite({label: label}, [element]);
+        return inputComposite;
+    }
+}
+
+function DateField() {
+    var _arguments = Array.prototype.slice.call(arguments);
+
+    var label;
+    for(var i=0; i<_arguments.length; i++) {
+        var argument = _arguments[i];
+        if(!Array.isArray(argument) && typeof argument == "object") {
+            var keys = Object.keys(argument);
+            for(var j=0; j<keys.length; j++) {
+                var key = keys[j];
+                if(key == "label" && typeof argument[key] == "string") {
+                    label = argument[key];
+                    delete argument[key];
+                }
+            }
+            break;
+        }
+    }
+
+    if(label == null) {
+        _arguments.splice(0, 0, "date");
+        return Input.apply(this, _arguments);
+    }else {
+        _arguments.splice(0, 0, "date");
+        var element = Input.apply(this, _arguments);
+        var inputComposite = InputComposite({label: label}, [element]);
+        return inputComposite;
+    }
 }
 
 /**
@@ -745,8 +907,31 @@ function MailField() {
  */
 function FileSelector() {
     var _arguments = Array.prototype.slice.call(arguments);
+
+    var changeHandler;
+    for(var i=0; i<_arguments.length; i++) {
+        var argument = _arguments[i];
+        if(!Array.isArray(argument) && typeof argument == "object") {
+            var keys = Object.keys(argument);
+            for(var j=0; j<keys.length; j++) {
+                var key = keys[j];
+                if(key == "changeHandler" && typeof argument[key] == "function") {
+                    changeHandler = argument[key];
+                    delete argument[key];
+                }
+            }
+            break;
+        }
+    }
+
     _arguments.splice(0, 0, "file");
-    return Input.apply(this, _arguments);
+    var element = Input.apply(this, _arguments);
+
+    if(changeHandler != null) {
+        element.addEventListener("change", changeHandler);
+    }
+
+    return element;
 }
 
 /**
@@ -754,6 +939,7 @@ function FileSelector() {
  * @property {string} [label] Label of table header
  * @property {number} [width] Column width
  * @property {Object} [style] Column styles
+ * @property {Object} [class] Column CSS class
  * @property {string} [dataKey] The key for each record of the Array object set in the Table.
  * @property {function(HTMLTableDataCellElement, any, any): void} [dataHandler] Use this callback if you want to set data directly in a cell.
  * @param {HTMLTableDataCellElement} dataHandler.cell
@@ -929,6 +1115,9 @@ function Table() {
                     for(var i=0; i<columns.length; i++) {
                         var column = columns[i];
                         var cell = TableCell();
+                        if(column.class != undefined) {
+                            cell.setAttribute("class", column.class);
+                        }
                         if(column.style != undefined) {
                             cell.defineStyles(column.style);
                         }
@@ -948,7 +1137,7 @@ function Table() {
                     row.addEventListener("click", function(event) {
                         var row = event.currentTarget;
                         var index = tableBody.querySelectorAll("tr").indexOf(row);
-                        tapHandler(data[index]);
+                        tapHandler(data[index], row);
                     });
                 }
                 if(animate) {
@@ -1189,6 +1378,7 @@ function InlineImage() {
 
 /**
  * Create CANVAS element.
+ * If width and height have been set, Canvas size will be initialized to match the screen resolution.
  * @param {string} [identifier] 
  * @param {Object} [attributes] 
  * @param {Array} [children] 
@@ -1196,8 +1386,35 @@ function InlineImage() {
  */
 function Canvas() {
     var _arguments = Array.prototype.slice.call(arguments);
+
+    var width;
+    var height;
+    for(var i=0; i<_arguments.length; i++) {
+        var argument = _arguments[i];
+        if(!Array.isArray(argument) && typeof argument == "object") {
+            var keys = Object.keys(argument);
+            for(var j=0; j<keys.length; j++) {
+                var key = keys[j];
+                if(key == "width" && typeof argument[key] == "number") {
+                    width = argument[key];
+                    delete argument[key];
+                }else if(key == "height" && typeof argument[key] == "number") {
+                    height = argument[key];
+                    delete argument[key];
+                }
+            }
+            break;
+        }
+    }
+
     _arguments.splice(0, 0, "canvas");
-    return HtmlTag.apply(this, _arguments);
+    var element = HtmlTag.apply(this, _arguments);
+
+    if(width != undefined && height != undefined) {
+        CanvasUtil.initCanvas(element, Size(width, height));
+    }
+
+    return element;
 }
 
 /**
@@ -1692,6 +1909,7 @@ function Checkbox() {
  * @param {boolean} [settings.selectedDrawing=true] 
  * @param {boolean} [settings.editable=true] 
  * @param {string} [settings.dataKey] The key for object set in the ViewController or parent View. 
+ * @param {string} [settings.valueKey] When the element of the items is Object, the key for the value to be data-bounding.
  * @returns {HTMLDivElement}
  */
 function Select() {
@@ -1717,8 +1935,8 @@ function Select() {
     element.classList.add("_hardcore-select");
 
     if(settings != undefined) {
-        if(settings.styles != undefined) {
-            element.defineStyles(settings.styles);
+        if(settings.style != undefined) {
+            element.defineStyles(settings.style);
         }
         if(settings.valueKey != undefined) {
             element.valueKey = settings.valueKey;
@@ -1727,6 +1945,18 @@ function Select() {
             element.dataKey = settings.dataKey;
             if(element.valueKey == undefined) {
                 element.valueKey = settings.dataKey;
+            }
+        }
+        if(settings.itemDrawer == undefined && settings.labelHandler == undefined) {
+            settings.labelHandler = function(item) {
+                return item["label"];
+            }
+        }
+        if(settings.itemDrawer == undefined && settings.styleHandler == undefined) {
+            settings.styleHandler = function(item, current) {
+                return {
+                    padding: [0,8]
+                };
             }
         }
     }
@@ -1743,6 +1973,9 @@ function Select() {
     Object.defineProperty(element, "items", { 
         get: function() {
             return select.items;
+        },
+        set: function(newValue) {
+            select.items = newValue;
         }
     });
     if(element.dataKey != undefined) {
@@ -2024,6 +2257,16 @@ Object.defineProperty(Document.prototype, "globalStyles", {
             }
             _hadcore_styleSheet = styleSheets[document.styleSheets.length-1];
         }
+        function indexOfRule(key) {
+            if(_hadcore_styleSheet.cssRules == undefined) return -1;
+            for(var i=0; i<_hadcore_styleSheet.cssRules.length; i++) {
+                var rule = _hadcore_styleSheet.cssRules[i];
+                if(rule.cssText.startsWith(key)) {
+                    return i;
+                }
+            }
+            return -1;
+        }
         var i;
         if(typeof newValue == "string") {
             _hadcore_styleSheet.insertRule(newValue);
@@ -2041,6 +2284,10 @@ Object.defineProperty(Document.prototype, "globalStyles", {
                 var styles = newValue[selector];
                 if(typeof styles != "object") {
                     continue;
+                }
+                var currentStylesIndex = indexOfRule(selector);
+                if(currentStylesIndex != -1) {
+                    _hadcore_styleSheet.deleteRule(currentStylesIndex);
                 }
                 var expression = "";
                 expression += selector;
@@ -2064,6 +2311,9 @@ Object.defineProperty(Document.prototype, "globalStyles", {
                             }
                         }
                         styleValue = valueExp;
+                    }
+                    if(styleKey == "background-image" && styleValue != "none" && !styleValue.endsWith(")")) {
+                        styleValue = "url('"+styleValue+"')"
                     }
                     expression += styleKey + ":" + styleValue + ";";
                 }
@@ -2105,6 +2355,21 @@ HTMLElement.prototype.defineStyles = function(styles) {
 HTMLElement.prototype.replaceChildren = function(childNode) {
     HtmlElementUtil.replaceChildren(this, childNode);
     return this;
+};
+
+/**
+ * @typedef {Object} Offset
+ * @property {number} left
+ * @property {number} top
+ */
+
+/**
+ * Get the offset from the root element or parent element.
+ * @param {HTMLElement} parentElement 
+ * @returns {Offset}
+ */
+HTMLElement.prototype.offset = function(parentElement) {
+    return HtmlElementUtil.offset(this, parentElement);
 };
 
 /**
@@ -2162,6 +2427,35 @@ NodeList.prototype.forEach = function(iteration) {
     }
     return this;
 };
+
+/**
+ * Draw on the Canvas.
+ * @param {function(CanvasRenderingContext2D, Size): void} drawer 
+ * @param {boolean} refresh Clear the previous drawing contents before drawing.
+ * @returns HTMLCanvasElement
+ */
+HTMLCanvasElement.prototype.draw = function(drawer, refresh) {
+    var size = Size();
+    if(this.clientWidth == 0 && this.clientHeight == 0) {
+        var width = this.style.getPropertyValue("width");
+        var height = this.style.getPropertyValue("height");
+        if(typeof width == "string" && width.endsWith("px")) {
+            size.width = Number(width.substr(0, width.length-2));
+        }
+        if(typeof height == "string" && height.endsWith("px")) {
+            size.height = Number(height.substr(0, height.length-2));
+        }
+    }else {
+        size.width = this.clientWidth;
+        size.height = this.clientHeight;
+    }
+    var context = this.getContext("2d");
+    if(refresh != undefined && refresh) {
+        context.clearRect(0, 0, size.width, size.height);
+    }
+    drawer(context, size);
+    return this;
+}
 
 
 ////////////////////////////////////// Animations //////////////////////////////////////
@@ -4108,6 +4402,7 @@ var HtmlElementUtil = {
             for(var i=0; i<keys.length; i++) {
                 var key = keys[i];
                 var value = styles[key];
+                var priority = undefined;
                 if(Array.isArray(value)) {
                     var expression = "";
                     for(var j=0; j<value.length; j++) {
@@ -4124,12 +4419,20 @@ var HtmlElementUtil = {
                 }else if(typeof value != "object") {
                     if(typeof value == "number") {
                         value = value+"px";
+                    }else if(typeof value == "string") {
+                        if(value.endsWith("!important")) {
+                            priority = "important";
+                            value = value.substr(0, value.length-10);
+                        }
                     }
-                    element.style.setProperty(key, value);
+                    if(key == "background-image" && value != "none" && !value.endsWith(")")) {
+                        value = "url('"+value+"')"
+                    }
+                    element.style.setProperty(key, value, priority);
                     if(key == "user-select") {
-                        element.style.setProperty("-webkit-user-select", value);
-                        element.style.setProperty("-moz-user-select", value);
-                        element.style.setProperty("-ms-user-select", value);
+                        element.style.setProperty("-webkit-"+key, value, priority);
+                        element.style.setProperty("-moz-"+key, value, priority);
+                        element.style.setProperty("-ms-"+key, value, priority);
                     }
                 }else {
                     var innerElements = element.querySelectorAll(key);
@@ -4181,6 +4484,7 @@ var Controls = {
      * @param {function():void} [settings.closeHandler] 
      * @param {boolean} [settings.selectedDrawing=true] 
      * @param {boolean} [settings.editable=true] 
+     * @param {number} [settings.zIndex] 
      * 
      * @returns {Object} interface
      * @returns {number} interface.selectedIndex 
@@ -4202,6 +4506,7 @@ var Controls = {
         var parent;
         var itemWidth = 120;
         var itemHeight = 32;
+        var zIndex;
 
         var itemDrawer;
         var labelHandler;
@@ -4258,6 +4563,9 @@ var Controls = {
             if(settings.editable != undefined) {
                 editable = settings.editable;
             }
+            if(settings.zIndex != undefined) {
+                zIndex = settings.zIndex;
+            }
         }
         if(parent == undefined) {
             parent = document.querySelector("body");
@@ -4291,6 +4599,9 @@ var Controls = {
             selection.style.setProperty("width", itemWidth+"px");
             selection.style.setProperty("line-height", "0px");
         }
+        if(zIndex != null) {
+            selection.style.setProperty("z-index", zIndex);
+        }
 
         var mask = document.createElement("div");
         mask.style.setProperty("position", "absolute");
@@ -4299,6 +4610,9 @@ var Controls = {
         mask.style.setProperty("width", "100%");
         mask.style.setProperty("height", "100%");
         mask.style.setProperty("background-color", "transparent");
+        if(zIndex != null) {
+            mask.style.setProperty("z-index", zIndex);
+        }
 
         function createItem(item, current) {
             var itemElement;
@@ -4355,6 +4669,9 @@ var Controls = {
 
         function drawSelectedItem() {
             if(!selectedDrawing) return;
+            if(reference.items == null || reference.items.length == 0) {
+                return;
+            }
             if(reference.selectedIndex < 0 || reference.selectedIndex >= reference.items.length) {
                 return;
             }
@@ -4593,6 +4910,7 @@ var Controls = {
         controlsElement.classList.add("controls");
         element.appendChild(controlsElement);
 
+        element.style.setProperty("z-index", 999999);
         element.style.setProperty("background-color", "white");
         element.style.setProperty("color", "black");
         element.style.setProperty("padding", "16px");
@@ -4770,6 +5088,7 @@ var Controls = {
         var shadow = false;
         var modal = true;
         var visible = true;
+        var zIndex;
         if(settings != undefined) {
             if(settings.location != undefined) {
                 location = settings.location;
@@ -4811,6 +5130,9 @@ var Controls = {
             if(settings.visible != undefined) {
                 visible = settings.visible;
             }
+            if(settings.zIndex != undefined) {
+                zIndex = settings.zIndex;
+            }
         }
         if(parent == undefined) {
             parent = document.querySelector("body");
@@ -4821,6 +5143,9 @@ var Controls = {
         container.style.setProperty("position", "absolute");
         container.style.setProperty("left", location.x+"px");
         container.style.setProperty("top", location.y+"px");
+        if(zIndex != null) {
+            container.style.setProperty("z-index", zIndex);
+        }
 
         var mask = document.createElement("div");
         mask.style.setProperty("position", "absolute");
@@ -4829,6 +5154,9 @@ var Controls = {
         mask.style.setProperty("width", "100%");
         mask.style.setProperty("height", "100%");
         mask.style.setProperty("background-color", "transparent");
+        if(zIndex != null) {
+            mask.style.setProperty("z-index", zIndex);
+        }
 
         var canvasElement = document.createElement("canvas");
         container.appendChild(canvasElement);
@@ -5009,6 +5337,7 @@ var Controls = {
         });
         var location;
         function detectScroll(parentElement) {
+            if(parentElement == null) return;
             location.x -= parentElement.scrollLeft;
             location.y -= parentElement.scrollTop;
             if(parentElement.parentElement != null) {
