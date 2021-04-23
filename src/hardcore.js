@@ -322,28 +322,48 @@ function bindData(data, element) {
 
     var i;
 
-    function getValue(data, dataKey) {
+    function getValue(data, dataKey, dataHandler) {
         var value = data[dataKey];
         value = value !== undefined ? value : null;
+        if(dataHandler != null) {
+            value = dataHandler(value);
+        }
         return value;
     }
-    function setValue(data, dataKey, value) {
-        data[dataKey] = value !== undefined ? value : null;
+    function setValue(data, dataKey, value, dataHandler) {
+        value = value !== undefined ? value : null;
+        if(dataHandler != null) {
+            value = dataHandler(value);
+        }
+        data[dataKey] = value;
     }
 
     var inputElements = element.querySelectorAll("input,textarea,select");
     for(i=0; i<inputElements.length; i++) {
         var inputElement = inputElements[i];
         if(inputElement.dataKey != null) {
-            inputElement.value = getValue(data, inputElement.dataKey);
+            inputElement.value = getValue(data, inputElement.dataKey, inputElement.dataHandler);
             // autocomplete support
             inputElement.addEventListener("input", function(event) {
-                setValue(data, event.currentTarget.dataKey, event.currentTarget.value);
+                var inputElement = event.currentTarget;
+                setValue(data, inputElement.dataKey, inputElement.value, inputElement.dataHandler);
             });
             // general input completion
             inputElement.addEventListener("blur", function(event) {
-                setValue(data, event.currentTarget.dataKey, event.currentTarget.value);
+                var inputElement = event.currentTarget;
+                setValue(data, inputElement.dataKey, inputElement.value, inputElement.dataHandler);
             });
+        }
+    }
+
+    var dateElements = element.querySelectorAll("._hardcore-date");
+    for(i=0; i<dateElements.length; i++) {
+        var dateElement = dateElements[i];
+        if(dateElement.dataKey != null) {
+            dateElement.value = getValue(data, dateElement.dataKey, dateElement.dataHandler);
+            dateElement.dataBindHandler = function(value, dataKey) {
+                setValue(data, dataKey, value);
+            };
         }
     }
 
@@ -394,9 +414,9 @@ function bindData(data, element) {
         var checkboxElement = checkboxElements[i];
         if(checkboxElement.dataKey != null) {
             checkboxElement.checked = getValue(data, checkboxElement.dataKey);
-            checkboxElement.addEventListener("click", function(event) {
-                setValue(data, event.currentTarget.dataKey, event.currentTarget.checked);
-            });
+            checkboxElement.dataBindHandler = function(value, dataKey) {
+                setValue(data, dataKey, value);
+            };
         }
     }
     
@@ -660,6 +680,7 @@ function Input() {
 
     var leaveWithEnter = true;
     var dataKey;
+    var dataHandler;
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
         if(!Array.isArray(argument) && typeof argument == "object") {
@@ -671,6 +692,9 @@ function Input() {
                     delete argument[key];
                 }else if(key == "dataKey" && typeof argument[key] == "string") {
                     dataKey = argument[key];
+                    delete argument[key];
+                }else if(key == "dataHandler" && typeof argument[key] == "function") {
+                    dataHandler = argument[key];
                     delete argument[key];
                 }
             }
@@ -704,6 +728,10 @@ function Input() {
 
     if(dataKey != null) {
         element.dataKey = dataKey;
+    }
+
+    if(dataHandler != null) {
+        element.dataHandler = dataHandler;
     }
 
     return element;
@@ -869,7 +897,490 @@ function MailField() {
     }
 }
 
+/**
+ * Create input field for a date/time value element.
+ * @param {string} [identifier] 
+ * @param {Object} [attributes] 
+ * @param {string} [attributes.dataKey] The key for object set in the ViewController or parent View. 
+ * @param {date|time|datetime} [attributes.type] 
+ * @param {string} [attributes.format] 
+ * @param {string} [attributes.color] 
+ * @param {string} [attributes.weekendColor] 
+ * @param {number} [attributes.zIndex] 
+ * @returns {HTMLInputElement}
+ */
 function DateField() {
+    var _arguments = Array.prototype.slice.call(arguments);
+
+    var label;
+    var type = "date";
+    var format = "yyyy/M/d";
+    var dataKey;
+    var dataHandler;
+    var color = "black";
+    var weekendColor;
+    var zIndex = 0;
+    for(var i=0; i<_arguments.length; i++) {
+        var argument = _arguments[i];
+        if(!Array.isArray(argument) && typeof argument == "object") {
+            var keys = Object.keys(argument);
+            for(var j=0; j<keys.length; j++) {
+                var key = keys[j];
+                if(key == "label" && typeof argument[key] == "string") {
+                    label = argument[key];
+                    delete argument[key];
+                }else if(key == "type" && typeof argument[key] == "string") {
+                    type = argument[key];
+                    delete argument[key];
+                }else if(key == "format" && typeof argument[key] == "string") {
+                    format = argument[key];
+                    delete argument[key];
+                }else if(key == "dataKey" && typeof argument[key] == "string") {
+                    dataKey = argument[key];
+                    delete argument[key];
+                }else if(key == "dataHandler" && typeof argument[key] == "function") {
+                    dataHandler = argument[key];
+                    delete argument[key];
+                }else if(key == "color" && typeof argument[key] == "string") {
+                    color = argument[key];
+                    delete argument[key];
+                }else if(key == "weekendColor" && typeof argument[key] == "string") {
+                    weekendColor = argument[key];
+                    delete argument[key];
+                }else if(key == "zIndex" && typeof argument[key] == "number") {
+                    zIndex = argument[key];
+                    delete argument[key];
+                }
+            }
+            break;
+        }
+    }
+
+    var element = View.apply(this, _arguments);
+    
+    element.style.setProperty("cursor", "default");
+
+    if(dataKey != null) {
+        element.dataKey = dataKey;
+        element.classList.add("_hardcore-date");
+    }
+    if(dataHandler != null) {
+        element.dataHandler = function(value) {
+            element.innerText = formatDate(value);
+            return dataHandler(value);
+        };
+    }else {
+        element.dataHandler = function(value) {
+            element.innerText = formatDate(value);
+            return value;
+        };
+    }
+
+    function getValue() {
+        if(element.value != null) {
+            if(typeof element.value == "number") {
+                return new Date(element.value);
+            }else if(typeof element.value == "string") {
+                return DateUtil.parse(element.value, format);
+            }else if(element.value instanceof Date) {
+                return element.value;
+            }
+        }
+        return null;
+    }
+
+    function formatDate(value) {
+        var expression = "";
+        if(typeof value == "number") {
+            expression = DateUtil.format(new Date(value), format);
+        }else if(value instanceof Date) {
+            expression = DateUtil.format(value, format);
+        }
+        return expression;
+    }
+
+    var width = 240;
+    var height = 144;
+
+    var daySize = Size(Math.floor(width/7), Math.floor(height/6));
+        
+    function loadMonth(element, container, year, monthIndex, selectable, now) {
+        var header = container.querySelector(".header");
+        header.innerText = year + "年" + (monthIndex+1) + "月";
+        var days = container.querySelectorAll(".day");
+        for(var i=0; i<days.length; i++) {
+            days[i].remove();
+        }
+        var day = new Date(year, monthIndex, 1);
+        var weekView;
+        while(day.getMonth() == monthIndex) {
+            var dayOfWeek = day.getDay();
+            if(weekView == null) {
+                weekView = View();
+                for(var j=0; j<dayOfWeek; j++) {
+                    var _dayView = View(".day", {style:{
+                        display: "inline-block",
+                        "vertical-align": "top",
+                        width: daySize.width,
+                        height: daySize.height
+                    }});
+                    weekView.appendChild(_dayView);
+                }
+                container.appendChild(weekView);
+            }else if(dayOfWeek == 0) {
+                weekView = View();
+                container.appendChild(weekView);
+            }
+            var contents;
+            if(now != null && day.getTime() == now.getTime()) {
+                contents = Canvas({width: daySize.width, height: daySize.height});
+                var context = contents.getContext("2d");
+                var center = Point(daySize.width/2, daySize.height/2);
+                context.arc(center.x, center.y, Math.min(center.x, center.y), 0, 2*Math.PI, false);
+                context.fillStyle = color;
+                context.fill();
+                context.fillStyle = "white";
+                context.textBaseline = "middle";
+                context.textAlign = "center";
+                context.fillText(day.getDate(), center.x, center.y);
+            }else {
+                contents = day.getDate();
+            }
+            var dayView = View(".day", {style:{
+                "text-align": "center",
+                display: "inline-block",
+                "line-height": daySize.height,
+                "vertical-align": "top",
+                "user-select": "none",
+                width: daySize.width,
+                height: daySize.height,
+                color: ((weekendColor != null && (dayOfWeek == 0 || dayOfWeek == 6)) ? weekendColor : color)
+            }}, [contents]);
+            if(selectable) {
+                dayView.addEventListener("click", function(event) {
+                    var dayElement = event.currentTarget;
+                    var date = dayElement.value;
+                    if(date != null) {
+                        element.value = date;
+                        element.innerText = formatDate(date);
+                        if(dataKey != null) {
+                            element.dataBindHandler(date, dataKey);
+                        }
+                    }
+                });
+                dayView.value = day;
+            }
+            weekView.appendChild(dayView);
+            day = DateUtil.getDateByAdding(day, 1);
+        }
+    }
+
+    function createCalendar(element) {
+        var container = View({style:{
+            width: width, 
+            "overflow-x": "hidden", 
+            "cursor": "default", 
+            "overscroll-behavior-x": "none"
+        }});
+
+        var calendarContainer = View({style:{width: width, "white-space":"nowrap"}});
+        container.appendChild(calendarContainer);
+
+        var now = DateUtil.getDateBySlicingTime(new Date());
+        var nowYear = now.getFullYear();
+        var nowMonthIndex = now.getMonth();
+
+        var selectedDate = getValue();
+        if(selectedDate == null) {
+            selectedDate = new Date();
+        }
+        var year = selectedDate.getFullYear();
+        var monthIndex = selectedDate.getMonth();
+
+        var _year = year;
+        var _monthIndex = monthIndex;
+        if(_monthIndex > 0) {
+            _monthIndex -= 1;
+        }else {
+            _year -= 1;
+            _monthIndex = 11;
+        }
+        for(var i=0; i<3; i++) {
+            var calendar = View(".month", {style: {
+                width: width, 
+                "display": "inline-block", 
+                "vertical-align": "top"
+            }}, [
+                View(".header", {style:{"text-align": "center"}})
+            ]);
+            calendarContainer.appendChild(calendar);
+            loadMonth(element, calendar, _year, _monthIndex, i==1, (nowYear == _year && nowMonthIndex == _monthIndex ? now : null));
+
+            if(_monthIndex < 11) {
+                _monthIndex += 1;
+            }else {
+                _year += 1;
+                _monthIndex = 0;
+            }
+        }
+
+        function reloadCalendars() {
+            var _year = year;
+            var _monthIndex = monthIndex;
+            if(_monthIndex > 0) {
+                _monthIndex -= 1;
+            }else {
+                _year -= 1;
+                _monthIndex = 11;
+            }
+            var calendars = calendarContainer.querySelectorAll(".month");
+            for(var i=0; i<3; i++) {
+                loadMonth(element, calendars[i], _year, _monthIndex, i==1, (nowYear == _year && nowMonthIndex == _monthIndex ? now : null));
+
+                if(_monthIndex < 11) {
+                    _monthIndex += 1;
+                }else {
+                    _year += 1;
+                    _monthIndex = 0;
+                }
+            }
+        }
+
+        UIEventUtil.handleTouch(container, {
+            touchBegan: function(event, context) {
+                context.beginLocation = UIEventUtil.getLocation(event);
+            }, 
+            touchMove: function(event, context) {
+                if(context == null || context.beginLocation == null || container.scrolling) {
+                    return;
+                }
+                var currentLocation = UIEventUtil.getLocation(event);
+                if(currentLocation.x - context.beginLocation.x > 40) {
+                    container.scrolling = true;
+                    new FunctionalAnimation(function(progress) {
+                        container.scrollLeft = (1-progress)*width;
+                    }, FunctionalAnimation.methods.easeOut, 500).start().finish(function() {
+                        if(monthIndex > 0) {
+                            monthIndex -= 1;
+                        }else {
+                            year -= 1;
+                            monthIndex = 11;
+                        }
+                        reloadCalendars();
+                        container.scrollLeft = width;
+
+                        container.scrolling = false;
+                    });
+                    return false;
+                }else if(currentLocation.x - context.beginLocation.x < -40) {
+                    container.scrolling = true;
+                    new FunctionalAnimation(function(progress) {
+                        container.scrollLeft = width+progress*width;
+                    }, FunctionalAnimation.methods.easeOut, 500).start().finish(function() {
+                        if(monthIndex < 11) {
+                            monthIndex += 1;
+                        }else {
+                            year += 1;
+                            monthIndex = 0;
+                        }
+                        reloadCalendars();
+                        container.scrollLeft = width;
+
+                        container.scrolling = false;
+                    });
+                    return false;
+                }
+            }
+        });
+        
+        return container;
+    }
+
+    function createTimePicker(element) {
+        var container = View({style: {"overflow": "hidden"}});
+
+        var indicator = Canvas({width: daySize.width*2, height: daySize.height, style:{
+            position: "absolute"
+        }});
+        var context = indicator.getContext("2d");
+        DrawUtil.drawRoundRect(context, Rect(5,1,daySize.width*2-6,daySize.height-2), "darkgray", 4, true);
+        container.appendChild(indicator);
+
+        var hourView = View({style: {
+            "display": "inline-block", 
+            "overflow": "hidden",
+            width: daySize.width,
+            height: height,
+            "vertical-align": "top"
+        }});
+        var minutesView = View({style: {
+            "display": "inline-block", 
+            "overflow": "hidden",
+            width: daySize.width,
+            height: height,
+            "vertical-align": "top"
+        }});
+        for(var hour=0; hour<24; hour++) {
+            hourView.appendChild(View({style: {
+                "text-align": "right",
+                "line-height": daySize.height,
+                "user-select": "none",
+                padding: [0,4]
+            }}, [hour]));
+        }
+        for(hour=0; hour<5; hour++) {
+            hourView.appendChild(View({style: {
+                height: daySize.height
+            }}));
+        }
+        for(var minute=0; minute<59; minute++) {
+            minutesView.appendChild(View({style: {
+                "text-align": "right",
+                "line-height": daySize.height,
+                "user-select": "none",
+                padding: [0,4]
+            }}, [minute]));
+        }
+        for(minute=0; minute<5; minute++) {
+            minutesView.appendChild(View({style: {
+                height: daySize.height
+            }}));
+        }
+        container.appendChild(hourView);
+        container.appendChild(minutesView);
+
+        setupTouch(hourView, function(updatedValue) {
+            setValue(element, updatedValue);
+        });
+        setupTouch(minutesView, function(updatedValue) {
+            setValue(element, null, updatedValue);
+        });
+
+        var selectedDate = getValue();
+        if(element.value == null) {
+            selectedDate = new Date();
+        }
+        var hours = selectedDate.getHours();
+        if(ResizeObserver !== undefined) {
+            var resizeObserver = new ResizeObserver(function(observations) {
+                if(observations.length == 0) return;
+                var hourView = observations[0].target;
+                resizeObserver.disconnect();
+                hourView.scrollTop = daySize.height * hours;
+            });
+            resizeObserver.observe(hourView);
+        }else {
+            setTimeout(function() {
+                hourView.scrollTop = daySize.height * hours;
+            },0);
+        }
+
+        function setupTouch(container, updateHandler) {
+            UIEventUtil.handleTouch(container, {
+                touchBegan: function(event, context) {
+                    context.beginLocation = UIEventUtil.getLocation(event);
+                    context.beginOffsetTop = container.scrollTop;
+                }, 
+                touchMove: function(event, context) {
+                    if(context == null || context.beginLocation == null || context.beginOffsetTop == null || container.scrolling) {
+                        return;
+                    }
+                    var currentLocation = UIEventUtil.getLocation(event);
+                    var distance = context.beginLocation.y - currentLocation.y;
+                    container.scrollTop = context.beginOffsetTop + distance;
+                },
+                touchEnd: function(event, context) {
+                    if(context == null || context.beginLocation == null || context.beginOffsetTop == null || container.scrolling) {
+                        return;
+                    }
+                    var y = container.scrollTop;
+                    var distance = y % daySize.height;
+                    if(distance > 0) {
+                        container.scrolling = true;
+                        new FunctionalAnimation(function(progress) {
+                            container.scrollTop = y-distance*progress;
+                        }, FunctionalAnimation.methods.easeOut, 500).start().finish(function() {
+                            updateHandler(container.scrollTop / daySize.height);
+                            container.scrolling = false;
+                        });
+                    }else {
+                        updateHandler(container.scrollTop / daySize.height);
+                    }
+                }
+            });
+        }
+
+        function setValue(element, hours, minutes) {
+            var date = getValue();
+            if(date != null) {
+                if(hours != null) {
+                    date.setHours(hours);
+                }
+                if(minutes != null) {
+                    date.setMinutes(minutes);
+                }
+                element.value = date;
+                element.innerText = formatDate(date);
+                if(dataKey != null) {
+                    element.dataBindHandler(date, dataKey);
+                }
+            }
+        }
+
+        return container;
+    }
+
+    element.addEventListener("click", function(event) {
+        var element = event.currentTarget;
+        var content;
+        if(type == "date") {
+            content = createCalendar(element);
+        }else if(type == "time") {
+            content = createTimePicker(element);
+        }else {
+            content = View({style: {"white-space":"nowrap"}});
+            var calendar = createCalendar(element);
+            calendar.style.setProperty("display", "inline-block");
+            calendar.style.setProperty("vertical-align", "top");
+            content.appendChild(calendar);
+            var timePicker = createTimePicker(element);
+            timePicker.style.setProperty("display", "inline-block");
+            timePicker.style.setProperty("vertical-align", "top");
+            timePicker.style.setProperty("width", (daySize.width*2)+"px");
+            timePicker.style.setProperty("height", height+"px");
+            timePicker.style.setProperty("border-left", "1px solid darkgray");
+            content.appendChild(timePicker);
+        }
+        var offset = element.offset();
+        Controls.Balloon(content, {
+            location: Point(offset.left, offset.top+element.clientHeight), 
+            direction: "top", 
+            shadow: true, 
+            zIndex: zIndex,
+            loadHandler: function(balloon, settings) {
+                settings.location = Point(offset.left+element.clientWidth/2-balloon.offsetWidth/2, offset.top+element.clientHeight)
+                calendar.scrollLeft = width;
+                return settings;
+            }
+        });
+    });
+
+    if(label == null) {
+        return element;
+    }else {
+        var inputComposite = InputComposite({label: label}, [element]);
+        return inputComposite;
+    }
+}
+
+/**
+ * Create INPUT type=time element.
+ * @param {string} [identifier] 
+ * @param {Object} [attributes] 
+ * @param {string} [attributes.dataKey] The key for object set in the ViewController or parent View. 
+ * @returns {HTMLInputElement}
+ */
+ function TimeField() {
     var _arguments = Array.prototype.slice.call(arguments);
 
     var label;
@@ -889,10 +1400,10 @@ function DateField() {
     }
 
     if(label == null) {
-        _arguments.splice(0, 0, "date");
+        _arguments.splice(0, 0, "time");
         return Input.apply(this, _arguments);
     }else {
-        _arguments.splice(0, 0, "date");
+        _arguments.splice(0, 0, "time");
         var element = Input.apply(this, _arguments);
         var inputComposite = InputComposite({label: label}, [element]);
         return inputComposite;
@@ -1539,6 +2050,20 @@ function InputComposite() {
 
     var element = View.apply(this, _arguments);
 
+    function setProperty(element, key, value, selector) {
+        if(selector != null) {
+            var children = element.querySelectorAll(selector);
+            for(var i=0; i<children.length; i++) {
+                setProperty(children[i], key, value);
+            }
+            return;
+        }
+        var _value = element.style.getPropertyValue(key);
+        if(_value == null || _value.length == 0) {
+            element.style.setProperty(key, value);
+        }
+    }
+
     element.defineStyles({
         "min-height": "40px",
         "border": "1px solid darkgray",
@@ -1546,21 +2071,20 @@ function InputComposite() {
         "text-align": "left",
         "padding": "4px",
         "margin": "8px 0",
-        "input, select, textarea": {
-            "width": "calc(100% - 8px)"
-        },
         ".label": {
             "font-size": "10px",
-            "color": "darkgray",
-            "cursor": "default",
+            color: "darkgray",
+            cursor: "default",
             "user-select": "none"
         },
         ".unit": {
             "font-size": "10px",
             "margin-left": "4px",
-            "color": "darkgray"
+            color: "darkgray"
         }
     });
+    setProperty(element, "width", "calc(100% - 8px)", "input, select, textarea");
+
     if(style != undefined) {
         element.defineStyles(style);
     }
@@ -1861,6 +2385,9 @@ function Checkbox() {
             return this._checked;
         },
         set: function(newValue) {
+            if(newValue == null) {
+                newValue = false;
+            }
             var initial = this._checked == undefined;
             this._checked = newValue;
             var canvas = this.querySelector("canvas");
@@ -1885,6 +2412,9 @@ function Checkbox() {
         context.clearRect(0, 0, canvas.width, canvas.height);
         drawBox(context);
         element.checked = !element.checked;
+        if(dataKey != null) {
+            element.dataBindHandler(element.checked, dataKey);
+        }
         if(changeHandler != undefined) {
             changeHandler(element.checked);
         }
@@ -2748,7 +3278,7 @@ var DateUtil = {
     /**
      * Format Date object.
      * @param {Date} date
-     * @param {string} [format]
+     * @param {string} [format=yyyy-MM-dd]
      * @returns {string}
      * @see http://www.unicode.org/reports/tr35/tr35-31/tr35-dates.html#Date_Format_Patterns
      */
@@ -2846,6 +3376,90 @@ var DateUtil = {
             result = result.replace(/ss/, StringUtil.padding(seconds, "0", 2));
             result = result.replace(/s/, seconds);
         }
+        return result;
+    },
+
+    /**
+     * Parse Date formatted string.
+     * @param {string} dateString
+     * @param {string} [format=yyyy-MM-dd]
+     * @returns {Date}
+     * @see http://www.unicode.org/reports/tr35/tr35-31/tr35-dates.html#Date_Format_Patterns
+     */
+    parse: function(dateString, format) {
+        if(dateString == null || typeof dateString != "string" || dateString.length == 0) {
+            return null;
+        }
+        if(format == null) {
+            format = "yyyy-MM-dd";
+        }
+        var result = null;
+
+        function retrieveValue(souce, format, regex) {
+            var result = regex.exec(format);
+            if(result != null) {
+                return Number(souce.substring(result.index, regex.lastIndex));
+            }
+            return null;
+        }
+
+        var value;
+        if(format.includes("y")) {
+            value = retrieveValue(dateString, format, /y+/g);
+            if(result == null) {
+                result = new Date();
+            }
+            result.setFullYear(value);
+        }else {
+            result.setFullYear(0);
+        }
+        if(format.includes("M")) {
+            value = retrieveValue(dateString, format, /M+/g);
+            if(result == null) {
+                result = new Date();
+            }
+            result.setMonth(value-1);
+        }else {
+            result.setMonth(0);
+        }
+        if(format.includes("d")) {
+            value = retrieveValue(dateString, format, /d+/g);
+            if(result == null) {
+                result = new Date();
+            }
+            result.setDate(value);
+        }else {
+            result.setDate(0);
+        }
+        if(format.includes("H")) {
+            value = retrieveValue(dateString, format, /H+/g);
+            if(result == null) {
+                result = new Date();
+            }
+            result.setHours(value);
+        }else {
+            result.setHours(0);
+        }
+        if(format.includes("m")) {
+            value = retrieveValue(dateString, format, /m+/g);
+            if(result == null) {
+                result = new Date();
+            }
+            result.setMinutes(value);
+        }else {
+            result.setMinutes(0);
+        }
+        if(format.includes("s")) {
+            value = retrieveValue(dateString, format, /s+/g);
+            if(result == null) {
+                result = new Date();
+            }
+            result.setSeconds(value);
+        }else {
+            result.setSeconds(0);
+        }
+        result.setMilliseconds(0);
+
         return result;
     },
 
@@ -3412,6 +4026,7 @@ var DrawUtil = {
      * @param {Rect} rect 
      * @param {string} color 
      * @param {number} radius 
+     * @param {boolean} stroke 
      */
     drawRoundRect: function(context, rect, color, radius, stroke) {
         if(radius == undefined) {
@@ -4163,49 +4778,53 @@ var UIEventUtil = {
     handleTouch: function(element, settings) {
         var context;
         if("ontouchstart" in document.documentElement) {
-            if(settings.touchBegan != undefined) {
-                element.addEventListener("touchstart", function(event) {
-                    context = {};
+            element.addEventListener("touchstart", function(event) {
+                context = {};
+                if(settings.touchBegan != undefined) {
                     settings.touchBegan(event, context);
-                }, {passive: (settings.touchBeganCancellable != undefined ? settings.touchBeganCancellable : true)});
-            }
+                }
+            }, {passive: (settings.touchBeganCancellable != undefined ? settings.touchBeganCancellable : true)});
             if(settings.touchMove != undefined) {
                 element.addEventListener("touchmove", function(event) {
                     settings.touchMove(event, context);
                 }, {passive: (settings.touchMoveCancellable != undefined ? settings.touchMoveCancellable : true)});
             }
-            if(settings.touchEnd != undefined) {
-                element.addEventListener("touchend", function(event) {
+            element.addEventListener("touchend", function(event) {
+                if(settings.touchEnd != undefined) {
                     settings.touchEnd(event, context, true);
-                    context = undefined;
-                }, {passive: (settings.touchEndCancellable != undefined ? settings.touchEndCancellable : true)});
-                element.addEventListener("touchcancel", function(event) {
+                }
+                context = undefined;
+            }, {passive: (settings.touchEndCancellable != undefined ? settings.touchEndCancellable : true)});
+            element.addEventListener("touchcancel", function(event) {
+                if(settings.touchEnd != undefined) {
                     settings.touchEnd(event, context, false);
-                    context = undefined;
-                }), {passive: (settings.touchEndCancellable != undefined ? settings.touchEndCancellable : true)};
-            }
+                }
+                context = undefined;
+            }), {passive: (settings.touchEndCancellable != undefined ? settings.touchEndCancellable : true)};
         }else {
-            if(settings.touchBegan != undefined) {
-                element.addEventListener("mousedown", function(event) {
-                    context = {}; 
+            element.addEventListener("mousedown", function(event) {
+                context = {}; 
+                if(settings.touchBegan != undefined) {
                     settings.touchBegan(event, context);
-                });
-            }
+                }
+            }); 
             if(settings.touchMove != undefined) {
                 element.addEventListener("mousemove", function(event) {
                     settings.touchMove(event, context);
                 });
             }
-            if(settings.touchEnd != undefined) {
-                element.addEventListener("mouseup", function(event) {
+            element.addEventListener("mouseup", function(event) {
+                if(settings.touchEnd != undefined) {
                     settings.touchEnd(event, context, true);
-                    context = undefined;
-                });
-                element.addEventListener("mouseleave", function (event) {
+                }
+                context = undefined;
+            });
+            element.addEventListener("mouseleave", function (event) {
+                if(settings.touchEnd != undefined) {
                     settings.touchEnd(event, context, false);
-                    context = undefined;
-                });
-            }
+                }
+                context = undefined;
+            });
         }
     },
 

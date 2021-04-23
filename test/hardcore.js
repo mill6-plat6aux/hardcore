@@ -33,6 +33,19 @@ describe("DateUtil", () => {
         assert.strictEqual(DateUtil.format(""), null);
         assert.strictEqual(DateUtil.format(new Date(), "TEST"), "TEST");
     });
+    it("parse", () => {
+        assert.strictEqual(DateUtil.parse("2020-04-05", "yyyy-MM-dd").getTime(), new Date(2020, 4-1, 5).getTime());
+        assert.strictEqual(DateUtil.parse("20200405", "yyyyMMdd").getTime(), new Date(2020, 4-1, 5).getTime());
+        assert.strictEqual(DateUtil.parse("2020/4/5", "yyyy/M/d").getTime(), new Date(2020, 4-1, 5).getTime());
+        assert.strictEqual(DateUtil.parse("2020/4/5 Sunday", "yyyy/M/d EEEE").getTime(), new Date(2020, 4-1, 5).getTime());
+        assert.strictEqual(DateUtil.parse("2020/4/5 Sun", "yyyy/M/d EEE").getTime(), new Date(2020, 4-1, 5).getTime());
+        assert.strictEqual(DateUtil.parse("2020/4/5 日曜日", "yyyy/M/d eeee").getTime(), new Date(2020, 4-1, 5).getTime());
+        assert.strictEqual(DateUtil.parse("2020/4/5 日", "yyyy/M/d eee").getTime(), new Date(2020, 4-1, 5).getTime());
+        assert.strictEqual(DateUtil.parse("2020/4/5 4:25", "yyyy/M/d H:mm").getTime(), new Date(2020, 4-1, 5, 4, 25).getTime());
+        assert.strictEqual(DateUtil.parse("2020/4/5 04:25:03", "yyyy/M/d HH:mm:ss").getTime(), new Date(2020, 4-1, 5, 4, 25, 3).getTime());
+        assert.strictEqual(DateUtil.parse(null, null), null);
+        assert.strictEqual(DateUtil.parse("", null), null);
+    });
     it("getDateByAdding", () => {
         let DateUnit = hardcore.__get__("DateUnit");
         assert.strictEqual(DateUtil.getDateByAdding(new Date(2020, 4-1, 5), 3).getTime(), new Date(2020, 4-1, 8).getTime());
