@@ -387,6 +387,8 @@ function bindData(data, element) {
                 }
             }
             selectElement.selectedIndex = selectedIndex;
+        }
+        if(selectElement.dataKey != null) {
             selectElement.dataBindHandler = function(selectedIndex, _element) {
                 if(_element.items != null && selectedIndex < _element.items.length) {
                     var selectedItem = _element.items[selectedIndex];
