@@ -2092,9 +2092,12 @@ function InputComposite() {
     }
 
     element.addEventListener("click", function(event) {
-        var innerElement = event.currentTarget.querySelector("input,textarea,selector");
-        if(innerElement != null) {
-            innerElement.focus();
+        var targetElement = event.target;
+        if(targetElement instanceof HTMLDivElement) {
+            var innerElement = event.currentTarget.querySelector("input,textarea,selector");
+            if(innerElement != null) {
+                innerElement.focus();
+            }
         }
     });
 
