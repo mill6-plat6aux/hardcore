@@ -66,10 +66,19 @@ ViewController.prototype.showView = function() {
 };
 
 /**
+ * Reload the view.
+ * @memberof ViewController
+ * @type {function(void): void}
+ */
+ViewController.prototype.reloadData = function() {
+    bindData(this.data, this.view);
+}
+
+/**
  * @name ViewController#parent
  * @type {HTMLElement|string}
  */
- Object.defineProperty(ViewController.prototype, "parent", {
+Object.defineProperty(ViewController.prototype, "parent", {
     get: function() {
         return this._parent;
     },
@@ -1467,7 +1476,7 @@ function FileSelector() {
  * @param {Array.<TableColumnDefinition>} [attributes.data] 
  * @param {Array.<TableColumnDefinition>} [attributes.dataKey] The key for object set in the ViewController or parent View. "." points to the root of the data set in the ViewController or parent View.
  * @param {Array.<TableColumnDefinition>} [attributes.columns] 
- * @param {function(any): void} [attributes.tapHandler] Select a row handler
+ * @param {function(any, number, HTMLTableRowElement): void} [attributes.tapHandler] Select a row handler. The first argument is the selected row data.
  * @param {number} [attributes.rowHeight]
  * @param {boolean} [attributes.animate=false]
  * @param {Object} [attributes.headerStyle]
@@ -1650,7 +1659,7 @@ function Table() {
                     row.addEventListener("click", function(event) {
                         var row = event.currentTarget;
                         var index = tableBody.querySelectorAll("tr").indexOf(row);
-                        tapHandler(data[index], row);
+                        tapHandler(data[index], index, row);
                     });
                 }
                 if(animate) {
@@ -2022,6 +2031,9 @@ function InputComposite() {
     var label;
     var style;
     var children;
+    var borderColor = "darkgray";
+    var labelColor = "darkgray";
+    var unitColor = "darkgray";
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
         if(identifierIndex == -1 && typeof argument == "string") {
@@ -2037,6 +2049,15 @@ function InputComposite() {
                     delete argument[key];
                 }else if(key == "style") {
                     style = argument[key];
+                    delete argument[key];
+                }else if(key == "borderColor") {
+                    borderColor = argument[key];
+                    delete argument[key];
+                }else if(key == "labelColor") {
+                    labelColor = argument[key];
+                    delete argument[key];
+                }else if(key == "unitColor") {
+                    unitColor = argument[key];
                     delete argument[key];
                 }
             }
@@ -2068,21 +2089,21 @@ function InputComposite() {
 
     element.defineStyles({
         "min-height": "40px",
-        "border": "1px solid darkgray",
+        "border": "1px solid "+borderColor,
         "border-radius": "4px",
         "text-align": "left",
         "padding": "4px",
         "margin": "8px 0",
         ".label": {
             "font-size": "10px",
-            color: "darkgray",
+            color: labelColor,
             cursor: "default",
             "user-select": "none"
         },
         ".unit": {
             "font-size": "10px",
             "margin-left": "4px",
-            color: "darkgray"
+            color: unitColor
         }
     });
     setProperty(element, "width", "calc(100% - 8px)", "input, select, textarea");
@@ -2155,6 +2176,10 @@ function NumericField() {
         }
     }
     var element = TextField.apply(this, _arguments);
+    var inputElement = element;
+    if(inputElement.tagName.toLowerCase() != "input") {
+        inputElement = inputElement.querySelector("input");
+    }
 
     if(unit != undefined) {
         if(ResizeObserver !== undefined) {
@@ -2172,34 +2197,34 @@ function NumericField() {
                 unitElement.innerText = unit;
                 element.after(unitElement);
             });
-            resizeObserver.observe(element);
+            resizeObserver.observe(inputElement);
         }else {
             console.error("Your browser does not support ResizeObserver. Please try to run Polyfill for this function.");
         }
     }
 
     if(currency) {
-        element.addEventListener("focus", function() {
-            var value = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").get.call(element);
+        inputElement.addEventListener("focus", function() {
+            var value = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").get.call(inputElement);
             if(value != null) {
-                Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(element, value.replace(/,/g, ""));
+                Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(inputElement, value.replace(/,/g, ""));
             }
         });
-        element.addEventListener("blur", function() {
-            var value = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").get.call(element);
+        inputElement.addEventListener("blur", function() {
+            var value = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").get.call(inputElement);
             if(value != null) {
-                Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(element, StringUtil.currencyString(value));
+                Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(inputElement, StringUtil.currencyString(value));
             }
         });
-        var value = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").get.call(element);
+        var value = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").get.call(inputElement);
         if(value != null) {
-            Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(element, StringUtil.currencyString(value));
+            Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(inputElement, StringUtil.currencyString(value));
         }
     }
 
-    Object.defineProperty(element, "value", { 
+    Object.defineProperty(inputElement, "value", { 
         get: function() {
-            var value = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").get.call(element);
+            var value = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").get.call(inputElement);
             if(value == null) {
                 return value;
             }
@@ -2219,7 +2244,7 @@ function NumericField() {
             if(currency) {
                 newValue = StringUtil.currencyString(newValue);
             }
-            Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(element, newValue);
+            Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(inputElement, newValue);
         }
     });
 
@@ -3579,7 +3604,19 @@ var StringUtil = {
         if(source.length == 0) return source;
         var result = [];
         var index = 0;
-        for(var i=source.length-1; i>=0; i--) {
+        var i;
+        if(source.includes(".")) {
+            for(i=source.length-1; i>=0; i--) {
+                var char = source.charAt(i);
+                result.push(char);
+                if(char == ".") {
+                    source = source.substring(0, i);
+                    break;
+                }
+            }
+        }
+        index = 0;
+        for(i=source.length-1; i>=0; i--) {
             if(index != 0 && index % 3 == 0) {
                 result.push(",");
             }

@@ -99,6 +99,14 @@ describe("StringUtil", () => {
         assert.strictEqual(StringUtil.currencyString(123456), "123,456");
         assert.strictEqual(StringUtil.currencyString(1234567), "1,234,567");
         assert.strictEqual(StringUtil.currencyString("1234567"), "1,234,567");
+        assert.strictEqual(StringUtil.currencyString(123.0), "123");
+        assert.strictEqual(StringUtil.currencyString(123.4), "123.4");
+        assert.strictEqual(StringUtil.currencyString(123.45), "123.45");
+        assert.strictEqual(StringUtil.currencyString(1234.5), "1,234.5");
+        assert.strictEqual(StringUtil.currencyString(0.5), "0.5");
+        assert.strictEqual(StringUtil.currencyString(0.567), "0.567");
+        assert.strictEqual(StringUtil.currencyString(0.0), "0");
+        assert.strictEqual(StringUtil.currencyString(0), "0");
         assert.strictEqual(StringUtil.currencyString(""), "");
         assert.strictEqual(StringUtil.currencyString(null), "");
         assert.strictEqual(StringUtil.currencyString("ABC"), "");

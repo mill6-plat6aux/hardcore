@@ -59,6 +59,10 @@ var HttpConnection = {
             method = self.defaultMethod;
         }
 
+        if(request instanceof Array && !Array.isArray(request)) {
+            request = Array.from(request);
+        }
+
         var _request = {
             method: method,
             cache: self.defaultCachePolicy,
