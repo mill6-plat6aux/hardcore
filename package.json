@@ -1,6 +1,6 @@
 {
   "name": "hardcore-client",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "View components for Pure JavaScript lovers❤️",
   "keywords": [
     "Front-end",
@@ -35,6 +35,6 @@
     "mocha": "^8.2.1",
     "polyfill-library": "^3.103.0",
     "rewire": "^5.0.0",
-    "uglify-es": "^3.3.10"
+    "uglify-js": "^3.14.1"
   }
 }

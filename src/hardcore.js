@@ -52,6 +52,12 @@ function ViewController() {
      * @type {boolean}
      */
     this.replace = true;
+
+    /**
+     * Called when the data loading is complete.
+     * @type {function(void): void}
+     */
+    this.dataLoadedHandler = null;
 }
 
 /**
@@ -108,6 +114,10 @@ Object.defineProperty(ViewController.prototype, "parent", {
             // Bind the data to the view if the data has been set.
             if(this.data != null) {
                 this._data = bindData(this.data, this.view);
+
+                if(this.dataLoadedHandler != null) {
+                    this.dataLoadedHandler();
+                }
             }
         }
     }
@@ -139,6 +149,10 @@ Object.defineProperty(ViewController.prototype, "view", {
         // Bind the data to the view if the data has been set.
         if(this.data != null) {
             this._data = bindData(this.data, this.view);
+
+            if(this.dataLoadedHandler != null) {
+                this.dataLoadedHandler();
+            }
         }
     }
 });
@@ -161,6 +175,10 @@ Object.defineProperty(ViewController.prototype, "data", {
         // Bind the data to the view if the view has been set.
         if(this.view != null) {
             this._data = bindData(this.data, this.view);
+        }
+        
+        if(this.dataLoadedHandler != null) {
+            this.dataLoadedHandler();
         }
     }
 });
@@ -303,11 +321,11 @@ PopoverViewController.prototype.showView = function() {
 /**
  * Dismiss the view.
  * To change the dismiss method, override it with a subclass. This method must not be called directly.
- * @memberof ViewController
+ * @memberof PopoverViewController
  * @type {function(void): void}
  * @protected
  */
-ViewController.prototype.dismissView = function() {
+ PopoverViewController.prototype.dismissView = function() {
     this.container.remove();
 };
 
@@ -329,10 +347,21 @@ PopoverViewController.prototype.dismiss = function() {
 function bindData(data, element) {
     if(data == null) return null;
 
-    var i;
-
     function getValue(data, dataKey, dataHandler) {
-        var value = data[dataKey];
+        var value;
+        if(dataKey.includes(".")) {
+            var target = data;
+            var keyList = dataKey.split(".");
+            for(var i=0; i<keyList.length; i++) {
+                var key = keyList[i];
+                if(target != null) {
+                    target = target[key];
+                }
+            }
+            value = target;
+        }else {
+            value = data[dataKey];
+        }
         value = value !== undefined ? value : null;
         if(dataHandler != null) {
             value = dataHandler(value);
@@ -344,8 +373,23 @@ function bindData(data, element) {
         if(dataHandler != null) {
             value = dataHandler(value);
         }
-        data[dataKey] = value;
+        if(dataKey.includes(".")) {
+            var target = data;
+            var keyList = dataKey.split(".");
+            for(var i=0; i<keyList.length-1; i++) {
+                var key = keyList[i];
+                if(target != null) {
+                    target = target[key];
+                }
+            }
+            var lastKey = keyList[keyList.length-1];
+            target[lastKey] = value;
+        }else {
+            data[dataKey] = value;
+        }
     }
+
+    var i;
 
     var inputElements = element.querySelectorAll("input,textarea,select");
     for(i=0; i<inputElements.length; i++) {
@@ -759,6 +803,7 @@ function TextField() {
     var _arguments = Array.prototype.slice.call(arguments);
 
     var label;
+    var changeHandler;
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
         if(!Array.isArray(argument) && typeof argument == "object") {
@@ -768,18 +813,29 @@ function TextField() {
                 if(key == "label" && typeof argument[key] == "string") {
                     label = argument[key];
                     delete argument[key];
+                }else if(key == "changeHandler" && typeof argument[key] == "function") {
+                    changeHandler = argument[key];
+                    delete argument[key];
                 }
             }
             break;
         }
     }
 
+    var element;
     if(label == null) {
         _arguments.splice(0, 0, "text");
-        return Input.apply(this, _arguments);
+        element = Input.apply(this, _arguments);
+        if(changeHandler != undefined) {
+            element.addEventListener("change", changeHandler);
+        }
+        return element;
     }else {
         _arguments.splice(0, 0, "text");
-        var element = Input.apply(this, _arguments);
+        element = Input.apply(this, _arguments);
+        if(changeHandler != undefined) {
+            element.addEventListener("change", changeHandler);
+        }
         var inputComposite = InputComposite({label: label}, [element]);
         return inputComposite;
     }
@@ -928,6 +984,7 @@ function DateField() {
     var format = "yyyy/M/d";
     var dataKey;
     var dataHandler;
+    var editingEndHandler;
     var color = "black";
     var weekendColor;
     var zIndex = 0;
@@ -952,6 +1009,9 @@ function DateField() {
                 }else if(key == "dataHandler" && typeof argument[key] == "function") {
                     dataHandler = argument[key];
                     delete argument[key];
+                }else if(key == "editingEndHandler" && typeof argument[key] == "function") {
+                    editingEndHandler = argument[key];
+                    delete argument[key];
                 }else if(key == "color" && typeof argument[key] == "string") {
                     color = argument[key];
                     delete argument[key];
@@ -970,6 +1030,7 @@ function DateField() {
     var element = View.apply(this, _arguments);
     
     element.style.setProperty("cursor", "default");
+    element.style.setProperty("display", "inline-block");
 
     if(dataKey != null) {
         element.dataKey = dataKey;
@@ -987,18 +1048,22 @@ function DateField() {
         };
     }
 
-    function getValue() {
-        if(element.value != null) {
-            if(typeof element.value == "number") {
-                return new Date(element.value);
-            }else if(typeof element.value == "string") {
-                return DateUtil.parse(element.value, format);
-            }else if(element.value instanceof Date) {
-                return element.value;
+    Object.defineProperty(element, "value", { 
+        get: function() {
+            return this._value !== undefined ? this._value : null;
+        },
+        set: function(newValue) {
+            var value;
+            if(typeof newValue == "number") {
+                value = new Date(newValue);
+            }else if(typeof newValue == "string") {
+                value = DateUtil.parse(newValue, format);
+            }else if(newValue instanceof Date) {
+                value = newValue;
             }
+            this._value = value;
         }
-        return null;
-    }
+    });
 
     function formatDate(value) {
         var expression = "";
@@ -1101,7 +1166,7 @@ function DateField() {
         var nowYear = now.getFullYear();
         var nowMonthIndex = now.getMonth();
 
-        var selectedDate = getValue();
+        var selectedDate = element.value;
         if(selectedDate == null) {
             selectedDate = new Date();
         }
@@ -1211,7 +1276,8 @@ function DateField() {
         var container = View({style: {"overflow": "hidden"}});
 
         var indicator = Canvas({width: daySize.width*2, height: daySize.height, style:{
-            position: "absolute"
+            position: "absolute",
+            "pointer-events": "none"
         }});
         var context = indicator.getContext("2d");
         DrawUtil.drawRoundRect(context, Rect(5,1,daySize.width*2-6,daySize.height-2), "darkgray", 4, true);
@@ -1267,7 +1333,7 @@ function DateField() {
             setValue(element, null, updatedValue);
         });
 
-        var selectedDate = getValue();
+        var selectedDate = element.value;
         if(element.value == null) {
             selectedDate = new Date();
         }
@@ -1322,7 +1388,7 @@ function DateField() {
         }
 
         function setValue(element, hours, minutes) {
-            var date = getValue();
+            var date = element.value;
             if(date != null) {
                 if(hours != null) {
                     date.setHours(hours);
@@ -1369,9 +1435,25 @@ function DateField() {
             shadow: true, 
             zIndex: zIndex,
             loadHandler: function(balloon, settings) {
-                settings.location = Point(offset.left+element.clientWidth/2-balloon.offsetWidth/2, offset.top+element.clientHeight)
-                calendar.scrollLeft = width;
+                var location = Point(offset.left+element.clientWidth/2-balloon.offsetWidth/2, offset.top+element.clientHeight);
+                var tipOffset = balloon.offsetWidth/2;
+                if(location.x < 0) {
+                    tipOffset = -location.x;
+                    location.x = 0;
+                }
+                settings.tipOffset = tipOffset;
+                settings.location = location;
+                if(type == "date") {
+                    content.scrollLeft = width;
+                }else if(type == "datetime") {
+                    calendar.scrollLeft = width;
+                }
                 return settings;
+            },
+            dismissHandler: function() {
+                if(editingEndHandler != null) {
+                    editingEndHandler(element.value);
+                }
             }
         });
     });
@@ -1903,6 +1985,9 @@ function InlineImage() {
  * If width and height have been set, Canvas size will be initialized to match the screen resolution.
  * @param {string} [identifier] 
  * @param {Object} [attributes] 
+ * @param {number} [attributes.width] 
+ * @param {number} [attributes.height] 
+ * @param {function(CanvasRenderingContext2D, Size)} [attributes.drawer] 
  * @param {Array} [children] 
  * @returns {HTMLCanvasElement}
  */
@@ -1911,6 +1996,7 @@ function Canvas() {
 
     var width;
     var height;
+    var drawer;
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
         if(!Array.isArray(argument) && typeof argument == "object") {
@@ -1923,6 +2009,9 @@ function Canvas() {
                 }else if(key == "height" && typeof argument[key] == "number") {
                     height = argument[key];
                     delete argument[key];
+                }else if(key == "drawer" && typeof argument[key] == "function") {
+                    drawer = argument[key];
+                    delete argument[key];
                 }
             }
             break;
@@ -1934,6 +2023,15 @@ function Canvas() {
 
     if(width != undefined && height != undefined) {
         CanvasUtil.initCanvas(element, Size(width, height));
+    }
+
+    if(drawer != null) {
+        if(ResizeObserver !== undefined) {
+            var resizeObserver = new ResizeObserver(function(observations) {
+                drawer(element.getContext("2d"), Size(element.clientWidth, element.clientWidth));
+            });
+            resizeObserver.observe(element);
+        }
     }
 
     return element;

@@ -5,7 +5,7 @@
  */
 
 const FileSystem = require("fs");
-const UglifyJS = require("uglify-es");
+const UglifyJS = require("uglify-js");
 const Polyfill = require("polyfill-library");
 
 let distDirectory = "dist";
