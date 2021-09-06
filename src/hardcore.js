@@ -973,6 +973,7 @@ function MailField() {
  * @param {string} [attributes.format] 
  * @param {string} [attributes.color] 
  * @param {string} [attributes.weekendColor] 
+ * @param {string} [attributes.indicatorColor] 
  * @param {number} [attributes.zIndex] 
  * @returns {HTMLInputElement}
  */
@@ -987,6 +988,7 @@ function DateField() {
     var editingEndHandler;
     var color = "black";
     var weekendColor;
+    var indicatorColor = "darkgray";
     var zIndex = 0;
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
@@ -1017,6 +1019,9 @@ function DateField() {
                     delete argument[key];
                 }else if(key == "weekendColor" && typeof argument[key] == "string") {
                     weekendColor = argument[key];
+                    delete argument[key];
+                }else if(key == "indicatorColor" && typeof argument[key] == "string") {
+                    indicatorColor = argument[key];
                     delete argument[key];
                 }else if(key == "zIndex" && typeof argument[key] == "number") {
                     zIndex = argument[key];
@@ -1080,7 +1085,7 @@ function DateField() {
 
     var daySize = Size(Math.floor(width/7), Math.floor(height/6));
         
-    function loadMonth(element, container, year, monthIndex, selectable, now) {
+    function loadMonth(element, container, year, monthIndex, selectable, now, selectedDate) {
         var header = container.querySelector(".header");
         header.innerText = year + "年" + (monthIndex+1) + "月";
         var days = container.querySelectorAll(".day");
@@ -1107,10 +1112,10 @@ function DateField() {
                 weekView = View();
                 container.appendChild(weekView);
             }
-            var contents;
+            var contents = [];
             if(now != null && day.getTime() == now.getTime()) {
-                contents = Canvas({width: daySize.width, height: daySize.height});
-                var context = contents.getContext("2d");
+                var nowView = Canvas({width: daySize.width, height: daySize.height});
+                var context = nowView.getContext("2d");
                 var center = Point(daySize.width/2, daySize.height/2);
                 context.arc(center.x, center.y, Math.min(center.x, center.y), 0, 2*Math.PI, false);
                 context.fillStyle = color;
@@ -1119,10 +1124,16 @@ function DateField() {
                 context.textBaseline = "middle";
                 context.textAlign = "center";
                 context.fillText(day.getDate(), center.x, center.y);
+                contents.push(nowView);
             }else {
-                contents = day.getDate();
+                contents.push(day.getDate());
+            }
+            if(selectedDate != null && day.getTime() == selectedDate.getTime()) {
+                var indicatorView = createCalendarIndicator();
+                contents.push(indicatorView);
             }
             var dayView = View(".day", {style:{
+                position: "relative",
                 "text-align": "center",
                 display: "inline-block",
                 "line-height": daySize.height,
@@ -1131,7 +1142,7 @@ function DateField() {
                 width: daySize.width,
                 height: daySize.height,
                 color: ((weekendColor != null && (dayOfWeek == 0 || dayOfWeek == 6)) ? weekendColor : color)
-            }}, [contents]);
+            }}, contents);
             if(selectable) {
                 dayView.addEventListener("click", function(event) {
                     var dayElement = event.currentTarget;
@@ -1142,6 +1153,13 @@ function DateField() {
                         if(dataKey != null) {
                             element.dataBindHandler(date, dataKey);
                         }
+
+                        var nodeList = container.querySelectorAll(".indicator");
+                        nodeList.forEach(function(node) {
+                            node.remove();
+                        });
+                        var indicatorView = createCalendarIndicator();
+                        dayElement.appendChild(indicatorView);
                     }
                 });
                 dayView.value = day;
@@ -1149,6 +1167,23 @@ function DateField() {
             weekView.appendChild(dayView);
             day = DateUtil.getDateByAdding(day, 1);
         }
+    }
+
+    function createCalendarIndicator() {
+        var indicatorView = Canvas(".indicator", {width: daySize.width, height: daySize.height, drawer: function(context, size) {
+            var center = Point(size.width/2, size.height/2);
+            context.arc(center.x, center.y, Math.min(center.x, center.y), 0, 2*Math.PI, false);
+            context.strokeStyle = indicatorColor;
+            context.lineWidth = 1;
+            context.stroke();
+        }});
+        indicatorView.styles = {
+            position: "absolute",
+            "left": "0px",
+            "top": "0px",
+            "pointer-events": "none"
+        };
+        return indicatorView;
     }
 
     function createCalendar(element) {
@@ -1168,7 +1203,7 @@ function DateField() {
 
         var selectedDate = element.value;
         if(selectedDate == null) {
-            selectedDate = new Date();
+            selectedDate = DateUtil.getDateBySlicingTime(new Date());
         }
         var year = selectedDate.getFullYear();
         var monthIndex = selectedDate.getMonth();
@@ -1190,7 +1225,8 @@ function DateField() {
                 View(".header", {style:{"text-align": "center"}})
             ]);
             calendarContainer.appendChild(calendar);
-            loadMonth(element, calendar, _year, _monthIndex, i==1, (nowYear == _year && nowMonthIndex == _monthIndex ? now : null));
+            
+            loadMonth(element, calendar, _year, _monthIndex, i==1, (nowYear == _year && nowMonthIndex == _monthIndex ? now : null), selectedDate);
 
             if(_monthIndex < 11) {
                 _monthIndex += 1;
@@ -1200,7 +1236,7 @@ function DateField() {
             }
         }
 
-        function reloadCalendars() {
+        function reloadCalendars(element) {
             var _year = year;
             var _monthIndex = monthIndex;
             if(_monthIndex > 0) {
@@ -1209,9 +1245,17 @@ function DateField() {
                 _year -= 1;
                 _monthIndex = 11;
             }
+            
+            var selectedDate = element.value;
+
+            var nodeList = calendarContainer.querySelectorAll(".indicator");
+            nodeList.forEach(function(node) {
+                node.remove();
+            });
+
             var calendars = calendarContainer.querySelectorAll(".month");
             for(var i=0; i<3; i++) {
-                loadMonth(element, calendars[i], _year, _monthIndex, i==1, (nowYear == _year && nowMonthIndex == _monthIndex ? now : null));
+                loadMonth(element, calendars[i], _year, _monthIndex, i==1, (nowYear == _year && nowMonthIndex == _monthIndex ? now : null), selectedDate);
 
                 if(_monthIndex < 11) {
                     _monthIndex += 1;
@@ -1242,7 +1286,7 @@ function DateField() {
                             year -= 1;
                             monthIndex = 11;
                         }
-                        reloadCalendars();
+                        reloadCalendars(element);
                         container.scrollLeft = width;
 
                         container.scrolling = false;
@@ -1259,7 +1303,7 @@ function DateField() {
                             year += 1;
                             monthIndex = 0;
                         }
-                        reloadCalendars();
+                        reloadCalendars(element);
                         container.scrollLeft = width;
 
                         container.scrolling = false;
@@ -1280,7 +1324,7 @@ function DateField() {
             "pointer-events": "none"
         }});
         var context = indicator.getContext("2d");
-        DrawUtil.drawRoundRect(context, Rect(5,1,daySize.width*2-6,daySize.height-2), "darkgray", 4, true);
+        DrawUtil.drawRoundRect(context, Rect(5,1,daySize.width*2-6,daySize.height-2), indicatorColor, 4, true);
         container.appendChild(indicator);
 
         var hourView = View({style: {
@@ -2028,7 +2072,7 @@ function Canvas() {
     if(drawer != null) {
         if(ResizeObserver !== undefined) {
             var resizeObserver = new ResizeObserver(function(observations) {
-                drawer(element.getContext("2d"), Size(element.clientWidth, element.clientWidth));
+                drawer(element.getContext("2d"), Size(element.clientWidth, element.clientHeight));
             });
             resizeObserver.observe(element);
         }
