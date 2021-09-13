@@ -1473,13 +1473,14 @@ function DateField() {
             content.appendChild(timePicker);
         }
         var offset = element.offset();
+        var scrollOffset = HtmlElementUtil.scrollOffset(element);
         Controls.Balloon(content, {
-            location: Point(offset.left, offset.top+element.clientHeight), 
+            location: Point(offset.left, offset.top+element.clientHeight-scrollOffset.y), 
             direction: "top", 
             shadow: true, 
             zIndex: zIndex,
             loadHandler: function(balloon, settings) {
-                var location = Point(offset.left+element.clientWidth/2-balloon.offsetWidth/2, offset.top+element.clientHeight);
+                var location = Point(offset.left+element.clientWidth/2-balloon.offsetWidth/2, offset.top+element.clientHeight-scrollOffset.y);
                 var tipOffset = balloon.offsetWidth/2;
                 if(location.x < 0) {
                     tipOffset = -location.x;
@@ -1589,8 +1590,8 @@ function FileSelector() {
  * @property {Object} [style] Column styles
  * @property {Object} [class] Column CSS class
  * @property {string} [dataKey] The key for each record of the Array object set in the Table.
- * @property {function(HTMLTableDataCellElement, any, any): void} [dataHandler] Use this callback if you want to set data directly in a cell.
- * @param {HTMLTableDataCellElement} dataHandler.cell
+ * @property {function(HTMLTableCellElement, any, any): void} [dataHandler] Use this callback if you want to set data directly in a cell.
+ * @param {HTMLTableCellElement} dataHandler.cell
  * @param {*} dataHandler.value
  * @param {*} dataHandler.record
  */
@@ -1610,6 +1611,7 @@ function FileSelector() {
  * @param {string} [attributes.rowBorderStyle]
  * @param {boolean} [attributes.rowHighlight=true]
  * @param {string} [attributes.rowHighlightStyle]
+ * @param {function(HTMLTableRowElement, any)} [attributes.rowHandler]
  * @param {Array} [children] 
  * @returns {HTMLTableElement}
  */
@@ -1630,6 +1632,7 @@ function Table() {
     };
     var rowBorderStyle = "1px solid darkgray";
     var rowHighlightStyle = "whitesmoke";
+    var rowHandler;
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
         if(!Array.isArray(argument) && typeof argument == "object") {
@@ -1672,6 +1675,9 @@ function Table() {
                     delete argument[key];
                 }else if(key == "rowHighlightStyle" && typeof argument[key] == "string") {
                     rowHighlightStyle = argument[key];
+                    delete argument[key];
+                }else if(key == "rowHandler" && typeof argument[key] == "function") {
+                    rowHandler = argument[key];
                     delete argument[key];
                 }
             }
@@ -1738,11 +1744,22 @@ function Table() {
                 }
                 if(rowHighlightStyle != undefined) {
                     row.addEventListener("mouseenter", function(event) {
-                        event.currentTarget.style.setProperty("background-color", rowHighlightStyle);
+                        var row = event.currentTarget;
+                        row.originalBackgroundColor = row.style.getPropertyValue("background-color");
+                        row.style.setProperty("background-color", rowHighlightStyle);
                     });
                     row.addEventListener("mouseleave", function(event) {
-                        event.currentTarget.style.setProperty("background-color", "inherit");
+                        var row = event.currentTarget;
+                        if(row.originalBackgroundColor != null) {
+                            row.style.setProperty("background-color", row.originalBackgroundColor);
+                            delete row.originalBackgroundColor;
+                        }else {
+                            row.style.setProperty("background-color", "inherit");
+                        }
                     });
+                }
+                if(rowHandler != null) {
+                    rowHandler(row, record);
                 }
                 function setValue(value, cell) {
                     if(value == null) {
@@ -1795,71 +1812,16 @@ function Table() {
                 return row;
             }
 
-            function ObservedArray() {
-            }
-            ObservedArray.prototype = Object.create(Array.prototype);
-            ObservedArray.prototype.push = function(record) {
-                Array.prototype.push.call(this, record);
-                var container = element.querySelector("tbody");
-                if(container == null) return;
-                container.appendChild(createRow(record, columns, tapHandler, false));
-            };
-            ObservedArray.prototype.splice = function() {
-                Array.prototype.splice.apply(this, arguments);
-                var container = element.querySelector("tbody");
-                if(container == null) return;
-                var startIndex;
-                var endIndex;
-                var deleteCount;
-                var records = [];
-                var i;
-                for(i=0; i<arguments.length; i++) {
-                    if(i == 0) {
-                        startIndex = arguments[i];
-                    }else if(i == 1) {
-                        deleteCount = arguments[i];
-                    }else {
-                        records.push(arguments[i]);
-                    }
-                }
-                if(startIndex == undefined) {
-                    return;
-                }
-                var rows = element.querySelectorAll("tbody > tr");
-                if(deleteCount == undefined) {
-                    deleteCount = rows.length;
-                }
-                if(deleteCount > 0) {
-                    endIndex = startIndex+deleteCount;
-                    if(endIndex <= rows.length) {
-                        for(i=endIndex-1; i>=startIndex; i--) {
-                            rows[i].remove();
-                        }
-                    }
-                }
-                rows = element.querySelectorAll("tbody > tr");
-                if(records != undefined && records.length > 0 && deleteCount == records.length) {
-                    endIndex = startIndex+deleteCount;
-                    var recordIndex = 0;
-                    for(i=startIndex; i<endIndex; i++) {
-                        var row = createRow(records[recordIndex++], columns, tapHandler, false);
-                        if(i < rows.length) {
-                            rows[i].insertAdjacentElement("beforebegin", row);
-                        }else {
-                            container.appendChild(row);
-                        }
-                    }
-                }
-            };
-
             var i;
 
             var observedArray;
             if(Array.isArray(newValue)) {
-                observedArray = new ObservedArray();
+                observedArray = new ObservedArray(element, createRow, columns, tapHandler);
                 for(i=0; i<newValue.length; i++) {
                     observedArray.push(newValue[i]);
                 }
+            }else if(newValue instanceof ObservedArray) {
+                observedArray = newValue;
             }
 
             element.bindingData = observedArray;
@@ -1911,6 +1873,67 @@ function Table() {
 
     return element;
 }
+
+function ObservedArray(element, createRow, columns, tapHandler) {
+    this.element = element;
+    this.createRow = createRow;
+    this.columns = columns;
+    this.tapHandler = tapHandler;
+}
+ObservedArray.prototype = Object.create(Array.prototype);
+ObservedArray.prototype.push = function(record) {
+    Array.prototype.push.call(this, record);
+    var container = this.element.querySelector("tbody");
+    if(container == null) return;
+    container.appendChild(this.createRow(record, this.columns, this.tapHandler, false));
+};
+ObservedArray.prototype.splice = function() {
+    Array.prototype.splice.apply(this, arguments);
+    var container = this.element.querySelector("tbody");
+    if(container == null) return;
+    var startIndex;
+    var endIndex;
+    var deleteCount;
+    var records = [];
+    var i;
+    for(i=0; i<arguments.length; i++) {
+        if(i == 0) {
+            startIndex = arguments[i];
+        }else if(i == 1) {
+            deleteCount = arguments[i];
+        }else {
+            records.push(arguments[i]);
+        }
+    }
+    if(startIndex == undefined) {
+        return;
+    }
+    var rows = this.element.querySelectorAll("tbody > tr");
+    if(deleteCount == undefined) {
+        deleteCount = rows.length;
+    }
+    if(deleteCount > 0) {
+        endIndex = startIndex+deleteCount;
+        if(endIndex <= rows.length) {
+            for(i=endIndex-1; i>=startIndex; i--) {
+                rows[i].remove();
+            }
+        }
+    }
+    rows = this.element.querySelectorAll("tbody > tr");
+    if(records != undefined && records.length > 0 && deleteCount == records.length) {
+        endIndex = startIndex+deleteCount;
+        var recordIndex = 0;
+        for(i=startIndex; i<endIndex; i++) {
+            var row = this.createRow(records[recordIndex++], this.columns, this.tapHandler, false);
+            if(i < rows.length) {
+                rows[i].insertAdjacentElement("beforebegin", row);
+            }else {
+                container.appendChild(row);
+            }
+        }
+    }
+};
 
 /**
  * Create THEAD element.
@@ -2588,7 +2611,7 @@ function Checkbox() {
             element.dataBindHandler(element.checked, dataKey);
         }
         if(changeHandler != undefined) {
-            changeHandler(element.checked);
+            changeHandler(element.checked, element);
         }
     });
 
@@ -2686,8 +2709,8 @@ function Select() {
                 if(settings.selectHandler != undefined) {
                     var originalHandler = settings.selectHandler;
                     select.selectHandler = function(selectedIndex, select) {
-                        originalHandler(selectedIndex, select);
                         newValue(selectedIndex, element);
+                        originalHandler(selectedIndex, select);
                     };
                 }else {
                     select.selectHandler = function(selectedIndex, select) {
@@ -5309,6 +5332,7 @@ var Controls = {
         var parent;
         var itemWidth = 120;
         var itemHeight = 32;
+        var backgroundColor = "white";
         var zIndex;
 
         var itemDrawer;
@@ -5335,6 +5359,9 @@ var Controls = {
             }
             if(settings.itemHeight != undefined) {
                 itemHeight = settings.itemHeight;
+            }
+            if(settings.backgroundColor != undefined) {
+                backgroundColor = settings.backgroundColor;
             }
             if(settings.itemDrawer != undefined) {
                 itemDrawer = settings.itemDrawer;
@@ -5393,7 +5420,7 @@ var Controls = {
         selection.style.setProperty("-ms-overflow-style", "none");
         selection.style.setProperty("-webkit-overflow-scrolling", "touch");
         selection.style.setProperty("scrollbar-width", "none");
-        selection.style.setProperty("background-color", "white");
+        selection.style.setProperty("background-color", backgroundColor);
         selection.style.setProperty("box-shadow", "3px 3px 6px rgba(0,0,0,0.3)");
         selection.style.setProperty("border", "1px solid rgba(0,0,0,0.3)");
         selection.style.setProperty("cursor", "pointer");
@@ -5491,11 +5518,7 @@ var Controls = {
                 if(styleHandler != undefined) {
                     var styles = styleHandler(item, true);
                     if(styles != null && typeof styles == "object") {
-                        var keys = Object.keys(styles);
-                        for(var i=0; i<keys.length; i++) {
-                            var key = keys[i];
-                            contentElement.style.setProperty(key, styles[key]);
-                        }
+                        contentElement.styles = styles;
                     }
                 }
             }else if(itemDrawer != undefined) {
@@ -5595,9 +5618,9 @@ var Controls = {
                             new FunctionalAnimation(function(progress) {
                                 selectionItem.style.setProperty("opacity", progress);
                                 selectionItem.style.setProperty("top", (16*(1-progress))+"px");
-                            }, FunctionalAnimation.methods.linear, 100).start();
+                            }, FunctionalAnimation.methods.linear, 50).start();
                         }, timing);
-                        timing += 100;
+                        timing += 50;
                     });
                 });
             }else {
