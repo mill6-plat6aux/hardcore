@@ -342,6 +342,149 @@ PopoverViewController.prototype.dismiss = function() {
 }
 
 /**
+ * Slideover View Controller
+ * @class
+ * @extends ViewController
+ */
+function SlideoverViewController() {
+    if(this === undefined) {
+        if(arguments.length == 1 && typeof arguments[0] == "function") {
+            var initializer = arguments[0];
+            var subClass = function() {
+                SlideoverViewController.apply(this);
+                initializer(this);
+            };
+            subClass.prototype = Object.create(SlideoverViewController.prototype);
+            return subClass;
+        }
+        console.error("SlideoverViewController is must be create with the new keyword.");
+        return;
+    }
+
+    ViewController.call(this);
+
+    var self = this;
+    
+    self.replace = false;
+
+    /**
+     * Whether popover is modal or not.
+     * @type {boolean}
+     */
+    self.modal = false;
+
+    /**
+     * By changing the style of this view, you can change the way it pops over.
+     * @type {HTMLDivElement}
+     * @readonly
+     */
+    self.container = View({style: {
+        position: "absolute", 
+        border: "1px solid darkgray", 
+        "box-shadow": "3px 3px 6px rgba(0,0,0,0.3)",
+        height: "100%",
+        top: 0
+    }}, [
+        View(".header", {style: {
+            height: 40
+        }}, [
+            View(".title", {style: {"padding-left":8, "line-height":40}}),
+            Canvas(".exitButton", {width:40, height:40, style: {
+                position: "absolute",
+                top: 0,
+                right: 0
+            }, drawer: function(context, size) {
+                var iconSize = 8;
+                context.moveTo(size.width/2-iconSize/2, size.height/2-iconSize/2);
+                context.lineTo(size.width/2+iconSize/2, size.height/2+iconSize/2);
+                context.moveTo(size.width/2+iconSize/2, size.height/2-iconSize/2);
+                context.lineTo(size.width/2-iconSize/2, size.height/2+iconSize/2);
+                context.strokeStyle = "white";
+                context.lineWidth = 1;
+                context.lineCap = "round";
+                context.stroke();
+            }, tapHandler: function(event) {
+                self.dismiss();
+            }}),
+        ]),
+        View(".contents", {style: {
+            height: "100%",
+            "overflow-y": "auto",
+            "-ms-overflow-style": "none",
+            "scrollbar-width": "none"
+        }})
+    ]);
+}
+SlideoverViewController.prototype = Object.create(ViewController.prototype);
+
+SlideoverViewController.prototype.showView = function() {
+    var self = this;
+
+    var maskStyle = {
+        "position": "absolute", 
+        "width": "100%",
+        "height": "100%",
+        "top": "0",
+        "left": "0"
+    }
+    var mask = View({style: maskStyle, tapHandler: function(event) {
+        if(self.modal) return;
+        self.dismiss();
+    }});
+    this.mask = mask;
+    this.parent.appendChild(mask);
+
+    if(this.title != null) {
+        var titleView = this.container.querySelector(".title");
+        titleView.innerText = this.title;
+    }
+    if(this.headerStyle != null) {
+        var headerView = this.container.querySelector(".header");
+        headerView.styles = this.headerStyle;
+    }
+
+    this.container.style.top = this.parent.offsetTop+"px";
+
+    var contentsView = this.container.querySelector(".contents");
+    contentsView.appendChild(this.view);
+
+    this.container.style.height = this.parent.clientHeight+"px";
+    if(this.title != null) {
+        contentsView.style.height = (this.parent.clientHeight - 40)+"px";
+    }
+    this.parent.appendChild(this.container);
+
+    if(ResizeObserver !== undefined) {
+        var resizeObserver = new ResizeObserver(function(observations) {
+            if(observations.length == 0) return;
+            var element = observations[0].target;
+            resizeObserver.disconnect();
+
+            element.style.right = -element.clientWidth + "px";
+            new StyleAnimation(element, "right", {finishValue: 0, method: FunctionalAnimation.methods.easeOut}).start();
+        });
+        resizeObserver.observe(this.container);
+    }else {
+        this.container.style.right = -this.container.clientWidth + "px";
+    }
+}
+
+/**
+ * Dismiss the view.
+ * @memberof SlideoverViewController
+ * @type {function(void): void}
+ */
+SlideoverViewController.prototype.dismiss = function() {
+    if(this.mask != undefined) {
+        this.mask.remove();
+    }
+    var self = this;
+    new StyleAnimation(this.container, "right", {finishValue: -this.container.clientWidth, method: FunctionalAnimation.methods.easeOut}).start().finish(function() {
+        self.container.remove();
+    });
+}
+
+/**
  * @ignore
  */
 function bindData(data, element) {
@@ -989,6 +1132,8 @@ function DateField() {
     var color = "black";
     var weekendColor;
     var indicatorColor = "darkgray";
+    var removable = true;
+    var style;
     var zIndex = 0;
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
@@ -1023,6 +1168,12 @@ function DateField() {
                 }else if(key == "indicatorColor" && typeof argument[key] == "string") {
                     indicatorColor = argument[key];
                     delete argument[key];
+                }else if(key == "removable" && typeof argument[key] == "boolean") {
+                    removable = argument[key];
+                    delete argument[key];
+                }else if(key == "style" && typeof argument[key] == "object") {
+                    style = argument[key];
+                    delete argument[key];
                 }else if(key == "zIndex" && typeof argument[key] == "number") {
                     zIndex = argument[key];
                     delete argument[key];
@@ -1034,8 +1185,15 @@ function DateField() {
 
     var element = View.apply(this, _arguments);
     
-    element.style.setProperty("cursor", "default");
-    element.style.setProperty("display", "inline-block");
+    element.styles = {
+        height:32, 
+        "line-height":32,
+        cursor: "default",
+        display: "inline-block"
+    }
+    if(style != null) {
+        element.styles = style;
+    }
 
     if(dataKey != null) {
         element.dataKey = dataKey;
@@ -1507,6 +1665,36 @@ function DateField() {
         return element;
     }else {
         var inputComposite = InputComposite({label: label}, [element]);
+
+        if(removable) {
+            element.style.width = "calc(100% - 32px)";
+            element.style.verticalAlign = "middle";
+            var removeButton = Canvas({width:32, height:32, drawer: function(context, size) {
+                var iconSize = 8;
+                context.beginPath();
+                context.moveTo(size.width/2 - iconSize/2, size.height/2 - iconSize/2);
+                context.lineTo(size.width/2 + iconSize/2, size.height/2 + iconSize/2);
+                context.moveTo(size.width/2 + iconSize/2, size.height/2 - iconSize/2);
+                context.lineTo(size.width/2 - iconSize/2, size.height/2 + iconSize/2);
+                context.lineWidth = 1;
+                context.lineCap = "round";
+                context.strokeStyle = "darkgray";
+                context.stroke();
+            }});
+            removeButton.styles = {
+                position: "relative",
+                "vertical-align": "middle"
+            };
+            removeButton.addEventListener("click", function() {
+                element.value = null;
+                element.innerText = "";
+                if(dataKey != null) {
+                    element.dataBindHandler(null, dataKey);
+                }
+            });
+            inputComposite.appendChild(removeButton);
+        }
+
         return inputComposite;
     }
 }
