@@ -84,6 +84,12 @@ var HttpConnection = {
             _request.headers = { "Content-Type": contentType+"; charset="+self.defaultCharacterSet };
         }
         return fetch(path, _request).then(function(response) {
+            if(response.redirected) {
+                if(response.url != null) {
+                    location.href = response.url;
+                }
+                return;
+            }
             if(response.ok) {
                 var contentType = response.headers.get("Content-Type");
                 if(contentType != null) {

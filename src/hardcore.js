@@ -226,9 +226,19 @@ function PopoverViewController() {
      */
     this.container = View({style: {
         "position": "absolute", 
-        "border": "1px solid darkgray", 
+        "border": "1px solid rgba(0,0,0,0.3)", 
         "box-shadow": "3px 3px 6px rgba(0,0,0,0.3)"
     }});
+
+    Object.defineProperty(this, "borderColor", {
+        configurable: true,
+        get: function() {
+            return this.container.style.borderColor;
+        },
+        set: function(newValue) {
+            this.container.style.borderColor = newValue;
+        }
+    });
 }
 PopoverViewController.prototype = Object.create(ViewController.prototype);
 
@@ -372,6 +382,18 @@ function SlideoverViewController() {
      * @type {boolean}
      */
     self.modal = false;
+    
+    /**
+     * Text that is displayed in header section.
+     * @type {string}
+     */
+    self.title;
+
+    /**
+     * Style of the header section.
+     * @type {object}
+     */
+    self.headerStyle;
 
     /**
      * By changing the style of this view, you can change the way it pops over.
@@ -1244,7 +1266,7 @@ function DateField() {
     var daySize = Size(Math.floor(width/7), Math.floor(height/6));
         
     function loadMonth(element, container, year, monthIndex, selectable, now, selectedDate) {
-        var header = container.querySelector(".header");
+        var header = container.querySelector(".header > .title");
         header.innerText = year + "年" + (monthIndex+1) + "月";
         var days = container.querySelectorAll(".day");
         for(var i=0; i<days.length; i++) {
@@ -1380,7 +1402,39 @@ function DateField() {
                 "display": "inline-block", 
                 "vertical-align": "top"
             }}, [
-                View(".header", {style:{"text-align": "center"}})
+                View(".header", {style:{"text-align": "center"}}, [
+                    Canvas({width:32, height:32, style: {"vertical-align": "middle"}, drawer: function(context, size) {
+                        var iconSize = Size(4,8);
+                        context.beginPath();
+                        context.moveTo(size.width/2 + iconSize.width/2, size.height/2 - iconSize.height/2);
+                        context.lineTo(size.width/2 - iconSize.width/2, size.height/2);
+                        context.lineTo(size.width/2 + iconSize.width/2, size.height/2 + iconSize.height/2);
+                        context.strokeStyle = color;
+                        context.lineCap = "round";
+                        context.lineWidth = 1;
+                        context.stroke();
+                    }, tapHandler: function() {
+                        backwardMonth();
+                    }}),
+                    View(".title", {width:"calc(100% - 64px)", height:32, style: {
+                        display: "inline-block", 
+                        "vertical-align": "middle",
+                        "line-height": 32
+                    }}),
+                    Canvas({width:32, height:32, style: {"vertical-align": "middle"}, drawer: function(context, size) {
+                        var iconSize = Size(4,8);
+                        context.beginPath();
+                        context.moveTo(size.width/2 - iconSize.width/2, size.height/2 - iconSize.height/2);
+                        context.lineTo(size.width/2 + iconSize.width/2, size.height/2);
+                        context.lineTo(size.width/2 - iconSize.width/2, size.height/2 + iconSize.height/2);
+                        context.strokeStyle = color;
+                        context.lineCap = "round";
+                        context.lineWidth = 1;
+                        context.stroke();
+                    }, tapHandler: function() {
+                        forwardMonth();
+                    }})
+                ])
             ]);
             calendarContainer.appendChild(calendar);
             
@@ -1424,6 +1478,42 @@ function DateField() {
             }
         }
 
+        function backwardMonth() {
+            container.scrolling = true;
+            new FunctionalAnimation(function(progress) {
+                container.scrollLeft = (1-progress)*width;
+            }, FunctionalAnimation.methods.easeOut, 500).start().finish(function() {
+                if(monthIndex > 0) {
+                    monthIndex -= 1;
+                }else {
+                    year -= 1;
+                    monthIndex = 11;
+                }
+                reloadCalendars(element);
+                container.scrollLeft = width;
+
+                container.scrolling = false;
+            });
+        }
+
+        function forwardMonth() {
+            container.scrolling = true;
+            new FunctionalAnimation(function(progress) {
+                container.scrollLeft = width+progress*width;
+            }, FunctionalAnimation.methods.easeOut, 500).start().finish(function() {
+                if(monthIndex < 11) {
+                    monthIndex += 1;
+                }else {
+                    year += 1;
+                    monthIndex = 0;
+                }
+                reloadCalendars(element);
+                container.scrollLeft = width;
+
+                container.scrolling = false;
+            });
+        }
+
         UIEventUtil.handleTouch(container, {
             touchBegan: function(event, context) {
                 context.beginLocation = UIEventUtil.getLocation(event);
@@ -1434,38 +1524,10 @@ function DateField() {
                 }
                 var currentLocation = UIEventUtil.getLocation(event);
                 if(currentLocation.x - context.beginLocation.x > 40) {
-                    container.scrolling = true;
-                    new FunctionalAnimation(function(progress) {
-                        container.scrollLeft = (1-progress)*width;
-                    }, FunctionalAnimation.methods.easeOut, 500).start().finish(function() {
-                        if(monthIndex > 0) {
-                            monthIndex -= 1;
-                        }else {
-                            year -= 1;
-                            monthIndex = 11;
-                        }
-                        reloadCalendars(element);
-                        container.scrollLeft = width;
-
-                        container.scrolling = false;
-                    });
+                    backwardMonth();
                     return false;
                 }else if(currentLocation.x - context.beginLocation.x < -40) {
-                    container.scrolling = true;
-                    new FunctionalAnimation(function(progress) {
-                        container.scrollLeft = width+progress*width;
-                    }, FunctionalAnimation.methods.easeOut, 500).start().finish(function() {
-                        if(monthIndex < 11) {
-                            monthIndex += 1;
-                        }else {
-                            year += 1;
-                            monthIndex = 0;
-                        }
-                        reloadCalendars(element);
-                        container.scrollLeft = width;
-
-                        container.scrolling = false;
-                    });
+                    forwardMonth();
                     return false;
                 }
             }
@@ -5521,6 +5583,7 @@ var Controls = {
         var itemWidth = 120;
         var itemHeight = 32;
         var backgroundColor = "white";
+        var borderColor = "rgba(0,0,0,0.3)";
         var zIndex;
 
         var itemDrawer;
@@ -5550,6 +5613,9 @@ var Controls = {
             }
             if(settings.backgroundColor != undefined) {
                 backgroundColor = settings.backgroundColor;
+            }
+            if(settings.borderColor != undefined) {
+                borderColor = settings.borderColor;
             }
             if(settings.itemDrawer != undefined) {
                 itemDrawer = settings.itemDrawer;
@@ -5610,7 +5676,7 @@ var Controls = {
         selection.style.setProperty("scrollbar-width", "none");
         selection.style.setProperty("background-color", backgroundColor);
         selection.style.setProperty("box-shadow", "3px 3px 6px rgba(0,0,0,0.3)");
-        selection.style.setProperty("border", "1px solid rgba(0,0,0,0.3)");
+        selection.style.setProperty("border", "1px solid " + borderColor);
         selection.style.setProperty("cursor", "pointer");
         selection.style.setProperty("user-select", "none");
         if(itemDrawer != null) {
@@ -6350,6 +6416,7 @@ var Controls = {
             menuItem.style.setProperty("white-space", "nowrap");
         });
         var location;
+        var direction = "bottom";
         function detectScroll(parentElement) {
             if(parentElement == null) return;
             location.x -= parentElement.scrollLeft;
@@ -6361,6 +6428,10 @@ var Controls = {
         if(source instanceof HTMLElement) {
             var offset = HtmlElementUtil.offset(source);
             location = Point(offset.left + source.clientWidth/2, offset.top);
+            if(location.y < 0) {
+                location.y = offset.top + source.offsetHeight;
+                direction = "top";
+            }
             detectScroll(source.parentElement);
         }else if(typeof source == "object" && source.x != undefined && source.y != undefined) {
             location = Point(source.x, source.y);
@@ -6370,7 +6441,7 @@ var Controls = {
         var balloon = Controls.Balloon(menu, {
             location: location, 
             fillColor: backgroundColor, 
-            direction: "bottom",
+            direction: direction,
             loadHandler: function(balloon) {
                 if(source instanceof HTMLElement) {
                     balloon.style.setProperty("left", (location.x - balloon.clientWidth/2)+"px");
