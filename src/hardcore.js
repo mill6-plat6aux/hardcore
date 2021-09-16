@@ -230,6 +230,10 @@ function PopoverViewController() {
         "box-shadow": "3px 3px 6px rgba(0,0,0,0.3)"
     }});
 
+    /**
+     * Border color of the popover window
+     * @type {string}
+     */
     Object.defineProperty(this, "borderColor", {
         configurable: true,
         get: function() {
@@ -436,6 +440,19 @@ function SlideoverViewController() {
             "scrollbar-width": "none"
         }})
     ]);
+
+    /**
+     * Background color of the sliding window
+     * @type {string}
+     */
+    Object.defineProperty(self, "backgroundColor", {
+        get: function() {
+            return self.container.querySelector(".contents").style.backgroundColor;
+        },
+        set: function(newValue) {
+            self.container.querySelector(".contents").style.backgroundColor = newValue;
+        }
+    });
 }
 SlideoverViewController.prototype = Object.create(ViewController.prototype);
 
