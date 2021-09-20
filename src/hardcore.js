@@ -224,7 +224,7 @@ function PopoverViewController() {
      * @type {HTMLDivElement}
      * @readonly
      */
-    this.container = View({style: {
+    this.container = View("._hardcore-popover", {style: {
         "position": "absolute", 
         "border": "1px solid rgba(0,0,0,0.3)", 
         "box-shadow": "3px 3px 6px rgba(0,0,0,0.3)"
@@ -386,6 +386,8 @@ function SlideoverViewController() {
      * @type {boolean}
      */
     self.modal = false;
+
+    self.dismissHandler;
     
     /**
      * Text that is displayed in header section.
@@ -404,7 +406,7 @@ function SlideoverViewController() {
      * @type {HTMLDivElement}
      * @readonly
      */
-    self.container = View({style: {
+    self.container = View("._hardcore-slideover", {style: {
         position: "absolute", 
         border: "1px solid darkgray", 
         "box-shadow": "3px 3px 6px rgba(0,0,0,0.3)",
@@ -459,19 +461,20 @@ SlideoverViewController.prototype = Object.create(ViewController.prototype);
 SlideoverViewController.prototype.showView = function() {
     var self = this;
 
-    var maskStyle = {
-        "position": "absolute", 
-        "width": "100%",
-        "height": "100%",
-        "top": "0",
-        "left": "0"
+    if(self.modal) {
+        var maskStyle = {
+            "position": "absolute", 
+            "width": "100%",
+            "height": "100%",
+            "top": "0",
+            "left": "0"
+        }
+        var mask = View({style: maskStyle, tapHandler: function(event) {
+            self.dismiss();
+        }});
+        this.mask = mask;
+        this.parent.appendChild(mask);
     }
-    var mask = View({style: maskStyle, tapHandler: function(event) {
-        if(self.modal) return;
-        self.dismiss();
-    }});
-    this.mask = mask;
-    this.parent.appendChild(mask);
 
     if(this.title != null) {
         var titleView = this.container.querySelector(".title");
@@ -514,6 +517,9 @@ SlideoverViewController.prototype.showView = function() {
  * @type {function(void): void}
  */
 SlideoverViewController.prototype.dismiss = function() {
+    if(this.dismissHandler != undefined) {
+        this.dismissHandler();
+    }
     if(this.mask != undefined) {
         this.mask.remove();
     }
@@ -1873,6 +1879,11 @@ function FileSelector() {
  * @param {function(any, number, HTMLTableRowElement): void} [attributes.tapHandler] Select a row handler. The first argument is the selected row data.
  * @param {number} [attributes.rowHeight]
  * @param {boolean} [attributes.animate=false]
+ * @param {Object} [attributes.sort]
+ * @param {Object} [attributes.sort.defaultHeaderCellStyle]
+ * @param {Object} [attributes.sort.upperSortHeaderCellStyle]
+ * @param {Object} [attributes.sort.lowerSortHeaderCellStyle]
+ * @param {string} [attributes.sort.defaultSortDataKey]
  * @param {Object} [attributes.headerStyle]
  * @param {boolean} [attributes.rowBorder=true]
  * @param {string} [attributes.rowBorderStyle]
@@ -1891,11 +1902,13 @@ function Table() {
     var rowHeight;
     var tapHandler;
     var animate = false;
+    var sort;
     var headerStyle = {
         "color": "gray",
         "font-size": "small",
         "height": "20px",
-        "line-height": "20px"
+        "line-height": "20px",
+        "user-select": "none"
     };
     var rowBorderStyle = "1px solid darkgray";
     var rowHighlightStyle = "whitesmoke";
@@ -1923,6 +1936,9 @@ function Table() {
                     delete argument[key];
                 }else if(key == "animate" && typeof argument[key] == "boolean") {
                     animate = argument[key];
+                    delete argument[key];
+                }else if(key == "sort" && typeof argument[key] == "object") {
+                    sort = argument[key];
                     delete argument[key];
                 }else if(key == "headerStyle" && typeof argument[key] == "object") {
                     headerStyle = argument[key];
@@ -1986,10 +2002,90 @@ function Table() {
             if(column.style != undefined) {
                 cell.defineStyles(column.style);
             }
+            if(sort != null) {
+                setupSorting(cell, sort);
+            }
             row.appendChild(cell);
         }
         header.append(row);
         element.append(header);
+    }
+
+    function setupSorting(cell, sort) {
+        if(sort.defaultHeaderCellStyle != null) {
+            cell.styles = sort.defaultHeaderCellStyle;
+        }
+        cell.addEventListener("click", function(event) {
+            var cell = event.currentTarget;
+            if(cell.classList.contains("_sort_u")) {
+                cell.classList.remove("_sort_u");
+            }else if(cell.classList.contains("_sort_l")) {
+                cell.classList.remove("_sort_l");
+                cell.classList.add("_sort_u");
+            }else {
+                cell.classList.add("_sort_l");
+            }
+            var cells = row.querySelectorAll("td");
+            var cellIndex = cells.indexOf(cell);
+            for(var i=0; i<cells.length; i++) {
+                var _cell = cells[i];
+                if(i == cellIndex) continue;
+                _cell.classList.remove("_sort_u");
+                _cell.classList.remove("_sort_l");
+            }
+            var dataKey = columns[cellIndex]["dataKey"];
+            var upperSort = false;
+            if(cell.classList.contains("_sort_u")) {
+                upperSort = true;
+                if(sort.upperSortHeaderCellStyle != null) {
+                    cell.styles = sort.upperSortHeaderCellStyle;
+                }
+            }else if(cell.classList.contains("_sort_l")) {
+                upperSort = false;
+                if(sort.lowerSortHeaderCellStyle != null) {
+                    cell.styles = sort.lowerSortHeaderCellStyle;
+                }
+            }else {
+                dataKey = sort.defaultSortDataKey;
+                upperSort = false;
+                if(sort.defaultHeaderCellStyle != null) {
+                    cell.styles = sort.defaultHeaderCellStyle;
+                }
+            }
+            if(dataKey == null) return;
+            var data = element.data;
+            if(data == null) return;
+            data.sort(function(record1, record2) {
+                var value1 = record1[dataKey];
+                var value2 = record2[dataKey];
+                if(value1 != null) {
+                    if(value2 != null) {
+                        if(upperSort) {
+                            return value1 < value2 ? 1 : (value1 > value2 ? -1 : 0);
+                        }else {
+                            return value1 < value2 ? -1 : (value1 > value2 ? 1 : 0);
+                        }
+                    }else {
+                        if(upperSort) {
+                            return -1;
+                        }else {
+                            return 1;
+                        }
+                    }
+                }else {
+                    if(value2 != null) {
+                        if(upperSort) {
+                            return 1;
+                        }else {
+                            return -1;
+                        }
+                    }else {
+                        return 0;
+                    }
+                }
+            });
+            element.data = data;
+        });
     }
 
     // data binding
