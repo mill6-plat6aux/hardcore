@@ -3066,6 +3066,14 @@ function Select() {
             select.items = newValue;
         }
     });
+    Object.defineProperty(element, "editable", { 
+        get: function() {
+            return select.editable;
+        },
+        set: function(newValue) {
+            select.editable = newValue;
+        }
+    });
     if(element.dataKey != undefined) {
         Object.defineProperty(element, "dataBindHandler", { 
             set: function(newValue) {
@@ -5689,7 +5697,8 @@ var Controls = {
         var reference = {
             items: undefined,
             selectedIndex: -1,
-            selectHandler: undefined
+            selectHandler: undefined,
+            editable: true
         }
 
         var parent;
@@ -5709,7 +5718,6 @@ var Controls = {
         var selectedDrawing = true;
         var animate = true;
         var hilighting = false;
-        var editable = true;
 
         if(settings != undefined) {
             if(settings.items != undefined) {
@@ -5758,7 +5766,7 @@ var Controls = {
                 hilighting = settings.hilighting;
             }
             if(settings.editable != undefined) {
-                editable = settings.editable;
+                reference.editable = settings.editable;
             }
             if(settings.zIndex != undefined) {
                 zIndex = settings.zIndex;
@@ -5901,7 +5909,7 @@ var Controls = {
                 var item = reference.items[i];
                 selection.appendChild(createItem(item));
             }
-            if(editable) {
+            if(reference.editable) {
                 if(labelHandler != undefined) {
                     selection.querySelectorAll("div").forEach(function(itemElement) {
                         itemElement.addEventListener("click", function(event) {
@@ -6017,11 +6025,10 @@ var Controls = {
             drawSelectedItem();
         }
 
-        if(editable) {
-            element.addEventListener("click", function() {
-                showSelection();
-            });
-        }
+        element.addEventListener("click", function() {
+            if(!reference.editable) return;
+            showSelection();
+        });
 
         reference.show = function() {
             showSelection();
