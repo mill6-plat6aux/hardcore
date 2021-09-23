@@ -5979,23 +5979,47 @@ var Controls = {
             selection.style.setProperty("max-height", maxHeight+"px");
 
             if(animate) {
-                selection.childNodes.forEach(function(selectionItem) {
-                    selectionItem.style.setProperty("opacity", 0);
-                    selectionItem.style.setProperty("top", "32px");
-                });
                 var height = selection.offsetHeight;
+                var visibleItemSize = Math.ceil(selection.clientHeight / itemHeight);
+
+                selection.childNodes.forEach(function(selectionItem, index) {
+                    selectionItem.style.setProperty("opacity", 0);
+                    if(index < visibleItemSize) {
+                        selectionItem.style.setProperty("top", "32px");
+                    }else {
+                        selectionItem.style.setProperty("top", "0px");
+                    }
+                });
                 selection.style.setProperty("height", 0);
                 selection.style.setProperty("visibility", "visible");
-                new StyleAnimation(selection, "height", {finishValue: height, duration: 200}).start().finish(function() {
+                selection.style.setProperty("overflow", "hidden");
+
+                var fadeinDelay = 200;
+                var slideinDelay = 50;
+
+                new StyleAnimation(selection, "height", {finishValue: height, duration: fadeinDelay}).start().finish(function() {
                     var timing = 0;
-                    selection.childNodes.forEach(function(selectionItem) {
-                        setTimeout(function() {
-                            new FunctionalAnimation(function(progress) {
-                                selectionItem.style.setProperty("opacity", progress);
-                                selectionItem.style.setProperty("top", (16*(1-progress))+"px");
-                            }, FunctionalAnimation.methods.linear, 50).start();
-                        }, timing);
-                        timing += 50;
+                    var lastItemIndex = selection.childNodes.length-1;
+                    selection.childNodes.forEach(function(selectionItem, index) {
+                        var lastItem = index == lastItemIndex;
+                        if(index < visibleItemSize) {
+                            setTimeout(function() {
+                                new FunctionalAnimation(function(progress) {
+                                    selectionItem.style.setProperty("opacity", progress);
+                                    selectionItem.style.setProperty("top", (16*(1-progress))+"px");
+                                }, FunctionalAnimation.methods.linear, slideinDelay).start().finish(function() {
+                                    if(lastItem) {
+                                        selection.style.setProperty("overflow", "auto");
+                                    }
+                                });
+                            }, timing);
+                            timing += slideinDelay;
+                        }else {
+                            selectionItem.style.setProperty("opacity", 1);
+                            if(lastItem) {
+                                selection.style.setProperty("overflow", "auto");
+                            }
+                        }
                     });
                 });
             }else {
@@ -6035,10 +6059,12 @@ var Controls = {
         };
         reference.close = function() {
             mask.remove();
+            selection.style.setProperty("overflow", "hidden");
             new StyleAnimation(selection, "height", {finishValue: 0, duration: 200}).start().finish(function() {
                 selection.remove();
                 selection.style.setProperty("visibility", "hidden");
                 selection.style.removeProperty("height");
+                selection.style.setProperty("overflow", "auto");
             });
         };
 
