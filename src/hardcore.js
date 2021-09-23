@@ -6104,7 +6104,15 @@ var Controls = {
         element.classList.add("message");
         var contentsElement = document.createElement("div");
         contentsElement.classList.add("contents");
-        contentsElement.innerText = text;
+        var textElement = document.createElement("div");
+        textElement.style.setProperty("display", "inline-block");
+        if(text != null && typeof text == "string") {
+            if(!text.includes("\n")) {
+                textElement.style.setProperty("line-height", "32px");
+            }
+            textElement.innerText = text;
+        }
+        contentsElement.appendChild(textElement);
         element.appendChild(contentsElement);
         var controlsElement = document.createElement("div");
         controlsElement.classList.add("controls");
@@ -6202,7 +6210,7 @@ var Controls = {
                 point.y += 2+2;
                 context.fillRect(point.x, point.y, 3, 10);
             }
-            icon.style.setProperty("vertical-align", "middle");
+            icon.style.setProperty("vertical-align", "top");
             icon.style.setProperty("margin-right", "8px");
             element.querySelector(".contents").prepend(icon);
         }
