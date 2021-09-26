@@ -2950,7 +2950,9 @@ function Checkbox() {
             this._checked = newValue;
             var canvas = this.querySelector("canvas");
             var context = canvas.getContext('2d');
-            if(this._checked) {
+            context.clearRect(0,0,canvas.width,canvas.height);
+            drawBox(context);
+            if(element.checked) {
                 if(initial) {
                     drawCheck(context);
                 }else {
