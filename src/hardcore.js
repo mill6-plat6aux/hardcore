@@ -2708,6 +2708,7 @@ function NumericField() {
     if(inputElement.tagName.toLowerCase() != "input") {
         inputElement = inputElement.querySelector("input");
     }
+    inputElement.style.setProperty("text-align", "right");
 
     if(unit != undefined) {
         if(ResizeObserver !== undefined) {
@@ -5624,7 +5625,7 @@ var HtmlElementUtil = {
                             value = value.substr(0, value.length-10);
                         }
                     }
-                    if(key == "background-image" && value != "none" && !value.endsWith(")")) {
+                    if(key == "background-image" && typeof value == "string" && value != "none" && !value.endsWith(")")) {
                         value = "url('"+value+"')"
                     }
                     element.style.setProperty(key, value, priority);

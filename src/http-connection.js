@@ -95,6 +95,10 @@ var HttpConnection = {
                 if(contentType != null) {
                     if(contentType == "application/json") {
                         return response.json();
+                    }else if(contentType.startsWith("text")) {
+                        return response.text();
+                    }else {
+                        return response.blob();
                     }
                 }
             }else {
