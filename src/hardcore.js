@@ -2061,23 +2061,23 @@ function Table() {
                 if(value1 != null) {
                     if(value2 != null) {
                         if(upperSort) {
-                            return value1 < value2 ? 1 : (value1 > value2 ? -1 : 0);
-                        }else {
                             return value1 < value2 ? -1 : (value1 > value2 ? 1 : 0);
+                        }else {
+                            return value1 < value2 ? 1 : (value1 > value2 ? -1 : 0);
                         }
                     }else {
                         if(upperSort) {
-                            return -1;
-                        }else {
                             return 1;
+                        }else {
+                            return -1;
                         }
                     }
                 }else {
                     if(value2 != null) {
                         if(upperSort) {
-                            return 1;
-                        }else {
                             return -1;
+                        }else {
+                            return 1;
                         }
                     }else {
                         return 0;
