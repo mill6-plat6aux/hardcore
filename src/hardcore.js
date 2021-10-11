@@ -1746,6 +1746,13 @@ function DateField() {
         });
     });
 
+    element.addEventListener("keydown", function(event) {
+        if(event.code == "Space") {
+            this.dispatchEvent(new MouseEvent("click"));
+            event.preventDefault();
+        }
+    });
+
     if(label == null) {
         return element;
     }else {
@@ -2978,6 +2985,13 @@ function Checkbox() {
         }
         if(changeHandler != undefined) {
             changeHandler(element.checked, element);
+        }
+    });
+
+    element.addEventListener("keydown", function(event) {
+        if(event.code == "Space") {
+            this.dispatchEvent(new MouseEvent("click"));
+            event.preventDefault();
         }
     });
 
@@ -6055,6 +6069,13 @@ var Controls = {
         element.addEventListener("click", function() {
             if(!reference.editable) return;
             showSelection();
+        });
+
+        element.addEventListener("keydown", function(event) {
+            if(event.code == "Space") {
+                this.dispatchEvent(new MouseEvent("click"));
+                event.preventDefault();
+            }
         });
 
         reference.show = function() {
