@@ -985,6 +985,9 @@ function Input() {
  * @param {string} [identifier] 
  * @param {Object} [attributes] 
  * @param {string} [attributes.dataKey] The key for object set in the ViewController or parent View. 
+ * @param {string} [attributes.label] Labeling by InputContainer
+ * @param {string} [attributes.changeHandler]
+ * @param {string} [attributes.inputHandler]
  * @returns {HTMLInputElement|HTMLDivElement}
  */
 function TextField() {
@@ -992,6 +995,7 @@ function TextField() {
 
     var label;
     var changeHandler;
+    var inputHandler;
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
         if(!Array.isArray(argument) && typeof argument == "object") {
@@ -1004,6 +1008,9 @@ function TextField() {
                 }else if(key == "changeHandler" && typeof argument[key] == "function") {
                     changeHandler = argument[key];
                     delete argument[key];
+                }else if(key == "inputHandler" && typeof argument[key] == "function") {
+                    inputHandler = argument[key];
+                    delete argument[key];
                 }
             }
             break;
@@ -1017,12 +1024,18 @@ function TextField() {
         if(changeHandler != undefined) {
             element.addEventListener("change", changeHandler);
         }
+        if(inputHandler != undefined) {
+            element.addEventListener("input", inputHandler);
+        }
         return element;
     }else {
         _arguments.splice(0, 0, "text");
         element = Input.apply(this, _arguments);
         if(changeHandler != undefined) {
             element.addEventListener("change", changeHandler);
+        }
+        if(inputHandler != undefined) {
+            element.addEventListener("input", inputHandler);
         }
         var inputComposite = InputComposite({label: label}, [element]);
         return inputComposite;
@@ -1034,6 +1047,9 @@ function TextField() {
  * @param {string} [identifier] 
  * @param {Object} [attributes] 
  * @param {string} [attributes.dataKey] The key for object set in the ViewController or parent View. 
+ * @param {string} [attributes.label] Labeling by InputContainer
+ * @param {string} [attributes.changeHandler]
+ * @param {string} [attributes.inputHandler]
  * @returns {HTMLTextAreaElement}
  */
 function TextArea() {
@@ -1041,6 +1057,8 @@ function TextArea() {
 
     var label;
     var dataKey;
+    var changeHandler;
+    var inputHandler;
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
         if(!Array.isArray(argument) && typeof argument == "object") {
@@ -1053,6 +1071,12 @@ function TextArea() {
                 }else if(key == "dataKey" && typeof argument[key] == "string") {
                     dataKey = argument[key];
                     delete argument[key];
+                }else if(key == "changeHandler" && typeof argument[key] == "function") {
+                    changeHandler = argument[key];
+                    delete argument[key];
+                }else if(key == "inputHandler" && typeof argument[key] == "function") {
+                    inputHandler = argument[key];
+                    delete argument[key];
                 }
             }
             break;
@@ -1066,12 +1090,24 @@ function TextArea() {
         if(dataKey != undefined) {
             element.dataKey = dataKey;
         }
+        if(changeHandler != undefined) {
+            element.addEventListener("change", changeHandler);
+        }
+        if(inputHandler != undefined) {
+            element.addEventListener("input", inputHandler);
+        }
         return element;
     }else {
         _arguments.splice(0, 0, "textarea");
         element = HtmlTag.apply(this, _arguments);
         if(dataKey != undefined) {
             element.dataKey = dataKey;
+        }
+        if(changeHandler != undefined) {
+            element.addEventListener("change", changeHandler);
+        }
+        if(inputHandler != undefined) {
+            element.addEventListener("input", inputHandler);
         }
         var inputComposite = InputComposite({label: label}, [element]);
         return inputComposite;
