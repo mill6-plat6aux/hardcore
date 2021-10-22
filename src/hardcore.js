@@ -231,6 +231,12 @@ function PopoverViewController() {
     }});
 
     /**
+     * Processing when the view is destroyed.
+     * @type {function(void): void}
+     */
+    self.dismissHandler;
+
+    /**
      * Border color of the popover window
      * @type {string}
      */
@@ -340,6 +346,9 @@ PopoverViewController.prototype.showView = function() {
  * @protected
  */
  PopoverViewController.prototype.dismissView = function() {
+    if(this.dismissHandler != undefined) {
+        this.dismissHandler();
+    }
     this.container.remove();
 };
 
@@ -387,6 +396,10 @@ function SlideoverViewController() {
      */
     self.modal = false;
 
+    /**
+     * Processing when the view is destroyed.
+     * @type {function(void): void}
+     */
     self.dismissHandler;
     
     /**
@@ -3022,6 +3035,7 @@ function Checkbox() {
         if(changeHandler != undefined) {
             changeHandler(element.checked, element);
         }
+        event.stopPropagation();
     });
 
     element.addEventListener("keydown", function(event) {
