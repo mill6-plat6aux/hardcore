@@ -2220,6 +2220,7 @@ function Table() {
                 if(tapHandler != undefined) {
                     row.addEventListener("click", function(event) {
                         var row = event.currentTarget;
+                        var tableBody = element.querySelector("tbody");
                         var index = tableBody.querySelectorAll("tr").indexOf(row);
                         tapHandler(data[index], index, row);
                     });
@@ -2742,6 +2743,7 @@ function NumericField() {
 
     var unit;
     var currency = false;
+    var multiplier = 1;
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
         if(typeof argument == "object" && !Array.isArray(argument)) {
@@ -2753,6 +2755,9 @@ function NumericField() {
                     delete argument[key];
                 }else if(key == "currency" && typeof argument[key] == "boolean") {
                     currency = argument[key];
+                    delete argument[key];
+                }else if(key == "multiplier" && typeof argument[key] == "number") {
+                    multiplier = argument[key];
                     delete argument[key];
                 }
             }
@@ -2807,6 +2812,8 @@ function NumericField() {
         }
     }
 
+    inputElement.multiplier = multiplier;
+
     Object.defineProperty(inputElement, "value", { 
         get: function() {
             var value = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").get.call(inputElement);
@@ -2823,12 +2830,14 @@ function NumericField() {
             if(Number.isNaN(value)) {
                 return null;
             }
+            value = value / element.multiplier;
             return value;
         },
         set: function(newValue) {
             if(currency) {
                 newValue = StringUtil.currencyString(newValue);
             }
+            value = value * element.multiplier;
             Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(inputElement, newValue);
         }
     });
@@ -3042,6 +3051,157 @@ function Checkbox() {
         if(event.code == "Space") {
             this.dispatchEvent(new MouseEvent("click"));
             event.preventDefault();
+        }
+    });
+
+    return element;
+}
+
+/**
+ * Create toggle button element.
+ * @param {string} [identifier] 
+ * @param {Object} [settings] 
+ * @param {Array<string>} [settings.items] labels
+ * @param {number} [settings.selectedIndex] 
+ * @param {string} [settings.borderColor=black] 
+ * @param {string} [settings.fillColor=black] 
+ * @param {string} [settings.labelColor=black] 
+ * @param {string} [settings.selectedLabelColor=black] 
+ * @param {function(number): void} [selectHandler]
+ * @returns {HTMLDivElement}
+ */
+function ToggleButton() {
+    var _arguments = Array.prototype.slice.call(arguments);
+
+    var items = [];
+    var selectedIndex = -1;
+    var borderColor = "black";
+    var fillColor = "black";
+    var labelColor = "black";
+    var selectedLabelColor = "white";
+    var selectHandler;
+    var style;
+    for(var i=0; i<_arguments.length; i++) {
+        var argument = _arguments[i];
+        if(!Array.isArray(argument) && typeof argument == "object") {
+            var keys = Object.keys(argument);
+            for(var j=0; j<keys.length; j++) {
+                var key = keys[j];
+                if(key == "items" && typeof argument[key] == "object") {
+                    items = argument[key];
+                    delete argument[key];
+                }else if(key == "selectedIndex" && typeof argument[key] == "number") {
+                    selectedIndex = argument[key];
+                    delete argument[key];
+                }else if(key == "borderColor" && typeof argument[key] == "string") {
+                    borderColor = argument[key];
+                    delete argument[key];
+                }else if(key == "fillColor" && typeof argument[key] == "string") {
+                    fillColor = argument[key];
+                    delete argument[key];
+                }else if(key == "labelColor" && typeof argument[key] == "string") {
+                    labelColor = argument[key];
+                    delete argument[key];
+                }else if(key == "selectedLabelColor" && typeof argument[key] == "string") {
+                    selectedLabelColor = argument[key];
+                    delete argument[key];
+                }else if(key == "selectHandler" && typeof argument[key] == "function") {
+                    selectHandler = argument[key];
+                    delete argument[key];
+                }else if(key == "style" && typeof argument[key] == "object") {
+                    style = argument[key];
+                    delete argument[key];
+                }
+            }
+            break;
+        }
+    }
+
+    var element = View.apply(this, _arguments);
+
+    if(style == undefined) {
+        style = {};
+    }
+    if(style.display == undefined) {
+        style.display = "inline-block";
+    }
+    if(style["white-space"] == undefined) {
+        style["white-space"] = "nowrap";
+    }
+    if(style.cursor == undefined) {
+        style.cursor = "default";
+    }
+    if(style["user-select"] == undefined) {
+        style["user-select"] = "none";
+    }
+    if(style.height == undefined) {
+        style.height = 32;
+    }
+    element.styles = style;
+
+    if(items != null && items.length > 0) {
+        if(selectedIndex != -1 && selectedIndex < items.length) {
+            element.selectedIndex = selectedIndex;
+        }else {
+            element.selectedIndex = -1;
+        }
+        var itemWidth = (1/items.length * 100) + "%";
+        for(i=0; i<items.length; i++) {
+            var item = items[i];
+            var itemElement = View(".item", {style: {
+                display: "inline-block",
+                width: itemWidth, 
+                height: "100%", 
+                color: labelColor,
+                "font-size": "small",
+                "text-align": "center",
+                "border-radius": (i==0 ? [4,0,0,4] : (i == items.length-1 ? [0,4,4,0] : 0)),
+                "border": "1px solid "+borderColor,
+                "line-height": 32
+            }}, [item]);
+            if(i>0) {
+                itemElement.style.borderLeft = "1px solid "+borderColor;
+            }
+            itemElement.addEventListener("click", function(event) {
+                var itemElement = event.currentTarget;
+                var itemElements = element.querySelectorAll(".item");
+                var index = itemElements.indexOf(itemElement);
+                if(element.selectedIndex == index) {
+                    index = -1;
+                    element.selectedIndex = -1;
+                }else {
+                    element.selectedIndex = index;
+                }
+                updateView();
+                if(selectHandler != null) {
+                    selectHandler(index);
+                }
+            });
+            element.appendChild(itemElement);
+        }
+    }
+
+    function updateView() {
+        var itemElements = element.querySelectorAll(".item");
+        for(var i=0; i<itemElements.length; i++) {
+            var _itemElement = itemElements[i];
+            if(i == element.selectedIndex) {
+                _itemElement.style.backgroundColor = fillColor;
+                _itemElement.style.color = selectedLabelColor;
+            }else {
+                _itemElement.style.backgroundColor = "transparent";
+                _itemElement.style.color = labelColor;
+            }
+        }
+    }
+
+    Object.defineProperty(element, "selectedIndex", { 
+        get: function() {
+            return this._selectedIndex;
+        },
+        set: function(newValue) {
+            this._selectedIndex = newValue;
+            updateView();
         }
     });
 
