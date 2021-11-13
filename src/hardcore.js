@@ -2830,15 +2830,19 @@ function NumericField() {
             if(Number.isNaN(value)) {
                 return null;
             }
-            value = value / element.multiplier;
+            value = value / inputElement.multiplier;
             return value;
         },
         set: function(newValue) {
-            if(currency) {
-                newValue = StringUtil.currencyString(newValue);
+            var value = null;
+            if(newValue != null) {
+                value = newValue;
+                value = value * inputElement.multiplier;
+                if(currency) {
+                    value = StringUtil.currencyString(value);
+                }
             }
-            value = value * element.multiplier;
-            Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(inputElement, newValue);
+            Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(inputElement, value);
         }
     });
 
