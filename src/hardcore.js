@@ -1211,6 +1211,10 @@ function MailField() {
  * @param {string} [attributes.color] 
  * @param {string} [attributes.weekendColor] 
  * @param {string} [attributes.indicatorColor] 
+ * @param {boolean} [settings.removable=true] 
+ * @param {boolean} [settings.editable=true] 
+ * @param {function(Date): void} [settings.editingEndHandler]
+ * @param {string} [attributes.placeholder] 
  * @param {number} [attributes.zIndex] 
  * @returns {HTMLInputElement}
  */
@@ -1227,7 +1231,10 @@ function DateField() {
     var weekendColor;
     var indicatorColor = "darkgray";
     var removable = true;
+    var editable = true;
+    var placeholder;
     var style;
+    var placeholderStyle;
     var zIndex = 0;
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
@@ -1265,8 +1272,17 @@ function DateField() {
                 }else if(key == "removable" && typeof argument[key] == "boolean") {
                     removable = argument[key];
                     delete argument[key];
+                }else if(key == "editable" && typeof argument[key] == "boolean") {
+                    editable = argument[key];
+                    delete argument[key];
                 }else if(key == "style" && typeof argument[key] == "object") {
                     style = argument[key];
+                    delete argument[key];
+                }else if(key == "placeholderStyle" && typeof argument[key] == "object") {
+                    placeholderStyle = argument[key];
+                    delete argument[key];
+                }else if(key == "placeholder" && typeof argument[key] == "string") {
+                    placeholder = argument[key];
                     delete argument[key];
                 }else if(key == "zIndex" && typeof argument[key] == "number") {
                     zIndex = argument[key];
@@ -1288,6 +1304,12 @@ function DateField() {
     if(style != null) {
         element.styles = style;
     }
+    if(placeholderStyle != null) {
+        element.styles = placeholderStyle;
+    }
+    if(placeholder != null) {
+        element.innerText = placeholder;
+    }
 
     if(dataKey != null) {
         element.dataKey = dataKey;
@@ -1295,15 +1317,35 @@ function DateField() {
     }
     if(dataHandler != null) {
         element.dataHandler = function(value) {
+            if(value == null) {
+                if(placeholderStyle != null) {
+                    element.styles = placeholderStyle;
+                }
+            }else {
+                if(style != null) {
+                    element.styles = style;
+                }
+            }
             element.innerText = formatDate(value);
             return dataHandler(value);
         };
     }else {
         element.dataHandler = function(value) {
+            if(value == null) {
+                if(placeholderStyle != null) {
+                    element.styles = placeholderStyle;
+                }
+            }else {
+                if(style != null) {
+                    element.styles = style;
+                }
+            }
             element.innerText = formatDate(value);
             return value;
         };
     }
+    
+    element.editable = editable;
 
     Object.defineProperty(element, "value", { 
         get: function() {
@@ -1324,7 +1366,11 @@ function DateField() {
 
     function formatDate(value) {
         var expression = "";
-        if(typeof value == "number") {
+        if(value == null) {
+            if(placeholder != null) {
+                expression = placeholder;
+            }
+        }else if(typeof value == "number") {
             expression = DateUtil.format(new Date(value), format);
         }else if(value instanceof Date) {
             expression = DateUtil.format(value, format);
@@ -1491,7 +1537,8 @@ function DateField() {
                     View(".title", {width:"calc(100% - 64px)", height:32, style: {
                         display: "inline-block", 
                         "vertical-align": "middle",
-                        "line-height": 32
+                        "line-height": 32,
+                        color: color
                     }}),
                     Canvas({width:32, height:32, style: {"vertical-align": "middle"}, drawer: function(context, size) {
                         var iconSize = Size(4,8);
@@ -1745,6 +1792,7 @@ function DateField() {
 
     element.addEventListener("click", function(event) {
         var element = event.currentTarget;
+        if(!element.editable) return;
         var content;
         if(type == "date") {
             content = createCalendar(element);
@@ -2734,6 +2782,7 @@ function ScrollView() {
  * @param {Object} [attributes] 
  * @param {string} [attributes.unit] 
  * @param {boolean} [attributes.currency=false] Whether or not to perform currency formatting.
+ * @param {number} [attributes.multiplier=1] 
  * @param {number} [attributes.value] 
  * @param {string} [attributes.dataKey] 
  * @returns {HTMLInputElement} element
@@ -3161,7 +3210,7 @@ function ToggleButton() {
                 "text-align": "center",
                 "border-radius": (i==0 ? [4,0,0,4] : (i == items.length-1 ? [0,4,4,0] : 0)),
                 "border": "1px solid "+borderColor,
-                "line-height": 32
+                "line-height": style.height
             }}, [item]);
             if(i>0) {
                 itemElement.style.borderLeft = "1px solid "+borderColor;
@@ -3183,6 +3232,7 @@ function ToggleButton() {
             });
             element.appendChild(itemElement);
         }
+        updateView();
     }
 
     function updateView() {
