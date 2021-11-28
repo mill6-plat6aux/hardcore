@@ -3120,6 +3120,7 @@ function Checkbox() {
  * @param {string} [settings.fillColor=black] 
  * @param {string} [settings.labelColor=black] 
  * @param {string} [settings.selectedLabelColor=black] 
+ * @param {boolean} [settings.removable=true] 
  * @param {function(number): void} [selectHandler]
  * @returns {HTMLDivElement}
  */
@@ -3132,6 +3133,7 @@ function ToggleButton() {
     var fillColor = "black";
     var labelColor = "black";
     var selectedLabelColor = "white";
+    var removable = false;
     var selectHandler;
     var style;
     for(var i=0; i<_arguments.length; i++) {
@@ -3157,6 +3159,9 @@ function ToggleButton() {
                     delete argument[key];
                 }else if(key == "selectedLabelColor" && typeof argument[key] == "string") {
                     selectedLabelColor = argument[key];
+                    delete argument[key];
+                }else if(key == "removable" && typeof argument[key] == "boolean") {
+                    removable = argument[key];
                     delete argument[key];
                 }else if(key == "selectHandler" && typeof argument[key] == "function") {
                     selectHandler = argument[key];
@@ -3206,7 +3211,7 @@ function ToggleButton() {
                 width: itemWidth, 
                 height: "100%", 
                 color: labelColor,
-                "font-size": "small",
+                "font-size": style["font-size"] != null ? style["font-size"] : "small",
                 "text-align": "center",
                 "border-radius": (i==0 ? [4,0,0,4] : (i == items.length-1 ? [0,4,4,0] : 0)),
                 "border": "1px solid "+borderColor,
@@ -3220,8 +3225,10 @@ function ToggleButton() {
                 var itemElements = element.querySelectorAll(".item");
                 var index = itemElements.indexOf(itemElement);
                 if(element.selectedIndex == index) {
-                    index = -1;
-                    element.selectedIndex = -1;
+                    if(removable) {
+                        index = -1;
+                        element.selectedIndex = -1;
+                    }
                 }else {
                     element.selectedIndex = index;
                 }
