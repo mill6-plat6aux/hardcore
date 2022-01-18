@@ -1826,6 +1826,10 @@ function DateField() {
                     tipOffset = -location.x;
                     location.x = 0;
                 }
+                if(location.y+balloon.offsetHeight > window.innerHeight) {
+                    settings.direction = "bottom";
+                    location.y = offset.top-balloon.offsetHeight-scrollOffset.y;
+                }
                 settings.tipOffset = tipOffset;
                 settings.location = location;
                 if(type == "date") {
@@ -1895,7 +1899,7 @@ function DateField() {
  * @param {string} [attributes.dataKey] The key for object set in the ViewController or parent View. 
  * @returns {HTMLInputElement}
  */
- function TimeField() {
+function TimeField() {
     var _arguments = Array.prototype.slice.call(arguments);
 
     var label;
@@ -6195,7 +6199,9 @@ var Controls = {
             });
             for(var i=0; i<reference.items.length; i++) {
                 var item = reference.items[i];
-                selection.appendChild(createItem(item));
+                var itemElement = createItem(item);
+                itemElement.setAttribute("tabIndex", i);
+                selection.appendChild(itemElement);
             }
             if(reference.editable) {
                 if(labelHandler != undefined) {
@@ -6343,9 +6349,61 @@ var Controls = {
         });
 
         element.addEventListener("keydown", function(event) {
-            if(event.code == "Space") {
-                this.dispatchEvent(new MouseEvent("click"));
-                event.preventDefault();
+            if(event.code == "Space" || event.code == "ArrowDown" || event.code == "ArrowUp") {
+                if(selection.style.visibility == "hidden") {
+                    event.currentTarget.dispatchEvent(new MouseEvent("click"));
+                    event.preventDefault();
+                }else {
+                    var items = selection.querySelectorAll(".item");
+                    if(items.length > 0) {
+                        items[0].focus();
+                    }
+                }
+            }
+        });
+
+        selection.addEventListener("keydown", function(event) {
+            var selection = event.currentTarget;
+            var items = selection.querySelectorAll(".item");
+            var i;
+            if(event.code == "Enter" || event.code == "Space") {
+                if(items.length > 0) {
+                    if(document.activeElement != null) {
+                        for(i=0; i<items.length; i++) {
+                            if(items[i] == document.activeElement) {
+                                items[i].dispatchEvent(new MouseEvent("click"));
+                                event.preventDefault();
+                                element.focus();
+                                break;
+                            }
+                        }
+                    }
+                }
+            }else if(event.code == "ArrowDown" || event.code == "ArrowUp") {
+                if(items.length > 0) {
+                    if(document.activeElement == null) {
+                        items[0].focus();
+                    }else {
+                        for(i=0; i<items.length; i++) {
+                            if(items[i] == document.activeElement) {
+                                if(event.code == "ArrowDown") {
+                                    if(i < items.length-1) {
+                                        items[i+1].focus();
+                                    }else {
+                                        items[0].focus();
+                                    }
+                                }else {
+                                    if(i > 0) {
+                                        items[i-1].focus();
+                                    }else {
+                                        items[items.length-1].focus();
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         });
 
