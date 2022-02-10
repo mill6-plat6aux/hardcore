@@ -6170,6 +6170,10 @@ var Controls = {
                 return;
             }
             if(reference.selectedIndex < 0 || reference.selectedIndex >= reference.items.length) {
+                var _contentElement = element.querySelector("div.item");
+                if(_contentElement != null) {
+                    _contentElement.remove();
+                }
                 return;
             }
             var item = reference.items[reference.selectedIndex];
