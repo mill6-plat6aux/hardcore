@@ -2085,6 +2085,8 @@ function Table() {
         element.classList.add("_hardcore-table");
     }
 
+    element.animate = animate;
+
     // header
     if(columns != undefined) {
         var header = TableHeader();
@@ -2318,12 +2320,12 @@ function Table() {
                 tableBody.style.setProperty("height", (this.clientHeight-tableHeader.clientHeight)+"px");
                 for(i=0; i<data.length; i++) {
                     var record = data[i];
-                    tableBody.appendChild(createRow(record, columns, tapHandler, animate));
+                    tableBody.appendChild(createRow(record, columns, tapHandler, element.animate));
                 }
                 element.appendChild(tableBody);
 
                 var showRow;
-                if(animate) {
+                if(element.animate) {
                     showRow = function(rows, index) {
                         var row = rows[index];
                         new FunctionalAnimation(function(progress) {
