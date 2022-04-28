@@ -6493,11 +6493,11 @@ var Controls = {
         if(typeof applyLabel == "function") {
             // applyHandler, cancelHandler
             if(typeof applyHandler == "function") {
-                cancelLabel = "Cancel";
                 cancelHandler = applyHandler;
+                cancelLabel = "Cancel";
 
-                applyLabel = "OK";
                 applyHandler = applyLabel;
+                applyLabel = "OK";
             }
         }
 
