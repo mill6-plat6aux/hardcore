@@ -1685,6 +1685,7 @@ function DateField() {
                 "text-align": "right",
                 "line-height": daySize.height,
                 "user-select": "none",
+                color: color,
                 padding: [0,4]
             }}, [hour]));
         }
@@ -1698,6 +1699,7 @@ function DateField() {
                 "text-align": "right",
                 "line-height": daySize.height,
                 "user-select": "none",
+                color: color,
                 padding: [0,4]
             }}, [minute]));
         }
@@ -6480,11 +6482,25 @@ var Controls = {
     /**
      * Show message dialog
      * @param {string} message
-     * @param {info|warning|confirm} type
+     * @param {"info"|"warning"|"confirm"} type
+     * @param {string} applyLabel
      * @param {function(): void} applyHandler
+     * @param {string} cancelLabel
      * @param {function(): void} cancelHandler
      */
-    Message: function(text, type, applyHandler, cancelHandler) {
+    Message: function(text, type, applyLabel, applyHandler, cancelLabel, cancelHandler) {
+        // irregular arguments
+        if(typeof applyLabel == "function") {
+            // applyHandler, cancelHandler
+            if(typeof applyHandler == "function") {
+                cancelLabel = "Cancel";
+                cancelHandler = applyHandler;
+
+                applyLabel = "OK";
+                applyHandler = applyLabel;
+            }
+        }
+
         var element = document.createElement("div");
         element.classList.add("message");
         var contentsElement = document.createElement("div");
@@ -6602,7 +6618,7 @@ var Controls = {
         var popup;
         if(applyHandler != undefined) {
             var applyButton = document.createElement("div");
-            applyButton.innerText = "OK";
+            applyButton.innerText = applyLabel != null ? applyLabel : "OK";
             applyButton.style.setProperty("display", "inline-block");
             applyButton.style.setProperty("margin", "0px 8px 8px 8px");
             applyButton.style.setProperty("font-weight", "600");
@@ -6617,7 +6633,7 @@ var Controls = {
         }
         if(cancelHandler != undefined) {
             var cancelButton = document.createElement("div");
-            cancelButton.innerText = "Cancel";
+            cancelButton.innerText = cancelLabel != null ? cancelLabel : "Cancel";
             cancelButton.style.setProperty("display", "inline-block");
             cancelButton.style.setProperty("margin", "0px 8px 8px 8px");
             cancelButton.style.setProperty("font-weight", "600");
