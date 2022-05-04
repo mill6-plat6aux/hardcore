@@ -3129,6 +3129,7 @@ function Checkbox() {
  * @param {string} [settings.labelColor=black] 
  * @param {string} [settings.selectedLabelColor=black] 
  * @param {boolean} [settings.removable=true] 
+ * @param {boolean} [settings.editable=true] 
  * @param {function(number): void} [selectHandler]
  * @returns {HTMLDivElement}
  */
@@ -3142,6 +3143,7 @@ function ToggleButton() {
     var labelColor = "black";
     var selectedLabelColor = "white";
     var removable = false;
+    var editable = true;
     var selectHandler;
     var style;
     for(var i=0; i<_arguments.length; i++) {
@@ -3171,6 +3173,9 @@ function ToggleButton() {
                 }else if(key == "removable" && typeof argument[key] == "boolean") {
                     removable = argument[key];
                     delete argument[key];
+                }else if(key == "editable" && typeof argument[key] == "boolean") {
+                    editable = argument[key];
+                    delete argument[key];
                 }else if(key == "selectHandler" && typeof argument[key] == "function") {
                     selectHandler = argument[key];
                     delete argument[key];
@@ -3184,6 +3189,8 @@ function ToggleButton() {
     }
 
     var element = View.apply(this, _arguments);
+
+    element.editable = editable;
 
     if(style == undefined) {
         style = {};
@@ -3229,6 +3236,7 @@ function ToggleButton() {
                 itemElement.style.borderLeft = "1px solid "+borderColor;
             }
             itemElement.addEventListener("click", function(event) {
+                if(!element.editable) return false;
                 var itemElement = event.currentTarget;
                 var itemElements = element.querySelectorAll(".item");
                 var index = itemElements.indexOf(itemElement);
