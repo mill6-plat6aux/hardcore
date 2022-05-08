@@ -4445,6 +4445,11 @@ var StringUtil = {
         var result = [];
         var index = 0;
         var i;
+        var negative = false;
+        if(source.startsWith("-")) {
+            negative = true;
+            source = source.substring(1);
+        }
         if(source.includes(".")) {
             for(i=source.length-1; i>=0; i--) {
                 var char = source.charAt(i);
@@ -4463,7 +4468,7 @@ var StringUtil = {
             result.push(source.charAt(i));
             index++;
         }
-        return result.reverse().join("");
+        return (negative ? "-" : "") + result.reverse().join("");
     }
 };
 
