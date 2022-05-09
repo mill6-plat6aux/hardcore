@@ -2792,6 +2792,8 @@ function ScrollView() {
  * @param {boolean} [attributes.currency=false] Whether or not to perform currency formatting.
  * @param {number} [attributes.multiplier=1] 
  * @param {number} [attributes.value] 
+ * @param {number} [attributes.maxValue] 
+ * @param {number} [attributes.minValue] 
  * @param {string} [attributes.dataKey] 
  * @returns {HTMLInputElement} element
  */
@@ -2801,6 +2803,8 @@ function NumericField() {
     var unit;
     var currency = false;
     var multiplier = 1;
+    var maxValue;
+    var minValue;
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
         if(typeof argument == "object" && !Array.isArray(argument)) {
@@ -2815,6 +2819,12 @@ function NumericField() {
                     delete argument[key];
                 }else if(key == "multiplier" && typeof argument[key] == "number") {
                     multiplier = argument[key];
+                    delete argument[key];
+                }else if(key == "maxValue" && typeof argument[key] == "number") {
+                    maxValue = argument[key];
+                    delete argument[key];
+                }else if(key == "minValue" && typeof argument[key] == "number") {
+                    minValue = argument[key];
                     delete argument[key];
                 }
             }
@@ -2887,14 +2897,26 @@ function NumericField() {
             if(Number.isNaN(value)) {
                 return null;
             }
+
             value = value / inputElement.multiplier;
+
+            if(maxValue != null && value > maxValue) {
+                value = maxValue;
+                inputElement.value = value;
+            }else if(minValue != null && value < minValue) {
+                value = minValue;
+                inputElement.value = value;
+            }
+            
             return value;
         },
         set: function(newValue) {
             var value = null;
             if(newValue != null) {
                 value = newValue;
+
                 value = value * inputElement.multiplier;
+
                 if(currency) {
                     value = StringUtil.currencyString(value);
                 }
