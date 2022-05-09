@@ -6530,10 +6530,9 @@ var Controls = {
             if(typeof applyHandler == "function") {
                 cancelHandler = applyHandler;
                 cancelLabel = "Cancel";
-
-                applyHandler = applyLabel;
-                applyLabel = "OK";
             }
+            applyHandler = applyLabel;
+            applyLabel = "OK";
         }
 
         var element = document.createElement("div");
