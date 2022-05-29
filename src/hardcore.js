@@ -4447,9 +4447,11 @@ var StringUtil = {
     /**
      * Get a three-digit delimited currency notation string.
      * @param {number} [source]
+     * @param {number} [decimalPlaces]
+     * @param {"round"|"floor"|"ceil"} [roundingMode]
      * @returns {string}
      */
-    currencyString: function(source) {
+    currencyString: function(source, decimalPlaces, roundingMode) {
         if(source == null) return "";
         if(typeof source != "number") {
             if(typeof source == "string" && source.length == 0) {
@@ -4461,7 +4463,20 @@ var StringUtil = {
             if(Number.isNaN(source)) {
                 return "";
             }
-            source = String(source);
+            var string = String(source);
+            if(string.includes(".") && typeof decimalPlaces == "number") {
+                var multiplier = Math.pow(10, decimalPlaces);
+                if(roundingMode == null || roundingMode == "round") {
+                    source = Math.round(source * multiplier) / multiplier;
+                }else if(roundingMode == "floor") {
+                    source = Math.floor(source * multiplier) / multiplier;
+                }else if(roundingMode == "ceil") {
+                    source = Math.ceil(source * multiplier) / multiplier;
+                }
+                source = String(source);
+            }else {
+                source = string;
+            }
         }
         if(source.length == 0) return source;
         var result = [];
