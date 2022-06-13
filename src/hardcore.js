@@ -2844,20 +2844,28 @@ function NumericField() {
                 if(observations.length == 0) return;
                 var element = observations[0].target;
                 resizeObserver.disconnect();
-                element.style.setProperty("text-align", "right");
-                var unitElement = document.createElement("span");
-                unitElement.defineStyles({
-                    "font-size": "10px",
-                    "margin-left": "4px",
-                    "color": "darkgray"
-                });
-                unitElement.innerText = unit;
-                element.after(unitElement);
+                showUnit(element, unit);
             });
             resizeObserver.observe(inputElement);
         }else {
             console.error("Your browser does not support ResizeObserver. Please try to run Polyfill for this function.");
         }
+    }
+
+    function showUnit(element, unit) {
+        var unitElement = element.querySelector(".unit");
+        if(unitElement != null) {
+            unitElement.remove();
+        }
+        unitElement = document.createElement("span");
+        unitElement.classList.add("unit");
+        unitElement.defineStyles({
+            "font-size": "10px",
+            "margin-left": "4px",
+            "color": "darkgray"
+        });
+        unitElement.innerText = unit;
+        element.after(unitElement);
     }
 
     if(currency) {
@@ -2922,6 +2930,12 @@ function NumericField() {
                 }
             }
             Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(inputElement, value);
+        }
+    });
+
+    Object.defineProperty(inputElement, "unit", { 
+        set: function(newValue) {
+            showUnit(inputElement, newValue);
         }
     });
 
