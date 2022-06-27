@@ -205,6 +205,8 @@ function PopoverViewController() {
 
     ViewController.call(this);
 
+    var self = this;
+
     this.replace = false;
 
     /**
@@ -234,7 +236,7 @@ function PopoverViewController() {
      * Processing when the view is destroyed.
      * @type {function(void): void}
      */
-    self.dismissHandler;
+    this.dismissHandler;
 
     /**
      * Border color of the popover window
@@ -247,6 +249,30 @@ function PopoverViewController() {
         },
         set: function(newValue) {
             this.container.style.borderColor = newValue;
+        }
+    });
+
+    Object.defineProperty(this, "draggable", {
+        set: function(newValue) {
+            if(typeof newValue != "boolean") return;
+            if(newValue) {
+                UIEventUtil.handleTouch(self.container, {
+                    touchBegan: function(event, context) {
+                        var target = event.currentTarget;
+                        context.originalPoint = Point(event.pageX-target.offsetLeft, event.pageY-target.offsetTop);
+                    },
+                    touchMove: function(event, context) {
+                        if(context == null || context.originalPoint == null) return;
+                        var target = event.currentTarget;
+                        target.style.setProperty("left", (event.pageX-context.originalPoint.x)+"px");
+                        target.style.setProperty("top", (event.pageY-context.originalPoint.y)+"px");
+                    },
+                    touchEnd: function(event, context) {
+                        if(context == null) return;
+                        delete context.originalPoint;
+                    }
+                });
+            }
         }
     });
 }
@@ -7089,7 +7115,7 @@ var Controls = {
             var currentY = event.clientY - target.offsetTop;
             var currentScrollOffsetX = context.beginScrollOffset.x - (currentX - context.beginLocation.x);
             var currentScrollOffsetY = context.beginScrollOffset.y - (currentY - context.beginLocation.y);
-            target.scrollLeft = currentScrollOffsetX
+            target.scrollLeft = currentScrollOffsetX;
             target.scrollTop = currentScrollOffsetY;
             if(callback != undefined) {
                 callback(Point(target.scrollLeft, target.scrollTop));
