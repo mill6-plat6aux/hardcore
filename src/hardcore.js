@@ -220,6 +220,12 @@ function PopoverViewController() {
      * @type {boolean}
      */
     this.modal = false;
+
+    /**
+     * Click outside the view to close it.
+     * @type {boolean}
+     */
+    this.dismissOnOutside = true;
     
     /**
      * By changing the style of this view, you can change the way it pops over.
@@ -251,30 +257,6 @@ function PopoverViewController() {
             this.container.style.borderColor = newValue;
         }
     });
-
-    Object.defineProperty(this, "draggable", {
-        set: function(newValue) {
-            if(typeof newValue != "boolean") return;
-            if(newValue) {
-                UIEventUtil.handleTouch(self.container, {
-                    touchBegan: function(event, context) {
-                        var target = event.currentTarget;
-                        context.originalPoint = Point(event.pageX-target.offsetLeft, event.pageY-target.offsetTop);
-                    },
-                    touchMove: function(event, context) {
-                        if(context == null || context.originalPoint == null) return;
-                        var target = event.currentTarget;
-                        target.style.setProperty("left", (event.pageX-context.originalPoint.x)+"px");
-                        target.style.setProperty("top", (event.pageY-context.originalPoint.y)+"px");
-                    },
-                    touchEnd: function(event, context) {
-                        if(context == null) return;
-                        delete context.originalPoint;
-                    }
-                });
-            }
-        }
-    });
 }
 PopoverViewController.prototype = Object.create(ViewController.prototype);
 
@@ -289,9 +271,9 @@ PopoverViewController.prototype.showView = function() {
         }
         var self = this;
         var mask = View({style: maskStyle, tapHandler: function(event) {
-            var mask = event.currentTarget;
-            self.dismissView();
-            mask.remove();
+            if(self.dismissOnOutside) {
+                self.dismiss();
+            }
         }});
         this.mask = mask;
         this.parent.appendChild(mask);
@@ -423,6 +405,12 @@ function SlideoverViewController() {
     self.modal = false;
 
     /**
+     * Click outside the view to close it.
+     * @type {boolean}
+     */
+     self.dismissOnOutside = true;
+
+    /**
      * Processing when the view is destroyed.
      * @type {function(void): void}
      */
@@ -509,7 +497,9 @@ SlideoverViewController.prototype.showView = function() {
             "left": "0"
         }
         var mask = View({style: maskStyle, tapHandler: function(event) {
-            self.dismiss();
+            if(self.dismissOnOutside) {
+                self.dismiss();
+            }
         }});
         this.mask = mask;
         this.parent.appendChild(mask);
@@ -2700,7 +2690,9 @@ function InputComposite() {
     var children;
     var borderColor = "darkgray";
     var labelColor = "darkgray";
+    var labelFontSize = "10px";
     var unitColor = "darkgray";
+    var unitFontSize = "10px";
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
         if(identifierIndex == -1 && typeof argument == "string") {
@@ -2711,7 +2703,7 @@ function InputComposite() {
             var keys = Object.keys(argument);
             for(var j=0; j<keys.length; j++) {
                 var key = keys[j];
-                if(key == "label") {
+                if(key == "label" && typeof argument[key] == "string") {
                     label = argument[key];
                     delete argument[key];
                 }else if(key == "style") {
@@ -2723,8 +2715,20 @@ function InputComposite() {
                 }else if(key == "labelColor") {
                     labelColor = argument[key];
                     delete argument[key];
+                }else if(key == "labelFontSize") {
+                    labelFontSize = argument[key];
+                    if(typeof labelFontSize == "number") {
+                        labelFontSize = labelFontSize + "px";
+                    }
+                    delete argument[key];
                 }else if(key == "unitColor") {
                     unitColor = argument[key];
+                    delete argument[key];
+                }else if(key == "unitFontSize") {
+                    unitFontSize = argument[key];
+                    if(typeof unitFontSize == "number") {
+                        unitFontSize = unitFontSize + "px";
+                    }
                     delete argument[key];
                 }
             }
@@ -2762,13 +2766,13 @@ function InputComposite() {
         "padding": "4px",
         "margin": "8px 0",
         ".label": {
-            "font-size": "10px",
+            "font-size": labelFontSize,
             color: labelColor,
             cursor: "default",
             "user-select": "none"
         },
         ".unit": {
-            "font-size": "10px",
+            "font-size": unitFontSize,
             "margin-left": "4px",
             color: unitColor
         }
