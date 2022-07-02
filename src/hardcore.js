@@ -235,7 +235,7 @@ function PopoverViewController() {
     this.container = View("._hardcore-popover", {style: {
         "position": "absolute", 
         "border": "1px solid rgba(0,0,0,0.3)", 
-        "box-shadow": "3px 3px 6px rgba(0,0,0,0.3)"
+        "box-shadow": "3px 3px 16px rgba(0,0,0,0.3)"
     }});
 
     /**
@@ -4501,6 +4501,22 @@ var StringUtil = {
             if(typeof source == "string" && source.length == 0) {
                 return "";
             }
+            
+            // multi-byte string
+            source = source.replace(/０/g, "0");
+            source = source.replace(/１/g, "1");
+            source = source.replace(/２/g, "2");
+            source = source.replace(/３/g, "3");
+            source = source.replace(/４/g, "4");
+            source = source.replace(/５/g, "5");
+            source = source.replace(/６/g, "6");
+            source = source.replace(/７/g, "7");
+            source = source.replace(/８/g, "8");
+            source = source.replace(/９/g, "9");
+
+            // comma separated number
+            source = source.replace(/,/g, "");
+
             source = Number(source);
         }
         if(typeof source == "number") {
@@ -5487,7 +5503,7 @@ var DrawUtil = {
         context.closePath();
         context.fillStyle = fillColor;
         if(shadow) {
-            context.shadowBlur = 14;
+            context.shadowBlur = 16;
             context.shadowOffsetX = 3;
             context.shadowOffsetY = 3;
             context.shadowColor = "rgba(0,0,0,0.5)";
@@ -6089,7 +6105,7 @@ var Controls = {
             selectedIndex: -1,
             selectHandler: undefined,
             editable: true
-        }
+        };
 
         var parent;
         var itemWidth = 120;
@@ -6186,7 +6202,7 @@ var Controls = {
         selection.style.setProperty("-webkit-overflow-scrolling", "touch");
         selection.style.setProperty("scrollbar-width", "none");
         selection.style.setProperty("background-color", backgroundColor);
-        selection.style.setProperty("box-shadow", "3px 3px 6px rgba(0,0,0,0.3)");
+        selection.style.setProperty("box-shadow", "3px 3px 16px rgba(0,0,0,0.3)");
         selection.style.setProperty("border", "1px solid " + borderColor);
         selection.style.setProperty("cursor", "pointer");
         selection.style.setProperty("user-select", "none");
