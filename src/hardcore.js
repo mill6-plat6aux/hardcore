@@ -2923,7 +2923,7 @@ function NumericField() {
         if(number == null || isNaN(number) || mutiplier == null || isNaN(mutiplier)) return number;
         var string = number.toString();
         var pointIndex = string.indexOf(".");
-        if(pointIndex == -1) return number;
+        if(pointIndex == -1) return number * mutiplier;
         var decimalScale = string.length - pointIndex - 1;
         var integer = number * Math.pow(10, decimalScale);
         integer = Math.floor(integer);
