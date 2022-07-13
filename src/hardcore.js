@@ -1838,13 +1838,16 @@ function DateField() {
             shadow: true, 
             zIndex: zIndex,
             loadHandler: function(balloon, settings) {
-                var location = Point(offset.left+element.clientWidth/2-balloon.offsetWidth/2, offset.top+element.clientHeight-scrollOffset.y);
+                var location = Point(
+                    offset.left+element.clientWidth/2-balloon.offsetWidth/2, 
+                    (settings.direction == "top" ? offset.top+element.clientHeight-scrollOffset.y : offset.top-balloon.offsetHeight-scrollOffset.y)
+                );
                 var tipOffset = balloon.offsetWidth/2;
                 if(location.x < 0) {
                     tipOffset = -location.x;
                     location.x = 0;
                 }
-                if(location.y+balloon.offsetHeight > window.innerHeight) {
+                if(settings.direction == "top" && location.y+balloon.offsetHeight > window.innerHeight) {
                     settings.direction = "bottom";
                     location.y = offset.top-balloon.offsetHeight-scrollOffset.y;
                 }
