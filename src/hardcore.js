@@ -3010,6 +3010,7 @@ function Checkbox() {
     var fontSize = "1em";
     var dataKey;
     var changeHandler;
+    var style;
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
         if(typeof argument == "object" && !Array.isArray(argument)) {
@@ -3037,6 +3038,8 @@ function Checkbox() {
                 }else if(key == "changeHandler" && typeof argument[key] == "function") {
                     changeHandler = argument[key];
                     delete argument[key];
+                }else if(key == "style" && typeof argument[key] == "object") {
+                    style = argument[key];
                 }
             }
             break;
@@ -3052,11 +3055,21 @@ function Checkbox() {
 
     element.classList.add("_hardcore-checkbox");
 
-    element.style.setProperty("display", "inline-block");
-    element.style.setProperty("height", "32px");
-    element.style.setProperty("line-height", "32px");
-    element.style.setProperty("font-size", fontSize);
-    element.style.setProperty("cursor", "pointer");
+    if(style == null || style.display == null) {
+        element.style.setProperty("display", "inline-block");
+    }
+    if(style == null || style.height == null) {
+        element.style.setProperty("height", "32px");
+    }
+    if(style == null || style["line-height"] == null) {
+        element.style.setProperty("line-height", "32px");
+    }
+    if(style == null || style["font-size"] == null) {
+        element.style.setProperty("font-size", fontSize);
+    }
+    if(style == null || style.cursor == null) {
+        element.style.setProperty("cursor", "pointer");
+    }
 
     var canvas = document.createElement("canvas");
     canvas.style.setProperty("vertical-align", "bottom");
