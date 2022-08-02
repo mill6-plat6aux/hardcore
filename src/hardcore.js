@@ -1377,6 +1377,7 @@ function DateField() {
                 value = newValue;
             }
             this._value = value;
+            element.dataHandler(value);
         }
     });
 
