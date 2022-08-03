@@ -2887,9 +2887,12 @@ function NumericField() {
     }
 
     function showUnit(element, unit) {
-        var unitElement = element.querySelector(".unit");
-        if(unitElement != null) {
-            unitElement.remove();
+        var unitElement;
+        if(element.parentElement != null) {
+            unitElement = element.parentElement.querySelector(".unit");
+            if(unitElement != null) {
+                unitElement.remove();
+            }
         }
         unitElement = document.createElement("span");
         unitElement.classList.add("unit");
