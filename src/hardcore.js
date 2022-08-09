@@ -1015,8 +1015,8 @@ function Input() {
  * @param {Object} [attributes] 
  * @param {string} [attributes.dataKey] The key for object set in the ViewController or parent View. 
  * @param {string} [attributes.label] Labeling by InputContainer
- * @param {string} [attributes.changeHandler]
- * @param {string} [attributes.inputHandler]
+ * @param {function(Event): void} [attributes.changeHandler]
+ * @param {function(InputEvent): void} [attributes.inputHandler]
  * @returns {HTMLInputElement|HTMLDivElement}
  */
 function TextField() {
@@ -3392,8 +3392,9 @@ function ToggleButton() {
  * @param {number} [settings.itemWidth] 
  * @param {number} [settings.itemHeight] 
  * @param {function(item:any):string} [settings.labelHandler] 
- * @param {function(item:any):object} [settings.styleHandler] 
- * @param {function(itemElement:HTMLDivElement, item): void} [settings.itemDrawer] 
+ * @param {function(item:any, current:boolean):object} [settings.styleHandler] 
+ * @param {function(item:any): HTMLDivElement} [settings.itemHandler]
+ * @param {function(itemElement:HTMLDivElement, item:any): void} [settings.itemDrawer] 
  * @param {function(selectedIndex:number): void} [settings.selectHandler] 
  * @param {function(void): void} [settings.closeHandler] 
  * @param {boolean} [settings.selectedDrawing=true] 
@@ -3437,12 +3438,12 @@ function Select() {
                 element.valueKey = settings.dataKey;
             }
         }
-        if(settings.itemDrawer == undefined && settings.labelHandler == undefined) {
+        if(settings.itemHandler == undefined && settings.itemDrawer == undefined && settings.labelHandler == undefined) {
             settings.labelHandler = function(item) {
                 return item["label"];
             }
         }
-        if(settings.itemDrawer == undefined && settings.styleHandler == undefined) {
+        if(settings.itemHandler == undefined && settings.itemDrawer == undefined && settings.styleHandler == undefined) {
             settings.styleHandler = function(item, current) {
                 return {
                     padding: [0,8]
@@ -6113,7 +6114,8 @@ var Controls = {
      * @param {number} settings.itemWidth 
      * @param {number} settings.itemHeight 
      * @param {function(any):string} [settings.labelHandler] The argument is a element of settings.items.
-     * @param {function(any):object} [settings.styleHandler] The argument is a element of settings.items.
+     * @param {function(any, boolean):object} [settings.styleHandler] The argument is a element of settings.items.
+     * @param {function(any): HTMLDivElement} [settings.itemHandler] The argument is a element of settings.items.
      * @param {function(HTMLDivElement, any): void} [settings.itemDrawer] The second argument is a element of settings.items.
      * @param {function(number): void} [settings.selectHandler] The argument is selected index of settings.items.
      * @param {function():void} [settings.closeHandler] 
@@ -6149,6 +6151,7 @@ var Controls = {
         var itemDrawer;
         var labelHandler;
         var styleHandler;
+        var itemHandler;
         var hoverStyleHandler;
 
         var closeHandler;
@@ -6184,6 +6187,9 @@ var Controls = {
             }
             if(settings.styleHandler != undefined) {
                 styleHandler = settings.styleHandler;
+            }
+            if(settings.itemHandler != undefined) {
+                itemHandler = settings.itemHandler;
             }
             if(settings.hoverStyleHandler != undefined) {
                 hoverStyleHandler = settings.hoverStyleHandler;
@@ -6301,8 +6307,12 @@ var Controls = {
                         }
                     });
                 }
-            }
-            else if(itemDrawer != undefined) {
+            }else if(itemHandler != undefined) {
+                itemElement = itemHandler(item);
+                if(!itemElement.classList.contains("item")) {
+                    itemElement.classList.add("item");
+                }
+            }else if(itemDrawer != undefined) {
                 itemElement = document.createElement("canvas");
                 CanvasUtil.initCanvas(itemElement, {width: itemWidth, height: itemHeight});
                 itemDrawer(itemElement, item);
@@ -6338,6 +6348,13 @@ var Controls = {
                         contentElement.styles = styles;
                     }
                 }
+            }else if(itemHandler != undefined) {
+                var itemlement = element.querySelector("div.item");
+                if(itemlement != null) {
+                    itemlement.remove();
+                }
+                itemlement = createItem(item, true);
+                element.appendChild(itemlement);
             }else if(itemDrawer != undefined) {
                 itemDrawer(element.querySelector("canvas"), item);
             }
@@ -6354,46 +6371,22 @@ var Controls = {
                 selection.appendChild(itemElement);
             }
             if(reference.editable) {
-                if(labelHandler != undefined) {
-                    selection.querySelectorAll("div").forEach(function(itemElement) {
-                        itemElement.addEventListener("click", function(event) {
-                            var itemElement = event.currentTarget;
-
-                            var index = -1;
-                            var itemElementList = selection.querySelectorAll("div");
-                            for(var i=0; i<itemElementList.length; i++) {
-                                if(itemElementList[i] === itemElement) {
-                                    index = i;
-                                    break;
-                                }
-                            }
-                            if(index == -1 || index >= reference.length) {
-                                return false;
-                            }
-                            reference.selectedIndex = index;
-
-                            drawSelectedItem();
-
-                            if(reference.selectHandler != undefined) {
-                                reference.selectHandler(reference.selectedIndex, reference);
-                            }
-
-                            reference.close();
-                        });
-                    });
+                var elementSelector;
+                if(labelHandler != undefined || itemHandler != undefined) {
+                    elementSelector = "div.item";
+                }else if(itemDrawer != undefined) {
+                    elementSelector = "canvas";
                 }
-                else if(itemDrawer != undefined) {
-                    selection.querySelectorAll("canvas").forEach(function(itemElement, index) {
-                        itemElement.addEventListener("click", function() {
-                            reference.selectedIndex = index;
-                            drawSelectedItem();
-                            if(reference.selectHandler != undefined) {
-                                reference.selectHandler(reference.selectedIndex, reference);
-                            }
-                            reference.close();
-                        });
+                selection.querySelectorAll(elementSelector).forEach(function(itemElement, index) {
+                    itemElement.addEventListener("click", function(event) {
+                        reference.selectedIndex = index;
+                        drawSelectedItem();
+                        if(reference.selectHandler != undefined) {
+                            reference.selectHandler(reference.selectedIndex, reference);
+                        }
+                        reference.close();
                     });
-                }
+                });
             }
         }
 
