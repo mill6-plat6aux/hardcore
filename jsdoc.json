@@ -2,11 +2,14 @@
     "source": {
         "include": ["src"]
     },
+    "templates": {
+        "referenceTitle": "Hardcore.js"
+    },
     "opts": {
         "encoding": "utf8",
         "readme": "doc-title.md",
         "destination": "docs",
-        "template": "node_modules/clean-jsdoc-theme",
+        "template": "node_modules/braintree-jsdoc-template",
         "theme_opts": {
             "theme": "light",
             "title": "Hardcore.js"

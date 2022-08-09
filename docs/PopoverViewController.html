@@ -1,247 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Adding meta -->
-    
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Adding external script-->
-    
+  <title>
+      PopoverViewController - Documentation
+  </title>
 
-    <!-- Adding external style-->
-    
+  <link href="https://www.braintreepayments.com/images/favicon-ccda0b14.png" rel="icon" type="image/png">
 
-    <!-- Adding scripts-->
-    
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
 
-    <!-- Adding style-->
-    
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 
-    <!-- Adding overlay script-->
-    
+  <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+  <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+  
 
-    <!-- Adding overlay style-->
-    
+  
 
-
-    <title>PopoverViewController</title>
-
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/third-party/ionicons.min.css">
-    <link type="text/css" rel="stylesheet" href="styles/third-party/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
-    <link type="text/css" rel="stylesheet" href="styles/clean-jsdoc-theme-base.css">
-    <link type="text/css" rel="stylesheet" href="styles/clean-jsdoc-theme-light.css">
-    
-<svg aria-hidden="true" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none">
-    <defs>
-        <symbol id="copy-icon" viewbox="0 0 488.3 488.3">
-            <g>
-                <path d="M314.25,85.4h-227c-21.3,0-38.6,17.3-38.6,38.6v325.7c0,21.3,17.3,38.6,38.6,38.6h227c21.3,0,38.6-17.3,38.6-38.6V124    C352.75,102.7,335.45,85.4,314.25,85.4z M325.75,449.6c0,6.4-5.2,11.6-11.6,11.6h-227c-6.4,0-11.6-5.2-11.6-11.6V124    c0-6.4,5.2-11.6,11.6-11.6h227c6.4,0,11.6,5.2,11.6,11.6V449.6z"/>
-                <path d="M401.05,0h-227c-21.3,0-38.6,17.3-38.6,38.6c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5c0-6.4,5.2-11.6,11.6-11.6h227    c6.4,0,11.6,5.2,11.6,11.6v325.7c0,6.4-5.2,11.6-11.6,11.6c-7.5,0-13.5,6-13.5,13.5s6,13.5,13.5,13.5c21.3,0,38.6-17.3,38.6-38.6    V38.6C439.65,17.3,422.35,0,401.05,0z"/>
-            </g>
-        </symbol>
-    </defs>
-</svg>
-
+  <!-- start Mixpanel -->
+  <script type="text/javascript">(function(e,a){if(!a.__SV){var b=window;try{var c,l,i,j=b.location,g=j.hash;c=function(a,b){return(l=a.match(RegExp(b+"=([^&]*)")))?l[1]:null};g&&c(g,"state")&&(i=JSON.parse(decodeURIComponent(c(g,"state"))),"mpeditor"===i.action&&(b.sessionStorage.setItem("_mpcehash",g),history.replaceState(i.desiredHash||"",e.title,j.pathname+j.search)))}catch(m){}var k,h;window.mixpanel=a;a._i=[];a.init=function(b,c,f){function e(b,a){var c=a.split(".");2==c.length&&(b=b[c[0]],a=c[1]);b[a]=function(){b.push([a].concat(Array.prototype.slice.call(arguments,
+  0)))}}var d=a;"undefined"!==typeof f?d=a[f]=[]:f="mixpanel";d.people=d.people||[];d.toString=function(b){var a="mixpanel";"mixpanel"!==f&&(a+="."+f);b||(a+=" (stub)");return a};d.people.toString=function(){return d.toString(1)+".people (stub)"};k="disable time_event track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config reset people.set people.set_once people.increment people.append people.union people.track_charge people.clear_charges people.delete_user".split(" ");
+  for(h=0;h<k.length;h++)e(d,k[h]);a._i.push([b,c,f])};a.__SV=1.2;b=e.createElement("script");b.type="text/javascript";b.async=!0;b.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===e.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";c=e.getElementsByTagName("script")[0];c.parentNode.insertBefore(b,c)}})(document,window.mixpanel||[]);
+  mixpanel.init("1919205b2da72e4da3b9b6639b444d59");</script>
+  <!-- end Mixpanel -->
 </head>
+
 <body>
-<input type="checkbox" id="nav-trigger" class="nav-trigger" />
-<label for="nav-trigger" class="navicon-button x">
-  <div class="navicon"></div>
-</label>
+  <svg style="display: none;">
+    <defs>
+      <symbol id="linkIcon" fill="#706d77" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 0h24v24H0z" fill="none"/>
+          <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+      </symbol>
+    </defs>
+  </svg>
 
-<label for="nav-trigger" class="overlay"></label>
+  <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+  <label for="nav-trigger" class="navicon-button x">
+    <div class="navicon"></div>
+  </label>
 
-<nav>
-    <h2><a href="index.html"><div class="text">Hardcore.js</div></a></h2><div class="search-box"><input type="text" placeholder="Search..." id="search-box" /><div class="search-item-container" id="search-item-container"><ul class="search-item-ul" id="search-item-ul"></ul></div></div><div class="sidebar-list-div"><h3>Classes</h3><ul><li class="accordion collapsed" id=9420275><div class="accordion-title"><a href="Color.html">Color</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="Color.html#colorWithAlpha">colorWithAlpha</a></li><li data-type='method'><a href="Color.html#toString">toString</a></li><li data-type='method'><a href="Color.html#toStringWithAlpha">toStringWithAlpha</a></li></ul></li><li class="accordion collapsed" id=5134527><div class="accordion-title"><a href="FunctionalAnimation.html">FunctionalAnimation</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="FunctionalAnimation.html#finish">finish</a></li><li data-type='method'><a href="FunctionalAnimation.html#start">start</a></li></ul></li><li class="" id=""><a href="Point.html">Point</a></li><li class="accordion collapsed" id=6671949><div class="accordion-title"><a href="Polygon.html">Polygon</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="Polygon.html#contains">contains</a></li></ul></li><li class="accordion collapsed" id=6167059><div class="accordion-title"><a href="PopoverViewController.html">PopoverViewController</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="PopoverViewController.html#dismiss">dismiss</a></li><li data-type='method'><a href="PopoverViewController.html#dismissView">dismissView</a></li><li data-type='method'><a href="PopoverViewController.html#reloadData">reloadData</a></li><li data-type='method'><a href="PopoverViewController.html#showView">showView</a></li></ul></li><li class="accordion collapsed" id=1811807><div class="accordion-title"><a href="Rect.html">Rect</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="Rect.html#contains">contains</a></li><li data-type='method'><a href="Rect.html#intersect">intersect</a></li></ul></li><li class="" id=""><a href="Size.html">Size</a></li><li class="accordion collapsed" id=468728><div class="accordion-title"><a href="SlideoverViewController.html">SlideoverViewController</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="SlideoverViewController.html#dismiss">dismiss</a></li><li data-type='method'><a href="SlideoverViewController.html#reloadData">reloadData</a></li><li data-type='method'><a href="SlideoverViewController.html#showView">showView</a></li></ul></li><li class="accordion collapsed" id=9800432><div class="accordion-title"><a href="StyleAnimation.html">StyleAnimation</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="StyleAnimation.html#finish">finish</a></li><li data-type='method'><a href="StyleAnimation.html#start">start</a></li></ul></li><li class="" id=""><a href="TextDrawingAttributes.html">TextDrawingAttributes</a></li><li class="accordion collapsed" id=3198245><div class="accordion-title"><a href="ViewController.html">ViewController</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="ViewController.html#reloadData">reloadData</a></li><li data-type='method'><a href="ViewController.html#showView">showView</a></li></ul></li></ul><h3>Namespaces</h3><ul><li class="accordion collapsed" id=9021208><div class="accordion-title"><a href="CanvasUtil.html">CanvasUtil</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="CanvasUtil.html#.initCanvas">initCanvas</a></li></ul></li><li class="accordion collapsed" id=7956523><div class="accordion-title"><a href="Controls.html">Controls</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="Controls.html#.Balloon">Balloon</a></li><li data-type='method'><a href="Controls.html#.ContextMenu">ContextMenu</a></li><li data-type='method'><a href="Controls.html#.Draggable">Draggable</a></li><li data-type='method'><a href="Controls.html#.Message">Message</a></li><li data-type='method'><a href="Controls.html#.Popup">Popup</a></li><li data-type='method'><a href="Controls.html#.Select">Select</a></li></ul></li><li class="accordion collapsed" id=9077933><div class="accordion-title"><a href="DateUtil.html">DateUtil</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="DateUtil.html#.format">format</a></li><li data-type='method'><a href="DateUtil.html#.getDateByAdding">getDateByAdding</a></li><li data-type='method'><a href="DateUtil.html#.getDateBySlicingTime">getDateBySlicingTime</a></li><li data-type='method'><a href="DateUtil.html#.parse">parse</a></li></ul></li><li class="accordion collapsed" id=3204351><div class="accordion-title"><a href="DrawUtil.html">DrawUtil</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="DrawUtil.html#.drawLine">drawLine</a></li><li data-type='method'><a href="DrawUtil.html#.drawRoundRect">drawRoundRect</a></li><li data-type='method'><a href="DrawUtil.html#.drawRoundRectBalloon">drawRoundRectBalloon</a></li><li data-type='method'><a href="DrawUtil.html#.drawText">drawText</a></li><li data-type='method'><a href="DrawUtil.html#.drawTextByCharacterWrap">drawTextByCharacterWrap</a></li><li data-type='method'><a href="DrawUtil.html#.drawTextByTruncatingTail">drawTextByTruncatingTail</a></li><li data-type='method'><a href="DrawUtil.html#.getBoundingRectOfTextByCharacterWrap">getBoundingRectOfTextByCharacterWrap</a></li><li data-type='method'><a href="DrawUtil.html#.sizeOfText">sizeOfText</a></li></ul></li><li class="" id=""><a href="HtmlElementUtil.html">HtmlElementUtil</a></li><li class="accordion collapsed" id=9606976><div class="accordion-title"><a href="HttpConnection.html">HttpConnection</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="HttpConnection.html#.globalServerErrorHandler">globalServerErrorHandler</a></li><li data-type='method'><a href="HttpConnection.html#.request">request</a></li></ul></li><li class="accordion collapsed" id=162572><div class="accordion-title"><a href="ImageUtil.html">ImageUtil</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="ImageUtil.html#.convertCanvasToBinary">convertCanvasToBinary</a></li><li data-type='method'><a href="ImageUtil.html#.convertImageToBase64String">convertImageToBase64String</a></li><li data-type='method'><a href="ImageUtil.html#.drawImage">drawImage</a></li><li data-type='method'><a href="ImageUtil.html#.loadImage">loadImage</a></li><li data-type='method'><a href="ImageUtil.html#.loadImageData">loadImageData</a></li><li data-type='method'><a href="ImageUtil.html#.loadImages">loadImages</a></li></ul></li><li class="accordion collapsed" id=1869199><div class="accordion-title"><a href="Module.html">Module</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="Module.html#.load">load</a></li><li data-type='method'><a href="Module.html#.loadLogic">loadLogic</a></li><li data-type='method'><a href="Module.html#.loadLogics">loadLogics</a></li><li data-type='method'><a href="Module.html#.loadStyleSheet">loadStyleSheet</a></li><li data-type='method'><a href="Module.html#.loadView">loadView</a></li><li data-type='method'><a href="Module.html#.loadViewComponent">loadViewComponent</a></li></ul></li><li class="accordion collapsed" id=1844656><div class="accordion-title"><a href="StorageUtil.html">StorageUtil</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="StorageUtil.html#.restoreJson">restoreJson</a></li><li data-type='method'><a href="StorageUtil.html#.storeJson">storeJson</a></li></ul></li><li class="accordion collapsed" id=6456380><div class="accordion-title"><a href="StringUtil.html">StringUtil</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="StringUtil.html#.currencyString">currencyString</a></li><li data-type='method'><a href="StringUtil.html#.getNullable">getNullable</a></li><li data-type='method'><a href="StringUtil.html#.padding">padding</a></li></ul></li><li class="accordion collapsed" id=6004809><div class="accordion-title"><a href="UIEventUtil.html">UIEventUtil</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="UIEventUtil.html#.getLocation">getLocation</a></li><li data-type='method'><a href="UIEventUtil.html#.handleTouch">handleTouch</a></li><li data-type='method'><a href="UIEventUtil.html#.setEnterKeyChain">setEnterKeyChain</a></li></ul></li><li class="accordion collapsed" id=4453891><div class="accordion-title"><a href="ValidationUtil.html">ValidationUtil</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="ValidationUtil.html#.validate">validate</a></li></ul></li></ul><h3>Interfaces</h3><ul><li class="" id=""><a href="Document.html">Document</a></li><li class="accordion collapsed" id=7905260><div class="accordion-title"><a href="HTMLElement.html">HTMLElement</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="HTMLElement.html#offset">offset</a></li><li data-type='method'><a href="HTMLElement.html#validate">validate</a></li></ul></li><li class="accordion collapsed" id=425141><div class="accordion-title"><a href="Node.html">Node</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="Node.html#removeAll">removeAll</a></li></ul></li><li class="accordion collapsed" id=2437881><div class="accordion-title"><a href="NodeList.html">NodeList</a><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-    <path 
-        fill-rule="evenodd" 
-        clip-rule="evenodd" 
-        d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z">
-    </path>
-</svg></div><ul class='methods accordion-content'><li data-type='method'><a href="NodeList.html#indexOf">indexOf</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3><ul><li><a href="global.html#Button">Button</a></li><li><a href="global.html#Canvas">Canvas</a></li><li><a href="global.html#Checkbox">Checkbox</a></li><li><a href="global.html#DateField">DateField</a></li><li><a href="global.html#FileSelector">FileSelector</a></li><li><a href="global.html#HtmlTag">HtmlTag</a></li><li><a href="global.html#InlineImage">InlineImage</a></li><li><a href="global.html#Input">Input</a></li><li><a href="global.html#InputComposite">InputComposite</a></li><li><a href="global.html#ListItem">ListItem</a></li><li><a href="global.html#MailField">MailField</a></li><li><a href="global.html#NumericField">NumericField</a></li><li><a href="global.html#OrderedList">OrderedList</a></li><li><a href="global.html#PasswordField">PasswordField</a></li><li><a href="global.html#ScrollView">ScrollView</a></li><li><a href="global.html#Select">Select</a></li><li><a href="global.html#Slider">Slider</a></li><li><a href="global.html#Table">Table</a></li><li><a href="global.html#TableBody">TableBody</a></li><li><a href="global.html#TableCell">TableCell</a></li><li><a href="global.html#TableHeader">TableHeader</a></li><li><a href="global.html#TableRow">TableRow</a></li><li><a href="global.html#TextArea">TextArea</a></li><li><a href="global.html#TextField">TextField</a></li><li><a href="global.html#TimeField">TimeField</a></li><li><a href="global.html#ToggleButton">ToggleButton</a></li><li><a href="global.html#UnorderedList">UnorderedList</a></li><li><a href="global.html#View">View</a></li></ul></div>
-</nav>
+  <label for="nav-trigger" class="overlay"></label>
 
-<div id="main">
-    
-    <h1 id='page-title' class="page-title">PopoverViewController</h1>
-    
+  <div class="top-nav-wrapper">
+    <ul>
+      <li >
+        <a href="index.html">
+          
+            <svg fill="#6D6D6D" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+              <path d="M0 0h24v24H0z" fill="none"/>
+            </svg>
+          
+          
+        </a>
+      </li>
+
+      
+
+    </ul>
+  </div>
+
+  <nav>
+    <h3 class="reference-title">
+      Hardcore.js
+    </h3>
 
     
 
+    <h3>Classes</h3><ul><li id="Color-nav"><a href="Color.html">Color</a><ul class='methods'><li data-type="method" id="Color-colorWithAlpha-nav"><a href="Color.html#colorWithAlpha">colorWithAlpha</a></li><li data-type="method" id="Color-toString-nav"><a href="Color.html#toString">toString</a></li><li data-type="method" id="Color-toStringWithAlpha-nav"><a href="Color.html#toStringWithAlpha">toStringWithAlpha</a></li></ul></li><li id="FunctionalAnimation-nav"><a href="FunctionalAnimation.html">FunctionalAnimation</a><ul class='methods'><li data-type="method" id="FunctionalAnimation-finish-nav"><a href="FunctionalAnimation.html#finish">finish</a></li><li data-type="method" id="FunctionalAnimation-start-nav"><a href="FunctionalAnimation.html#start">start</a></li></ul></li><li id="Point-nav"><a href="Point.html">Point</a></li><li id="Polygon-nav"><a href="Polygon.html">Polygon</a><ul class='methods'><li data-type="method" id="Polygon-contains-nav"><a href="Polygon.html#contains">contains</a></li></ul></li><li id="PopoverViewController-nav"><a href="PopoverViewController.html">PopoverViewController</a><ul class='methods'><li data-type="method" id="PopoverViewController-dismiss-nav"><a href="PopoverViewController.html#dismiss">dismiss</a></li><li data-type="method" id="PopoverViewController-dismissView-nav"><a href="PopoverViewController.html#dismissView">dismissView</a></li><li data-type="method" id="PopoverViewController-reloadData-nav"><a href="PopoverViewController.html#reloadData">reloadData</a></li><li data-type="method" id="PopoverViewController-showView-nav"><a href="PopoverViewController.html#showView">showView</a></li></ul></li><li id="Rect-nav"><a href="Rect.html">Rect</a><ul class='methods'><li data-type="method" id="Rect-contains-nav"><a href="Rect.html#contains">contains</a></li><li data-type="method" id="Rect-intersect-nav"><a href="Rect.html#intersect">intersect</a></li></ul></li><li id="Size-nav"><a href="Size.html">Size</a></li><li id="SlideoverViewController-nav"><a href="SlideoverViewController.html">SlideoverViewController</a><ul class='methods'><li data-type="method" id="SlideoverViewController-dismiss-nav"><a href="SlideoverViewController.html#dismiss">dismiss</a></li><li data-type="method" id="SlideoverViewController-reloadData-nav"><a href="SlideoverViewController.html#reloadData">reloadData</a></li><li data-type="method" id="SlideoverViewController-showView-nav"><a href="SlideoverViewController.html#showView">showView</a></li></ul></li><li id="StyleAnimation-nav"><a href="StyleAnimation.html">StyleAnimation</a><ul class='methods'><li data-type="method" id="StyleAnimation-finish-nav"><a href="StyleAnimation.html#finish">finish</a></li><li data-type="method" id="StyleAnimation-start-nav"><a href="StyleAnimation.html#start">start</a></li></ul></li><li id="TextDrawingAttributes-nav"><a href="TextDrawingAttributes.html">TextDrawingAttributes</a></li><li id="ViewController-nav"><a href="ViewController.html">ViewController</a><ul class='methods'><li data-type="method" id="ViewController-reloadData-nav"><a href="ViewController.html#reloadData">reloadData</a></li><li data-type="method" id="ViewController-showView-nav"><a href="ViewController.html#showView">showView</a></li></ul></li></ul><h3 id="global-nav">Global</h3><ul><li><a href="global.html#Button">Button</a></li><li><a href="global.html#Canvas">Canvas</a></li><li><a href="global.html#Checkbox">Checkbox</a></li><li><a href="global.html#DateField">DateField</a></li><li><a href="global.html#FileSelector">FileSelector</a></li><li><a href="global.html#HtmlTag">HtmlTag</a></li><li><a href="global.html#InlineImage">InlineImage</a></li><li><a href="global.html#Input">Input</a></li><li><a href="global.html#InputComposite">InputComposite</a></li><li><a href="global.html#ListItem">ListItem</a></li><li><a href="global.html#MailField">MailField</a></li><li><a href="global.html#NumericField">NumericField</a></li><li><a href="global.html#OrderedList">OrderedList</a></li><li><a href="global.html#PasswordField">PasswordField</a></li><li><a href="global.html#ScrollView">ScrollView</a></li><li><a href="global.html#Select">Select</a></li><li><a href="global.html#Slider">Slider</a></li><li><a href="global.html#Table">Table</a></li><li><a href="global.html#TableBody">TableBody</a></li><li><a href="global.html#TableCell">TableCell</a></li><li><a href="global.html#TableHeader">TableHeader</a></li><li><a href="global.html#TableRow">TableRow</a></li><li><a href="global.html#TextArea">TextArea</a></li><li><a href="global.html#TextField">TextField</a></li><li><a href="global.html#TimeField">TimeField</a></li><li><a href="global.html#ToggleButton">ToggleButton</a></li><li><a href="global.html#UnorderedList">UnorderedList</a></li><li><a href="global.html#View">View</a></li></ul>
+  </nav>
 
+  <div id="main">
+    
+      <h1 class="page-title">
+        PopoverViewController
+      </h1>
+    
 
+    
 
 <section>
-
-
-<header>
+  <header>
     
-        
-        <h2>
+      <h2>
         
         PopoverViewController
         
-        </h2>
-        
-        
+      </h2>
+
+      
     
-</header>
+  </header>
 
-
-<article>
+  <article>
     <div class="container-overview">
-    
+      
         
 
-    
 
+  
+
+  <span class='name-container'>
+    <a class="link-icon" href="#PopoverViewController">
+      <svg height="20" width="20" style="fill: black;">
+        <use xlink:href="#linkIcon"></use>
+      </svg>
+    </a>
     <h4 class="name" id="PopoverViewController">
-        <a href="#PopoverViewController">#</a>
-        <span class="type-signature"></span>new PopoverViewController<span class="signature">()</span><span class="type-signature"></span>
+      <span class="type-signature"></span>new PopoverViewController<span class="signature">()</span><span class="type-signature"></span>
     </h4>
+  </span>
 
-    
-
-
-
-    <div class="description">
-        Popover View Controller
-    </div>
+  
 
 
 
+  <div class="description">
+    Popover View Controller
+  </div>
 
 
 
@@ -254,44 +136,46 @@
 
 <dl class="details">
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
-        <div class="details-item-container">
-            <dt class="tag-source">Source:</dt>
-            <dd class="tag-source"><ul class="dummy"><li>
-                <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line191">line 191</a>
-            </li></ul></dd>
-        </div>
-    
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line191">line 191</a>
+        </li>
+      </ul>
+    </dd>
+  
 
-    
+  
 
-    
+  
 
-    
+  
 </dl>
 
 
@@ -307,20 +191,18 @@
 
 
 
-
-
-    
+      
     </div>
 
     
-        <h3 class="subsection-title">Extends</h3>
+      <h3 class="subsection-title">Extends</h3>
 
-        
+      
 
 
-    <ul>
-        <li><a href="ViewController.html">ViewController</a></li>
-    </ul>
+  <ul>
+    <li><a href="ViewController.html">ViewController</a></li>
+  </ul>
 
 
     
@@ -338,76 +220,63 @@
 
         
             
+
 <h4 class="name" id="container">
-    <a href="#container">#</a>
-    <span class="type-signature">(readonly) </span>container<span class="type-signature"> :HTMLDivElement</span>
+  <span class="type-signature">(readonly) </span>container<span class="type-signature"> :HTMLDivElement</span>
 </h4>
 
 
 
 
-<div class="description">
+  <div class="description">
     By changing the style of this view, you can change the way it pops over.
-</div>
-
-
-
-    <div class="member-item-container flex">
-        <strong>Type: </strong>
-        <ul>
-            <li>
-                
-<span class="param-type">HTMLDivElement</span>
-
-
-            </li>
-        </ul>
-    </div>
-
+  </div>
 
 
 
 
 <dl class="details">
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
-        <div class="details-item-container">
-            <dt class="tag-source">Source:</dt>
-            <dd class="tag-source"><ul class="dummy"><li>
-                <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line227">line 227</a>
-            </li></ul></dd>
-        </div>
-    
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line235">line 235</a>
+        </li>
+      </ul>
+    </dd>
+  
 
-    
+  
 
-    
+  
 
-    
+  
 </dl>
 
 
@@ -415,11 +284,12 @@
 
 
 
+          
         
             
+
 <h4 class="name" id="data">
-    <a href="#data">#</a>
-    <span class="type-signature"></span>data<span class="type-signature"> :Object|Array</span>
+  <span class="type-signature"></span>data<span class="type-signature"> :Object|Array</span>
 </h4>
 
 
@@ -427,72 +297,58 @@
 
 
 
-    <div class="member-item-container flex">
-        <strong>Type: </strong>
-        <ul>
-            <li>
-                
-<span class="param-type">Object</span>
-|
-
-<span class="param-type">Array</span>
-
-
-            </li>
-        </ul>
-    </div>
-
-
-
-
 
 <dl class="details">
 
-    
+  
 
-    
+  
 
-    
-        <div class="details-item-container">
-            <dt class="inherited-from">Inherited From:</dt>
-            <dd class="inherited-from"><ul class="dummy"><li>
-                <a href="ViewController.html#data">ViewController#data</a>
-            </li></ul></dd>
-        </div>
-    
+  
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from">
+      <ul class="dummy">
+        <li>
+          <a href="ViewController.html#data">ViewController#data</a>
+        </li>
+      </ul>
+    </dd>
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
-        <div class="details-item-container">
-            <dt class="tag-source">Source:</dt>
-            <dd class="tag-source"><ul class="dummy"><li>
-                <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line160">line 160</a>
-            </li></ul></dd>
-        </div>
-    
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line160">line 160</a>
+        </li>
+      </ul>
+    </dd>
+  
 
-    
+  
 
-    
+  
 
-    
+  
 </dl>
 
 
@@ -500,85 +356,75 @@
 
 
 
+          
         
             
+
 <h4 class="name" id="dataLoadedHandler">
-    <a href="#dataLoadedHandler">#</a>
-    <span class="type-signature"></span>dataLoadedHandler<span class="type-signature"> :function</span>
+  <span class="type-signature"></span>dataLoadedHandler<span class="type-signature"> :function</span>
 </h4>
 
 
 
 
-<div class="description">
+  <div class="description">
     Called when the data loading is complete.
-</div>
-
-
-
-    <div class="member-item-container flex">
-        <strong>Type: </strong>
-        <ul>
-            <li>
-                
-<span class="param-type">function</span>
-
-
-            </li>
-        </ul>
-    </div>
-
+  </div>
 
 
 
 
 <dl class="details">
 
-    
+  
 
-    
+  
 
-    
-        <div class="details-item-container">
-            <dt class="inherited-from">Inherited From:</dt>
-            <dd class="inherited-from"><ul class="dummy"><li>
-                <a href="ViewController.html#dataLoadedHandler">ViewController#dataLoadedHandler</a>
-            </li></ul></dd>
-        </div>
-    
+  
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from">
+      <ul class="dummy">
+        <li>
+          <a href="ViewController.html#dataLoadedHandler">ViewController#dataLoadedHandler</a>
+        </li>
+      </ul>
+    </dd>
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
-        <div class="details-item-container">
-            <dt class="tag-source">Source:</dt>
-            <dd class="tag-source"><ul class="dummy"><li>
-                <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line60">line 60</a>
-            </li></ul></dd>
-        </div>
-    
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line60">line 60</a>
+        </li>
+      </ul>
+    </dd>
+  
 
-    
+  
 
-    
+  
 
-    
+  
 </dl>
 
 
@@ -586,78 +432,200 @@
 
 
 
+          
         
             
+
+<h4 class="name" id="dismissHandler">
+  <span class="type-signature"></span>dismissHandler<span class="type-signature"> :function</span>
+</h4>
+
+
+
+
+  <div class="description">
+    Processing when the view is destroyed.
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line245">line 245</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="dismissOnOutside">
+  <span class="type-signature"></span>dismissOnOutside<span class="type-signature"> :boolean</span>
+</h4>
+
+
+
+
+  <div class="description">
+    Click outside the view to close it.
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line228">line 228</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
 <h4 class="name" id="layout">
-    <a href="#layout">#</a>
-    <span class="type-signature"></span>layout<span class="type-signature"> :string</span>
+  <span class="type-signature"></span>layout<span class="type-signature"> :string</span>
 </h4>
 
 
 
 
-<div class="description">
+  <div class="description">
     Display layout of Popover.
-</div>
-
-
-
-    <div class="member-item-container flex">
-        <strong>Type: </strong>
-        <ul>
-            <li>
-                
-<span class="param-type">string</span>
-
-
-            </li>
-        </ul>
-    </div>
-
+  </div>
 
 
 
 
 <dl class="details">
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
-        <div class="details-item-container">
-            <dt class="tag-source">Source:</dt>
-            <dd class="tag-source"><ul class="dummy"><li>
-                <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line214">line 214</a>
-            </li></ul></dd>
-        </div>
-    
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line216">line 216</a>
+        </li>
+      </ul>
+    </dd>
+  
 
-    
+  
 
-    
+  
 
-    
+  
 </dl>
 
 
@@ -665,78 +633,66 @@
 
 
 
+          
         
             
+
 <h4 class="name" id="modal">
-    <a href="#modal">#</a>
-    <span class="type-signature"></span>modal<span class="type-signature"> :boolean</span>
+  <span class="type-signature"></span>modal<span class="type-signature"> :boolean</span>
 </h4>
 
 
 
 
-<div class="description">
+  <div class="description">
     Whether popover is modal or not.
-</div>
-
-
-
-    <div class="member-item-container flex">
-        <strong>Type: </strong>
-        <ul>
-            <li>
-                
-<span class="param-type">boolean</span>
-
-
-            </li>
-        </ul>
-    </div>
-
+  </div>
 
 
 
 
 <dl class="details">
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
-        <div class="details-item-container">
-            <dt class="tag-source">Source:</dt>
-            <dd class="tag-source"><ul class="dummy"><li>
-                <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line220">line 220</a>
-            </li></ul></dd>
-        </div>
-    
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line222">line 222</a>
+        </li>
+      </ul>
+    </dd>
+  
 
-    
+  
 
-    
+  
 
-    
+  
 </dl>
 
 
@@ -744,11 +700,12 @@
 
 
 
+          
         
             
+
 <h4 class="name" id="parent">
-    <a href="#parent">#</a>
-    <span class="type-signature"></span>parent<span class="type-signature"> :<a href="HTMLElement.html">HTMLElement</a>|string</span>
+  <span class="type-signature"></span>parent<span class="type-signature"> :<a href="HTMLElement.html">HTMLElement</a>|string</span>
 </h4>
 
 
@@ -756,72 +713,58 @@
 
 
 
-    <div class="member-item-container flex">
-        <strong>Type: </strong>
-        <ul>
-            <li>
-                
-<span class="param-type"><a href="HTMLElement.html">HTMLElement</a></span>
-|
-
-<span class="param-type">string</span>
-
-
-            </li>
-        </ul>
-    </div>
-
-
-
-
 
 <dl class="details">
 
-    
+  
 
-    
+  
 
-    
-        <div class="details-item-container">
-            <dt class="inherited-from">Inherited From:</dt>
-            <dd class="inherited-from"><ul class="dummy"><li>
-                <a href="ViewController.html#parent">ViewController#parent</a>
-            </li></ul></dd>
-        </div>
-    
+  
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from">
+      <ul class="dummy">
+        <li>
+          <a href="ViewController.html#parent">ViewController#parent</a>
+        </li>
+      </ul>
+    </dd>
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
-        <div class="details-item-container">
-            <dt class="tag-source">Source:</dt>
-            <dd class="tag-source"><ul class="dummy"><li>
-                <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line83">line 83</a>
-            </li></ul></dd>
-        </div>
-    
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line83">line 83</a>
+        </li>
+      </ul>
+    </dd>
+  
 
-    
+  
 
-    
+  
 
-    
+  
 </dl>
 
 
@@ -829,85 +772,75 @@
 
 
 
+          
         
             
+
 <h4 class="name" id="replace">
-    <a href="#replace">#</a>
-    <span class="type-signature"></span>replace<span class="type-signature"> :boolean</span>
+  <span class="type-signature"></span>replace<span class="type-signature"> :boolean</span>
 </h4>
 
 
 
 
-<div class="description">
+  <div class="description">
     Whether or not to replace the child elements with the specified View.
-</div>
-
-
-
-    <div class="member-item-container flex">
-        <strong>Type: </strong>
-        <ul>
-            <li>
-                
-<span class="param-type">boolean</span>
-
-
-            </li>
-        </ul>
-    </div>
-
+  </div>
 
 
 
 
 <dl class="details">
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
-        <div class="details-item-container">
-            <dt class="tag-overrides">Overrides:</dt>
-            <dd class="tag-overrides"><ul class="dummy"><li>
-                <a href="ViewController.html#replace">ViewController#replace</a>
-            </li></ul></dd>
-        </div>
-    
+  
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides">
+      <ul class="dummy">
+        <li>
+          <a href="ViewController.html#replace">ViewController#replace</a>
+        </li>
+      </ul>
+    </dd>
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
-        <div class="details-item-container">
-            <dt class="tag-source">Source:</dt>
-            <dd class="tag-source"><ul class="dummy"><li>
-                <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line54">line 54</a>
-            </li></ul></dd>
-        </div>
-    
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line54">line 54</a>
+        </li>
+      </ul>
+    </dd>
+  
 
-    
+  
 
-    
+  
 
-    
+  
 </dl>
 
 
@@ -915,11 +848,12 @@
 
 
 
+          
         
             
+
 <h4 class="name" id="view">
-    <a href="#view">#</a>
-    <span class="type-signature"></span>view<span class="type-signature"> :<a href="HTMLElement.html">HTMLElement</a></span>
+  <span class="type-signature"></span>view<span class="type-signature"> :<a href="HTMLElement.html">HTMLElement</a></span>
 </h4>
 
 
@@ -927,69 +861,58 @@
 
 
 
-    <div class="member-item-container flex">
-        <strong>Type: </strong>
-        <ul>
-            <li>
-                
-<span class="param-type"><a href="HTMLElement.html">HTMLElement</a></span>
-
-
-            </li>
-        </ul>
-    </div>
-
-
-
-
 
 <dl class="details">
 
-    
+  
 
-    
+  
 
-    
-        <div class="details-item-container">
-            <dt class="inherited-from">Inherited From:</dt>
-            <dd class="inherited-from"><ul class="dummy"><li>
-                <a href="ViewController.html#view">ViewController#view</a>
-            </li></ul></dd>
-        </div>
-    
+  
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from">
+      <ul class="dummy">
+        <li>
+          <a href="ViewController.html#view">ViewController#view</a>
+        </li>
+      </ul>
+    </dd>
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
-        <div class="details-item-container">
-            <dt class="tag-source">Source:</dt>
-            <dd class="tag-source"><ul class="dummy"><li>
-                <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line126">line 126</a>
-            </li></ul></dd>
-        </div>
-    
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line126">line 126</a>
+        </li>
+      </ul>
+    </dd>
+  
 
-    
+  
 
-    
+  
 
-    
+  
 </dl>
 
 
@@ -997,32 +920,37 @@
 
 
 
+          
         
     
 
     
-        <h3 class="subsection-title">Methods</h3>
+      <h3 class="subsection-title">Methods</h3>
 
+      
         
-            
 
-    
 
+  
+
+  <span class='name-container'>
+    <a class="link-icon" href="#dismiss">
+      <svg height="20" width="20" style="fill: black;">
+        <use xlink:href="#linkIcon"></use>
+      </svg>
+    </a>
     <h4 class="name" id="dismiss">
-        <a href="#dismiss">#</a>
-        <span class="type-signature"></span>dismiss<span class="signature">()</span><span class="type-signature"></span>
+      <span class="type-signature"></span>dismiss<span class="signature">()</span><span class="type-signature"></span>
     </h4>
+  </span>
 
-    
-
-
-
-    <div class="description">
-        Dismiss the view.
-    </div>
+  
 
 
 
+  <div class="description">
+    Dismiss the view.
+  </div>
 
 
 
@@ -1035,44 +963,46 @@
 
 <dl class="details">
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
-        <div class="details-item-container">
-            <dt class="tag-source">Source:</dt>
-            <dd class="tag-source"><ul class="dummy"><li>
-                <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line360">line 360</a>
-            </li></ul></dd>
-        </div>
-    
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line368">line 368</a>
+        </li>
+      </ul>
+    </dd>
+  
 
-    
+  
 
-    
+  
 
-    
+  
 </dl>
 
 
@@ -1088,29 +1018,31 @@
 
 
 
-
-
+      
         
-            
 
-    
 
+  
+
+  <span class='name-container'>
+    <a class="link-icon" href="#dismissView">
+      <svg height="20" width="20" style="fill: black;">
+        <use xlink:href="#linkIcon"></use>
+      </svg>
+    </a>
     <h4 class="name" id="dismissView">
-        <a href="#dismissView">#</a>
-        <span class="type-signature">(protected) </span>dismissView<span class="signature">()</span><span class="type-signature"></span>
+      <span class="type-signature">(protected) </span>dismissView<span class="signature">()</span><span class="type-signature"></span>
     </h4>
+  </span>
 
-    
+  
 
 
 
-    <div class="description">
-        Dismiss the view.
+  <div class="description">
+    Dismiss the view.
 To change the dismiss method, override it with a subclass. This method must not be called directly.
-    </div>
-
-
-
+  </div>
 
 
 
@@ -1123,44 +1055,46 @@ To change the dismiss method, override it with a subclass. This method must not 
 
 <dl class="details">
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
-        <div class="details-item-container">
-            <dt class="tag-source">Source:</dt>
-            <dd class="tag-source"><ul class="dummy"><li>
-                <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line348">line 348</a>
-            </li></ul></dd>
-        </div>
-    
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line356">line 356</a>
+        </li>
+      </ul>
+    </dd>
+  
 
-    
+  
 
-    
+  
 
-    
+  
 </dl>
 
 
@@ -1176,28 +1110,30 @@ To change the dismiss method, override it with a subclass. This method must not 
 
 
 
-
-
+      
         
-            
 
-    
 
+  
+
+  <span class='name-container'>
+    <a class="link-icon" href="#reloadData">
+      <svg height="20" width="20" style="fill: black;">
+        <use xlink:href="#linkIcon"></use>
+      </svg>
+    </a>
     <h4 class="name" id="reloadData">
-        <a href="#reloadData">#</a>
-        <span class="type-signature"></span>reloadData<span class="signature">()</span><span class="type-signature"></span>
+      <span class="type-signature"></span>reloadData<span class="signature">()</span><span class="type-signature"></span>
     </h4>
+  </span>
 
-    
-
-
-
-    <div class="description">
-        Reload the view.
-    </div>
+  
 
 
 
+  <div class="description">
+    Reload the view.
+  </div>
 
 
 
@@ -1210,51 +1146,55 @@ To change the dismiss method, override it with a subclass. This method must not 
 
 <dl class="details">
 
-    
+  
 
-    
+  
 
-    
-        <div class="details-item-container">
-            <dt class="inherited-from">Inherited From:</dt>
-            <dd class="inherited-from"><ul class="dummy"><li>
-                <a href="ViewController.html#reloadData">ViewController#reloadData</a>
-            </li></ul></dd>
-        </div>
-    
+  
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from">
+      <ul class="dummy">
+        <li>
+          <a href="ViewController.html#reloadData">ViewController#reloadData</a>
+        </li>
+      </ul>
+    </dd>
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
-        <div class="details-item-container">
-            <dt class="tag-source">Source:</dt>
-            <dd class="tag-source"><ul class="dummy"><li>
-                <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line79">line 79</a>
-            </li></ul></dd>
-        </div>
-    
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line79">line 79</a>
+        </li>
+      </ul>
+    </dd>
+  
 
-    
+  
 
-    
+  
 
-    
+  
 </dl>
 
 
@@ -1270,29 +1210,31 @@ To change the dismiss method, override it with a subclass. This method must not 
 
 
 
-
-
+      
         
-            
 
-    
 
+  
+
+  <span class='name-container'>
+    <a class="link-icon" href="#showView">
+      <svg height="20" width="20" style="fill: black;">
+        <use xlink:href="#linkIcon"></use>
+      </svg>
+    </a>
     <h4 class="name" id="showView">
-        <a href="#showView">#</a>
-        <span class="type-signature">(protected) </span>showView<span class="signature">()</span><span class="type-signature"></span>
+      <span class="type-signature">(protected) </span>showView<span class="signature">()</span><span class="type-signature"></span>
     </h4>
+  </span>
 
-    
+  
 
 
 
-    <div class="description">
-        Show the view.
+  <div class="description">
+    Show the view.
 To change the display method, override it with a subclass. This method must not be called directly.
-    </div>
-
-
-
+  </div>
 
 
 
@@ -1305,51 +1247,55 @@ To change the display method, override it with a subclass. This method must not 
 
 <dl class="details">
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
-        <div class="details-item-container">
-            <dt class="tag-overrides">Overrides:</dt>
-            <dd class="tag-overrides"><ul class="dummy"><li>
-                <a href="ViewController.html#showView">ViewController#showView</a>
-            </li></ul></dd>
-        </div>
-    
+  
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides">
+      <ul class="dummy">
+        <li>
+          <a href="ViewController.html#showView">ViewController#showView</a>
+        </li>
+      </ul>
+    </dd>
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
+  
 
-    
-        <div class="details-item-container">
-            <dt class="tag-source">Source:</dt>
-            <dd class="tag-source"><ul class="dummy"><li>
-                <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line70">line 70</a>
-            </li></ul></dd>
-        </div>
-    
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="hardcore.js.html">hardcore.js</a>, <a href="hardcore.js.html#line70">line 70</a>
+        </li>
+      </ul>
+    </dd>
+  
 
-    
+  
 
-    
+  
 
-    
+  
 </dl>
 
 
@@ -1365,48 +1311,30 @@ To change the display method, override it with a subclass. This method must not 
 
 
 
-
-
-        
+      
     
 
     
 
     
-</article>
-
+  </article>
 </section>
 
 
 
 
-</div>
+  </div>
 
-<footer id="footer">
+  <br class="clear">
+
+  <footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a>
+  </footer>
+
+  <script src="scripts/linenumber.js"></script>
+  <script src="scripts/pagelocation.js"></script>
+
   
-</footer>
-
-<script src="scripts/third-party/prettify.js"></script>
-<script src="scripts/third-party/lang-css.js"></script>
-<script src="scripts/search.js"></script>
-<script src="scripts/third-party/fuse.js"></script>
-<script type="text/javascript" src="scripts/misc.js"></script>
-
-<script>prettyPrint();</script>
-<script src="scripts/linenumber.js"></script>
-<script src="scripts/fix-code-block.js"></script>
-<script>
-  var list = [{"title":"Color","link":"<a href=\"Color.html\">Color</a>"},{"title":"Color#colorWithAlpha","link":"<a href=\"Color.html#colorWithAlpha\">Color &rtrif; colorWithAlpha</a>"},{"title":"Color#toString","link":"<a href=\"Color.html#toString\">Color &rtrif; toString</a>"},{"title":"Color#toStringWithAlpha","link":"<a href=\"Color.html#toStringWithAlpha\">Color &rtrif; toStringWithAlpha</a>"},{"title":"FunctionalAnimation","link":"<a href=\"FunctionalAnimation.html\">FunctionalAnimation</a>"},{"title":"FunctionalAnimation#finish","link":"<a href=\"FunctionalAnimation.html#finish\">FunctionalAnimation &rtrif; finish</a>"},{"title":"FunctionalAnimation#start","link":"<a href=\"FunctionalAnimation.html#start\">FunctionalAnimation &rtrif; start</a>"},{"title":"Point","link":"<a href=\"Point.html\">Point</a>"},{"title":"Polygon","link":"<a href=\"Polygon.html\">Polygon</a>"},{"title":"Polygon#contains","link":"<a href=\"Polygon.html#contains\">Polygon &rtrif; contains</a>"},{"title":"PopoverViewController","link":"<a href=\"PopoverViewController.html\">PopoverViewController</a>"},{"title":"PopoverViewController#dismiss","link":"<a href=\"PopoverViewController.html#dismiss\">PopoverViewController &rtrif; dismiss</a>"},{"title":"PopoverViewController#dismissView","link":"<a href=\"PopoverViewController.html#dismissView\">PopoverViewController &rtrif; dismissView</a>"},{"title":"PopoverViewController#reloadData","link":"<a href=\"PopoverViewController.html#reloadData\">PopoverViewController &rtrif; reloadData</a>"},{"title":"PopoverViewController#showView","link":"<a href=\"PopoverViewController.html#showView\">PopoverViewController &rtrif; showView</a>"},{"title":"Rect","link":"<a href=\"Rect.html\">Rect</a>"},{"title":"Rect#contains","link":"<a href=\"Rect.html#contains\">Rect &rtrif; contains</a>"},{"title":"Rect#intersect","link":"<a href=\"Rect.html#intersect\">Rect &rtrif; intersect</a>"},{"title":"Size","link":"<a href=\"Size.html\">Size</a>"},{"title":"SlideoverViewController","link":"<a href=\"SlideoverViewController.html\">SlideoverViewController</a>"},{"title":"SlideoverViewController#dismiss","link":"<a href=\"SlideoverViewController.html#dismiss\">SlideoverViewController &rtrif; dismiss</a>"},{"title":"SlideoverViewController#reloadData","link":"<a href=\"SlideoverViewController.html#reloadData\">SlideoverViewController &rtrif; reloadData</a>"},{"title":"SlideoverViewController#showView","link":"<a href=\"SlideoverViewController.html#showView\">SlideoverViewController &rtrif; showView</a>"},{"title":"StyleAnimation","link":"<a href=\"StyleAnimation.html\">StyleAnimation</a>"},{"title":"StyleAnimation#finish","link":"<a href=\"StyleAnimation.html#finish\">StyleAnimation &rtrif; finish</a>"},{"title":"StyleAnimation#start","link":"<a href=\"StyleAnimation.html#start\">StyleAnimation &rtrif; start</a>"},{"title":"TextDrawingAttributes","link":"<a href=\"TextDrawingAttributes.html\">TextDrawingAttributes</a>"},{"title":"ViewController","link":"<a href=\"ViewController.html\">ViewController</a>"},{"title":"ViewController#reloadData","link":"<a href=\"ViewController.html#reloadData\">ViewController &rtrif; reloadData</a>"},{"title":"ViewController#showView","link":"<a href=\"ViewController.html#showView\">ViewController &rtrif; showView</a>"},{"title":"CanvasUtil","link":"<a href=\"CanvasUtil.html\">CanvasUtil</a>"},{"title":"CanvasUtil.initCanvas","link":"<a href=\"CanvasUtil.html#.initCanvas\">CanvasUtil.initCanvas &rtrif; undefined</a>"},{"title":"Controls","link":"<a href=\"Controls.html\">Controls</a>"},{"title":"Controls.Balloon","link":"<a href=\"Controls.html#.Balloon\">Controls.Balloon &rtrif; undefined</a>"},{"title":"Controls.ContextMenu","link":"<a href=\"Controls.html#.ContextMenu\">Controls.ContextMenu &rtrif; undefined</a>"},{"title":"Controls.Draggable","link":"<a href=\"Controls.html#.Draggable\">Controls.Draggable &rtrif; undefined</a>"},{"title":"Controls.Message","link":"<a href=\"Controls.html#.Message\">Controls.Message &rtrif; undefined</a>"},{"title":"Controls.Popup","link":"<a href=\"Controls.html#.Popup\">Controls.Popup &rtrif; undefined</a>"},{"title":"Controls.Select","link":"<a href=\"Controls.html#.Select\">Controls.Select &rtrif; undefined</a>"},{"title":"DateUtil","link":"<a href=\"DateUtil.html\">DateUtil</a>"},{"title":"DateUtil.format","link":"<a href=\"DateUtil.html#.format\">DateUtil.format &rtrif; undefined</a>"},{"title":"DateUtil.getDateByAdding","link":"<a href=\"DateUtil.html#.getDateByAdding\">DateUtil.getDateByAdding &rtrif; undefined</a>"},{"title":"DateUtil.getDateBySlicingTime","link":"<a href=\"DateUtil.html#.getDateBySlicingTime\">DateUtil.getDateBySlicingTime &rtrif; undefined</a>"},{"title":"DateUtil.parse","link":"<a href=\"DateUtil.html#.parse\">DateUtil.parse &rtrif; undefined</a>"},{"title":"DrawUtil","link":"<a href=\"DrawUtil.html\">DrawUtil</a>"},{"title":"DrawUtil.drawLine","link":"<a href=\"DrawUtil.html#.drawLine\">DrawUtil.drawLine &rtrif; undefined</a>"},{"title":"DrawUtil.drawRoundRect","link":"<a href=\"DrawUtil.html#.drawRoundRect\">DrawUtil.drawRoundRect &rtrif; undefined</a>"},{"title":"DrawUtil.drawRoundRectBalloon","link":"<a href=\"DrawUtil.html#.drawRoundRectBalloon\">DrawUtil.drawRoundRectBalloon &rtrif; undefined</a>"},{"title":"DrawUtil.drawText","link":"<a href=\"DrawUtil.html#.drawText\">DrawUtil.drawText &rtrif; undefined</a>"},{"title":"DrawUtil.drawTextByCharacterWrap","link":"<a href=\"DrawUtil.html#.drawTextByCharacterWrap\">DrawUtil.drawTextByCharacterWrap &rtrif; undefined</a>"},{"title":"DrawUtil.drawTextByTruncatingTail","link":"<a href=\"DrawUtil.html#.drawTextByTruncatingTail\">DrawUtil.drawTextByTruncatingTail &rtrif; undefined</a>"},{"title":"DrawUtil.getBoundingRectOfTextByCharacterWrap","link":"<a href=\"DrawUtil.html#.getBoundingRectOfTextByCharacterWrap\">DrawUtil.getBoundingRectOfTextByCharacterWrap &rtrif; undefined</a>"},{"title":"DrawUtil.sizeOfText","link":"<a href=\"DrawUtil.html#.sizeOfText\">DrawUtil.sizeOfText &rtrif; undefined</a>"},{"title":"HtmlElementUtil","link":"<a href=\"HtmlElementUtil.html\">HtmlElementUtil</a>"},{"title":"HttpConnection","link":"<a href=\"HttpConnection.html\">HttpConnection</a>"},{"title":"HttpConnection.globalServerErrorHandler","link":"<a href=\"HttpConnection.html#.globalServerErrorHandler\">HttpConnection.globalServerErrorHandler &rtrif; undefined</a>"},{"title":"HttpConnection.request","link":"<a href=\"HttpConnection.html#.request\">HttpConnection.request &rtrif; undefined</a>"},{"title":"ImageUtil","link":"<a href=\"ImageUtil.html\">ImageUtil</a>"},{"title":"ImageUtil.convertCanvasToBinary","link":"<a href=\"ImageUtil.html#.convertCanvasToBinary\">ImageUtil.convertCanvasToBinary &rtrif; undefined</a>"},{"title":"ImageUtil.convertImageToBase64String","link":"<a href=\"ImageUtil.html#.convertImageToBase64String\">ImageUtil.convertImageToBase64String &rtrif; undefined</a>"},{"title":"ImageUtil.drawImage","link":"<a href=\"ImageUtil.html#.drawImage\">ImageUtil.drawImage &rtrif; undefined</a>"},{"title":"ImageUtil.loadImage","link":"<a href=\"ImageUtil.html#.loadImage\">ImageUtil.loadImage &rtrif; undefined</a>"},{"title":"ImageUtil.loadImageData","link":"<a href=\"ImageUtil.html#.loadImageData\">ImageUtil.loadImageData &rtrif; undefined</a>"},{"title":"ImageUtil.loadImages","link":"<a href=\"ImageUtil.html#.loadImages\">ImageUtil.loadImages &rtrif; undefined</a>"},{"title":"Module","link":"<a href=\"Module.html\">Module</a>"},{"title":"Module.load","link":"<a href=\"Module.html#.load\">Module.load &rtrif; undefined</a>"},{"title":"Module.loadLogic","link":"<a href=\"Module.html#.loadLogic\">Module.loadLogic &rtrif; undefined</a>"},{"title":"Module.loadLogics","link":"<a href=\"Module.html#.loadLogics\">Module.loadLogics &rtrif; undefined</a>"},{"title":"Module.loadStyleSheet","link":"<a href=\"Module.html#.loadStyleSheet\">Module.loadStyleSheet &rtrif; undefined</a>"},{"title":"Module.loadView","link":"<a href=\"Module.html#.loadView\">Module.loadView &rtrif; undefined</a>"},{"title":"Module.loadViewComponent","link":"<a href=\"Module.html#.loadViewComponent\">Module.loadViewComponent &rtrif; undefined</a>"},{"title":"StorageUtil","link":"<a href=\"StorageUtil.html\">StorageUtil</a>"},{"title":"StorageUtil.restoreJson","link":"<a href=\"StorageUtil.html#.restoreJson\">StorageUtil.restoreJson &rtrif; undefined</a>"},{"title":"StorageUtil.storeJson","link":"<a href=\"StorageUtil.html#.storeJson\">StorageUtil.storeJson &rtrif; undefined</a>"},{"title":"StringUtil","link":"<a href=\"StringUtil.html\">StringUtil</a>"},{"title":"StringUtil.currencyString","link":"<a href=\"StringUtil.html#.currencyString\">StringUtil.currencyString &rtrif; undefined</a>"},{"title":"StringUtil.getNullable","link":"<a href=\"StringUtil.html#.getNullable\">StringUtil.getNullable &rtrif; undefined</a>"},{"title":"StringUtil.padding","link":"<a href=\"StringUtil.html#.padding\">StringUtil.padding &rtrif; undefined</a>"},{"title":"UIEventUtil","link":"<a href=\"UIEventUtil.html\">UIEventUtil</a>"},{"title":"UIEventUtil.getLocation","link":"<a href=\"UIEventUtil.html#.getLocation\">UIEventUtil.getLocation &rtrif; undefined</a>"},{"title":"UIEventUtil.handleTouch","link":"<a href=\"UIEventUtil.html#.handleTouch\">UIEventUtil.handleTouch &rtrif; undefined</a>"},{"title":"UIEventUtil.setEnterKeyChain","link":"<a href=\"UIEventUtil.html#.setEnterKeyChain\">UIEventUtil.setEnterKeyChain &rtrif; undefined</a>"},{"title":"ValidationUtil","link":"<a href=\"ValidationUtil.html\">ValidationUtil</a>"},{"title":"ValidationUtil.validate","link":"<a href=\"ValidationUtil.html#.validate\">ValidationUtil.validate &rtrif; undefined</a>"},{"title":"Document","link":"<a href=\"Document.html\">Document</a>"},{"title":"HTMLElement","link":"<a href=\"HTMLElement.html\">HTMLElement</a>"},{"title":"HTMLElement#offset","link":"<a href=\"HTMLElement.html#offset\">HTMLElement &rtrif; offset</a>"},{"title":"HTMLElement#validate","link":"<a href=\"HTMLElement.html#validate\">HTMLElement &rtrif; validate</a>"},{"title":"Node","link":"<a href=\"Node.html\">Node</a>"},{"title":"Node#removeAll","link":"<a href=\"Node.html#removeAll\">Node &rtrif; removeAll</a>"},{"title":"NodeList","link":"<a href=\"NodeList.html\">NodeList</a>"},{"title":"NodeList#indexOf","link":"<a href=\"NodeList.html#indexOf\">NodeList &rtrif; indexOf</a>"},{"title":"Button","link":"<a href=\"global.html#Button\">Global &rtrif; Button</a>"},{"title":"Canvas","link":"<a href=\"global.html#Canvas\">Global &rtrif; Canvas</a>"},{"title":"Checkbox","link":"<a href=\"global.html#Checkbox\">Global &rtrif; Checkbox</a>"},{"title":"DateField","link":"<a href=\"global.html#DateField\">Global &rtrif; DateField</a>"},{"title":"FileSelector","link":"<a href=\"global.html#FileSelector\">Global &rtrif; FileSelector</a>"},{"title":"HtmlTag","link":"<a href=\"global.html#HtmlTag\">Global &rtrif; HtmlTag</a>"},{"title":"InlineImage","link":"<a href=\"global.html#InlineImage\">Global &rtrif; InlineImage</a>"},{"title":"Input","link":"<a href=\"global.html#Input\">Global &rtrif; Input</a>"},{"title":"InputComposite","link":"<a href=\"global.html#InputComposite\">Global &rtrif; InputComposite</a>"},{"title":"ListItem","link":"<a href=\"global.html#ListItem\">Global &rtrif; ListItem</a>"},{"title":"MailField","link":"<a href=\"global.html#MailField\">Global &rtrif; MailField</a>"},{"title":"NumericField","link":"<a href=\"global.html#NumericField\">Global &rtrif; NumericField</a>"},{"title":"OrderedList","link":"<a href=\"global.html#OrderedList\">Global &rtrif; OrderedList</a>"},{"title":"PasswordField","link":"<a href=\"global.html#PasswordField\">Global &rtrif; PasswordField</a>"},{"title":"ScrollView","link":"<a href=\"global.html#ScrollView\">Global &rtrif; ScrollView</a>"},{"title":"Select","link":"<a href=\"global.html#Select\">Global &rtrif; Select</a>"},{"title":"Slider","link":"<a href=\"global.html#Slider\">Global &rtrif; Slider</a>"},{"title":"Table","link":"<a href=\"global.html#Table\">Global &rtrif; Table</a>"},{"title":"TableBody","link":"<a href=\"global.html#TableBody\">Global &rtrif; TableBody</a>"},{"title":"TableCell","link":"<a href=\"global.html#TableCell\">Global &rtrif; TableCell</a>"},{"title":"TableHeader","link":"<a href=\"global.html#TableHeader\">Global &rtrif; TableHeader</a>"},{"title":"TableRow","link":"<a href=\"global.html#TableRow\">Global &rtrif; TableRow</a>"},{"title":"TextArea","link":"<a href=\"global.html#TextArea\">Global &rtrif; TextArea</a>"},{"title":"TextField","link":"<a href=\"global.html#TextField\">Global &rtrif; TextField</a>"},{"title":"TimeField","link":"<a href=\"global.html#TimeField\">Global &rtrif; TimeField</a>"},{"title":"ToggleButton","link":"<a href=\"global.html#ToggleButton\">Global &rtrif; ToggleButton</a>"},{"title":"UnorderedList","link":"<a href=\"global.html#UnorderedList\">Global &rtrif; UnorderedList</a>"},{"title":"View","link":"<a href=\"global.html#View\">Global &rtrif; View</a>"}];
-  var options = 
-  setupSearch(list, options)
-</script>
-
- 
-
-
-
-
-
 
 </body>
 </html>

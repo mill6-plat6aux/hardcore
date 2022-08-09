@@ -1,15 +1,15 @@
 'use strict';
 
-const $ = window.$;
+$(document).ready(function () {
+  var currentSectionNav, target;
 
-$(document).ready(() => {
   // If an anchor hash is in the URL highlight the menu item
   highlightActiveHash();
   // If a specific page section is in the URL highlight the menu item
   highlightActiveSection();
 
   // If a specific page section is in the URL scroll that section up to the top
-  const currentSectionNav = $('#' + getCurrentSectionName() + '-nav');
+  currentSectionNav = $('#' + getCurrentSectionName() + '-nav');
 
   if (currentSectionNav.position()) {
     $('nav').scrollTop(currentSectionNav.position().top);
@@ -18,20 +18,13 @@ $(document).ready(() => {
   // function to scroll to anchor when clicking an anchor linl
   $('a[href*="#"]:not([href="#"])').click(function () {
     /* eslint-disable no-invalid-this */
-    if (
-      window.location.pathname.replace(/^\//, '') ===
-        this.pathname.replace(/^\//, '') &&
-      window.location.hostname === this.hostname
-    ) {
-      let target = $(this.hash);
+    if (location.pathname.replace(/^\//, '') === this.pathname.replace(/^\//, '') && location.hostname === this.hostname) {
+      target = $(this.hash);
       target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
       if (target.length) {
-        $('html, body').animate(
-          {
-            scrollTop: target.offset().top,
-          },
-          1000
-        );
+        $('html, body').animate({
+          scrollTop: target.offset().top
+        }, 1000);
       }
     }
     /* eslint-enable no-invalid-this */
@@ -39,25 +32,19 @@ $(document).ready(() => {
 });
 
 // If a new anchor section is selected, change the hightlighted menu item
-$(window).bind('hashchange', event => {
+$(window).bind('hashchange', function (event) {
   highlightActiveHash(event);
 });
 
 function highlightActiveHash(event) {
-  let oldUrl, oldSubSectionElement;
+  var oldUrl, oldSubSectionElement;
 
   // check for and remove old hash active state
   if (event && event.originalEvent.oldURL) {
     oldUrl = event.originalEvent.oldURL;
 
     if (oldUrl.indexOf('#') > -1) {
-      oldSubSectionElement = $(
-        '#' +
-          getCurrentSectionName() +
-          '-' +
-          oldUrl.substring(oldUrl.indexOf('#') + 1) +
-          '-nav'
-      );
+      oldSubSectionElement = $('#' + getCurrentSectionName() + '-' + oldUrl.substring(oldUrl.indexOf('#') + 1) + '-nav');
 
       if (oldSubSectionElement) {
         oldSubSectionElement.removeClass('active');
@@ -66,23 +53,21 @@ function highlightActiveHash(event) {
   }
 
   if (getCurrentHashName()) {
-    $(
-      '#' + getCurrentSectionName() + '-' + getCurrentHashName() + '-nav'
-    ).addClass('active');
+    $('#' + getCurrentSectionName() + '-' + getCurrentHashName() + '-nav').addClass('active');
   }
 }
 
 function highlightActiveSection() {
-  const pageId = getCurrentSectionName();
+  var pageId = getCurrentSectionName();
 
   $('#' + pageId + '-nav').addClass('active');
 }
 
 function getCurrentSectionName() {
-  const path = window.location.pathname;
-  const pageUrl = path.split('/').pop();
+  var path = window.location.pathname;
+  var pageUrl = path.split('/').pop();
 
-  let sectionName = pageUrl.substring(0, pageUrl.indexOf('.'));
+  var sectionName = pageUrl.substring(0, pageUrl.indexOf('.'));
 
   // remove the wodr module- if its in the url
   sectionName = sectionName.replace('module-', '');
@@ -91,8 +76,8 @@ function getCurrentSectionName() {
 }
 
 function getCurrentHashName() {
-  let pageSubSectionId;
-  const pageSubSectionHash = window.location.hash;
+  var pageSubSectionId;
+  var pageSubSectionHash = window.location.hash;
 
   if (pageSubSectionHash) {
     pageSubSectionId = pageSubSectionHash.substring(1).replace('.', '');
