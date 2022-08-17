@@ -1462,20 +1462,29 @@ function DateField() {
                 dayView.addEventListener("click", function(event) {
                     var dayElement = event.currentTarget;
                     var date = dayElement.value;
-                    if(date != null) {
-                        element.value = date;
-                        element.innerText = formatDate(date);
-                        if(dataKey != null) {
-                            element.dataBindHandler(date, dataKey);
-                        }
+                    if(date == null) return;
 
-                        var nodeList = container.querySelectorAll(".indicator");
-                        nodeList.forEach(function(node) {
-                            node.remove();
-                        });
-                        var indicatorView = createCalendarIndicator();
-                        dayElement.appendChild(indicatorView);
+                    var selectedDate = element.value;
+                    if(selectedDate != null) {
+                        selectedDate.setFullYear(date.getFullYear());
+                        selectedDate.setMonth(date.getMonth());
+                        selectedDate.setDate(date.getDate());
+                    }else {
+                        selectedDate = date;
                     }
+
+                    element.value = selectedDate;
+                    element.innerText = formatDate(selectedDate);
+                    if(dataKey != null) {
+                        element.dataBindHandler(selectedDate, dataKey);
+                    }
+
+                    var nodeList = container.querySelectorAll(".indicator");
+                    nodeList.forEach(function(node) {
+                        node.remove();
+                    });
+                    var indicatorView = createCalendarIndicator();
+                    dayElement.appendChild(indicatorView);
                 });
                 dayView.value = day;
             }
@@ -1519,6 +1528,8 @@ function DateField() {
         var selectedDate = element.value;
         if(selectedDate == null) {
             selectedDate = DateUtil.getDateBySlicingTime(new Date());
+        }else {
+            selectedDate = DateUtil.getDateBySlicingTime(selectedDate);
         }
         var year = selectedDate.getFullYear();
         var monthIndex = selectedDate.getMonth();
@@ -1711,7 +1722,7 @@ function DateField() {
                 height: daySize.height
             }}));
         }
-        for(var minute=0; minute<59; minute++) {
+        for(var minute=0; minute<60; minute++) {
             minutesView.appendChild(View({style: {
                 "text-align": "right",
                 "line-height": daySize.height,
@@ -1729,23 +1740,26 @@ function DateField() {
         container.appendChild(minutesView);
 
         setupTouch(hourView, function(updatedValue) {
-            setValue(element, updatedValue);
+            setValue(element, updatedValue, minutesView.scrollTop / daySize.height);
         });
         setupTouch(minutesView, function(updatedValue) {
-            setValue(element, null, updatedValue);
+            setValue(element, hourView.scrollTop / daySize.height, updatedValue);
         });
 
         var selectedDate = element.value;
         if(element.value == null) {
             selectedDate = new Date();
+            selectedDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), selectedDate.getHours());
         }
         var hours = selectedDate.getHours();
+        var minutes = selectedDate.getMinutes();
         if(ResizeObserver !== undefined) {
             var resizeObserver = new ResizeObserver(function(observations) {
                 if(observations.length == 0) return;
                 var hourView = observations[0].target;
                 resizeObserver.disconnect();
                 hourView.scrollTop = daySize.height * hours;
+                minutesView.scrollTop = daySize.height * minutes;
             });
             resizeObserver.observe(hourView);
         }else {
@@ -1791,18 +1805,19 @@ function DateField() {
 
         function setValue(element, hours, minutes) {
             var date = element.value;
-            if(date != null) {
-                if(hours != null) {
-                    date.setHours(hours);
-                }
-                if(minutes != null) {
-                    date.setMinutes(minutes);
-                }
-                element.value = date;
-                element.innerText = formatDate(date);
-                if(dataKey != null) {
-                    element.dataBindHandler(date, dataKey);
-                }
+            if(date == null) {
+                date = DateUtil.getDateBySlicingTime(new Date());
+            }
+            if(hours != null) {
+                date.setHours(hours);
+            }
+            if(minutes != null) {
+                date.setMinutes(minutes);
+            }
+            element.value = date;
+            element.innerText = formatDate(date);
+            if(dataKey != null) {
+                element.dataBindHandler(date, dataKey);
             }
         }
 
