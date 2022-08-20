@@ -6930,6 +6930,11 @@ var Controls = {
         parent.appendChild(container);
 
         function drawBaloon() {
+            // If the width has not been determined, fix at the current width.
+            if((element.style.width == null || element.style.width.length == 0) && element.offsetWidth != null && element.offsetWidth > 0) {
+                element.style.width = element.offsetWidth + "px";
+            }
+            
             var canvasSize = Size(element.offsetWidth+padding*2+margin*2, element.offsetHeight+padding*2+margin*2);
             if(direction == "top" || direction == "bottom") {
                 canvasSize.height += tipSize;
