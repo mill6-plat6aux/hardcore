@@ -2313,7 +2313,7 @@ function Table() {
                         var row = event.currentTarget;
                         var tableBody = element.querySelector("tbody");
                         var index = tableBody.querySelectorAll("tr").indexOf(row);
-                        tapHandler(data[index], index, row);
+                        tapHandler(data[index], index, row, event);
                     });
                 }
                 if(animate) {
