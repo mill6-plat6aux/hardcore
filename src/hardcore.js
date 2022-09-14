@@ -3946,7 +3946,7 @@ NodeList.prototype.forEach = function(iteration) {
  * Draw on the Canvas.
  * @param {function(CanvasRenderingContext2D, Size): void} drawer 
  * @param {boolean} refresh Clear the previous drawing contents before drawing.
- * @returns HTMLCanvasElement
+ * @returns {HTMLCanvasElement}
  */
 HTMLCanvasElement.prototype.draw = function(drawer, refresh) {
     var size = Size();
@@ -4928,10 +4928,11 @@ HTMLCanvasElement.prototype.initWithSize = function(size) {
  * @property {string} font
  * @property {string|number} size
  * @property {string} color
- * @property {left|right|center|start|end} align
+ * @property {"left"|"right"|"center"|"start"|"end"} align
  * @property {string|number} weight
  * @property {string|number} lineHeight
  * @property {string} fontExpression 
+ * @property {"top"|"hanging"|"middle"|"alphabetic"|"ideographic"|"bottom"} baseline 
  */
 function TextDrawingAttributes() {
     if(this == undefined) {
@@ -4957,6 +4958,8 @@ function TextDrawingAttributes() {
                 this.align = argument;
             }else if(argument == "bold" || argument == "bolder" || argument == "lighter" || argument == "normal") {
                 this.weight = argument;
+            }else if(argument == "top" || argument == "hanging" || argument == "alphabetic" || argument == "ideographic" || argument == "bottom") {
+                this.baseline = argument;
             }else {
                 if(this.font == undefined) {
                     this.font = argument;
@@ -5191,13 +5194,11 @@ var DrawUtil = {
 
         context.save();
         var color = this.defaultFontColor;
-        if(textDrawingAttributes != undefined) {
-            if(textDrawingAttributes.color != undefined) {
-                color = textDrawingAttributes.color;
-            }
+        if(textDrawingAttributes != undefined && textDrawingAttributes.color != undefined) {
+            color = textDrawingAttributes.color;
         }
         context.fillStyle = color;
-        if(textDrawingAttributes.fontExpression != undefined) {
+        if(textDrawingAttributes != undefined && textDrawingAttributes.fontExpression != undefined) {
             context.font = textDrawingAttributes.fontExpression();
         }else {
             var font = this.defaultFont;
@@ -5218,7 +5219,11 @@ var DrawUtil = {
             }
             context.font = fontSize+" "+font;
         }
-        context.textBaseline = "middle";
+        if(textDrawingAttributes != undefined && textDrawingAttributes.baseline != undefined) {
+            context.textBaseline = textDrawingAttributes.baseline;
+        }else {
+            context.textBaseline = "middle";
+        }
 
         var width = context.measureText(text).width;
         if(width > maxWidth) {
