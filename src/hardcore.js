@@ -2931,6 +2931,7 @@ function NumericField() {
             var value = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").get.call(inputElement);
             if(value != null) {
                 Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(inputElement, StringUtil.currencyString(value));
+                inputElement.dispatchEvent(new Event("change"));
             }
         });
         var value = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").get.call(inputElement);
@@ -6814,7 +6815,7 @@ var Controls = {
      * @param {Object} settings 
      * @param {Point} [settings.location]
      * @param {HTMLElement} [settings.parent]
-     * @param {function(HTMLElement): object} [settings.loadHandler]
+     * @param {function(HTMLElement, object): object} [settings.loadHandler]
      * @param {function(void): void} [settings.dismissHandler]
      * @param {number} [settings.padding]
      * @param {top|bottom|left|right} [settings.direction]
