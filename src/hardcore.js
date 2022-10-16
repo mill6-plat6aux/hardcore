@@ -1237,9 +1237,22 @@ function MailField() {
 function DateField() {
     var _arguments = Array.prototype.slice.call(arguments);
 
+    var format;
+    if(navigator.language != null) {
+        var language = navigator.language.toLowerCase();
+        if(language.startsWith("ja") || language.startsWith("zh") || language.startsWith("hu") || language.startsWith("ko")) {
+            format = "yyyy/M/d";
+        }else if(language.startsWith("en-us")) {
+            format = "M/d/yyyy";
+        }else {
+            format = "d/M/yyyy";
+        }
+    }else {
+        format = "d/M/yyyy";
+    }
+
     var label;
     var type = "date";
-    var format = "yyyy/M/d";
     var dataKey;
     var dataHandler;
     var editingEndHandler;
@@ -1402,7 +1415,51 @@ function DateField() {
         
     function loadMonth(element, container, year, monthIndex, selectable, now, selectedDate) {
         var header = container.querySelector(".header > .title");
-        header.innerText = year + "年" + (monthIndex+1) + "月";
+        if(navigator.language != null) {
+            var language = navigator.language.toLowerCase();
+            var monthExp;
+            if(language.startsWith("ja") || language.startsWith("zh")) {
+                header.innerText = year + "年" + (monthIndex+1) + "月";
+            }else if(language.startsWith("hu") || language.startsWith("ko")) {
+                header.innerText = year + "/" + (monthIndex+1);
+            }else if(language.startsWith("en")) {
+                switch(monthIndex) {
+                    case 0: monthExp = "January"; break;
+                    case 1: monthExp = "February"; break;
+                    case 2: monthExp = "March"; break;
+                    case 3: monthExp = "April"; break;
+                    case 4: monthExp = "May"; break;
+                    case 5: monthExp = "June"; break;
+                    case 6: monthExp = "July"; break;
+                    case 7: monthExp = "August"; break;
+                    case 8: monthExp = "September"; break;
+                    case 9: monthExp = "October"; break;
+                    case 10: monthExp = "November"; break;
+                    case 11: monthExp = "December"; break;
+                }
+                header.innerText = monthExp + " " + year;
+            }else if(language.startsWith("de")) {
+                switch(monthIndex) {
+                    case 0: monthExp = "Januar"; break;
+                    case 1: monthExp = "Februar"; break;
+                    case 2: monthExp = "März"; break;
+                    case 3: monthExp = "April"; break;
+                    case 4: monthExp = "Mai"; break;
+                    case 5: monthExp = "Juni"; break;
+                    case 6: monthExp = "Juli"; break;
+                    case 7: monthExp = "August"; break;
+                    case 8: monthExp = "September"; break;
+                    case 9: monthExp = "Oktober"; break;
+                    case 10: monthExp = "November"; break;
+                    case 11: monthExp = "Dezember"; break;
+                }
+                header.innerText = monthExp + " " + year;
+            }else {
+                header.innerText = (monthIndex+1) + "/" + year;
+            }
+        }else {
+            header.innerText = (monthIndex+1) + "/" + year;
+        }
         var days = container.querySelectorAll(".day");
         for(var i=0; i<days.length; i++) {
             days[i].remove();
