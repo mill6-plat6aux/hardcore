@@ -3027,7 +3027,7 @@ function NumericField() {
         }
 
         var result = integer1 * integer2;
-        return result / Math.pow(10, decimalScale1) / Math.pow(10, decimalScale2);
+        return result / Math.pow(10, decimalScale1 + decimalScale2);
     }
 
     function divideInSafety(value1, value2) {
@@ -3058,7 +3058,7 @@ function NumericField() {
         }
 
         var result = integer1 / integer2;
-        return result / Math.pow(10, decimalScale1) / Math.pow(10, decimalScale2);
+        return result / Math.pow(10, decimalScale1 - decimalScale2);
     }
 
     Object.defineProperty(inputElement, "value", { 
