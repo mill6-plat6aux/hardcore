@@ -2999,28 +2999,66 @@ function NumericField() {
 
     inputElement.multiplier = multiplier;
 
-    function mutiplyInSafety(number, mutiplier) {
-        if(number == null || isNaN(number) || mutiplier == null || isNaN(mutiplier)) return number;
-        var string = number.toString();
-        var pointIndex = string.indexOf(".");
-        if(pointIndex == -1) return number * mutiplier;
-        var decimalScale = string.length - pointIndex - 1;
-        var integer = number * Math.pow(10, decimalScale);
-        integer = Math.floor(integer);
-        var result = integer * mutiplier;
-        return result / Math.pow(10, decimalScale);
+    function mutiplyInSafety(value1, value2) {
+        if(value1 == null || isNaN(value1) || value2 == null || isNaN(value2)) return value1;
+
+        var string1 = value1.toString();
+        var pointIndex1 = string1.indexOf(".");
+
+        var string2 = value2.toString();
+        var pointIndex2 = string2.indexOf(".");
+
+        if(pointIndex1 == -1 && pointIndex2 == -1) return value1 * value2;
+        
+        var decimalScale1 = 0;
+        var integer1 = value1;
+        if(pointIndex1 >= 0) {
+            decimalScale1 = string1.length - pointIndex1 - 1;
+            integer1 = value1 * Math.pow(10, decimalScale1);
+            integer1 = Math.floor(integer1);
+        }
+
+        var decimalScale2 = 0;
+        var integer2 = value2;
+        if(pointIndex2 >= 0) {
+            decimalScale2 = string2.length - pointIndex2 - 1;
+            integer2 = value2 * Math.pow(10, decimalScale2);
+            integer2 = Math.floor(integer2);
+        }
+
+        var result = integer1 * integer2;
+        return result / Math.pow(10, decimalScale1) / Math.pow(10, decimalScale2);
     }
 
-    function divideInSafety(number, mutiplier) {
-        if(number == null || isNaN(number) || mutiplier == null || isNaN(mutiplier)) return number;
-        var string = number.toString();
-        var pointIndex = string.indexOf(".");
-        if(pointIndex == -1) return number / mutiplier;
-        var decimalScale = string.length - pointIndex - 1;
-        var integer = number * Math.pow(10, decimalScale);
-        integer = Math.floor(integer);
-        var result = integer / mutiplier;
-        return result / Math.pow(10, decimalScale);
+    function divideInSafety(value1, value2) {
+        if(value1 == null || isNaN(value1) || value2 == null || isNaN(value2)) return value1;
+
+        var string1 = value1.toString();
+        var pointIndex1 = string1.indexOf(".");
+
+        var string2 = value2.toString();
+        var pointIndex2 = string2.indexOf(".");
+
+        if(pointIndex1 == -1 && pointIndex2 == -1) return value1 / value2;
+        
+        var decimalScale1 = 0;
+        var integer1 = value1;
+        if(pointIndex1 >= 0) {
+            decimalScale1 = string1.length - pointIndex1 - 1;
+            integer1 = value1 * Math.pow(10, decimalScale1);
+            integer1 = Math.floor(integer1);
+        }
+
+        var decimalScale2 = 0;
+        var integer2 = value2;
+        if(pointIndex2 >= 0) {
+            decimalScale2 = string2.length - pointIndex2 - 1;
+            integer2 = value2 * Math.pow(10, decimalScale2);
+            integer2 = Math.floor(integer2);
+        }
+
+        var result = integer1 / integer2;
+        return result / Math.pow(10, decimalScale1) / Math.pow(10, decimalScale2);
     }
 
     Object.defineProperty(inputElement, "value", { 
