@@ -3011,6 +3011,18 @@ function NumericField() {
         return result / Math.pow(10, decimalScale);
     }
 
+    function divideInSafety(number, mutiplier) {
+        if(number == null || isNaN(number) || mutiplier == null || isNaN(mutiplier)) return number;
+        var string = number.toString();
+        var pointIndex = string.indexOf(".");
+        if(pointIndex == -1) return number / mutiplier;
+        var decimalScale = string.length - pointIndex - 1;
+        var integer = number * Math.pow(10, decimalScale);
+        integer = Math.floor(integer);
+        var result = integer / mutiplier;
+        return result / Math.pow(10, decimalScale);
+    }
+
     Object.defineProperty(inputElement, "value", { 
         get: function() {
             var value = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").get.call(inputElement);
@@ -3028,7 +3040,7 @@ function NumericField() {
                 return null;
             }
 
-            value = value / inputElement.multiplier;
+            value = divideInSafety(value, inputElement.multiplier);
 
             if(maxValue != null && value > maxValue) {
                 value = maxValue;
