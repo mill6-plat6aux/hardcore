@@ -3003,12 +3003,21 @@ function NumericField() {
         if(value1 == null || isNaN(value1) || value2 == null || isNaN(value2)) return value1;
 
         var string1 = value1.toString();
+        if(string1.includes("e-") && !string1.endsWith("e-")) {
+            var eIndex = string1.indexOf("e");
+            var exponent = Number(string1.substring(eIndex+2));
+            var base = string1.substring(0, eIndex);
+            var decimalIndex = base.indexOf(".");
+            var decimalLenghth = decimalIndex != -1 ? (base.length - decimalIndex - 1) : 0;
+            string1 = value1.toFixed(Number(exponent + decimalLenghth));
+        }
         var pointIndex1 = string1.indexOf(".");
 
         var string2 = value2.toString();
         var pointIndex2 = string2.indexOf(".");
 
         if(pointIndex1 == -1 && pointIndex2 == -1) return value1 * value2;
+        if(string1.includes("e") || string2.includes("e")) return value1 * value2;
         
         var decimalScale1 = 0;
         var integer1 = value1;
@@ -3034,12 +3043,21 @@ function NumericField() {
         if(value1 == null || isNaN(value1) || value2 == null || isNaN(value2)) return value1;
 
         var string1 = value1.toString();
+        if(string1.includes("e-") && !string1.endsWith("e-")) {
+            var eIndex = string1.indexOf("e");
+            var exponent = Number(string1.substring(eIndex+2));
+            var base = string1.substring(0, eIndex);
+            var decimalIndex = base.indexOf(".");
+            var decimalLenghth = decimalIndex != -1 ? (base.length - decimalIndex - 1) : 0;
+            string1 = value1.toFixed(Number(exponent + decimalLenghth));
+        }
         var pointIndex1 = string1.indexOf(".");
 
         var string2 = value2.toString();
         var pointIndex2 = string2.indexOf(".");
 
         if(pointIndex1 == -1 && pointIndex2 == -1) return value1 / value2;
+        if(string1.includes("e") || string2.includes("e")) return value1 / value2;
         
         var decimalScale1 = 0;
         var integer1 = value1;
@@ -4680,6 +4698,14 @@ var StringUtil = {
                 return "";
             }
             var string = String(source);
+            if(string.includes("e-") && !string.endsWith("e-")) {
+                var eIndex = string.indexOf("e");
+                var exponent = Number(string.substring(eIndex+2));
+                var base = string.substring(0, eIndex);
+                var decimalIndex = base.indexOf(".");
+                var decimalLenghth = decimalIndex != -1 ? (base.length - decimalIndex - 1) : 0;
+                string = source.toFixed(Number(exponent + decimalLenghth));
+            }
             if(string.includes(".") && typeof decimalPlaces == "number") {
                 var multiplier = Math.pow(10, decimalPlaces);
                 if(roundingMode == null || roundingMode == "round") {
