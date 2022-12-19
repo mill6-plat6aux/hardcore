@@ -2897,6 +2897,8 @@ function ScrollView() {
  * @param {string} [attributes.unit] 
  * @param {boolean} [attributes.currency=false] Whether or not to perform currency formatting.
  * @param {number} [attributes.multiplier=1] 
+ * @param {function(number, number): number} [attributes.multiplyFunction] 
+ * @param {function(number, number): number} [attributes.divideFunction] 
  * @param {number} [attributes.value] 
  * @param {number} [attributes.maxValue] 
  * @param {number} [attributes.minValue] 
@@ -2911,6 +2913,8 @@ function NumericField() {
     var multiplier = 1;
     var maxValue;
     var minValue;
+    var multiplyFunction;
+    var divideFunction;
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
         if(typeof argument == "object" && !Array.isArray(argument)) {
@@ -2930,6 +2934,12 @@ function NumericField() {
                     maxValue = argument[key];
                     delete argument[key];
                 }else if(key == "minValue" && typeof argument[key] == "number") {
+                    minValue = argument[key];
+                    delete argument[key];
+                }else if(key == "multiplyFunction" && typeof argument[key] == "function") {
+                    multiplyFunction = argument[key];
+                    delete argument[key];
+                }else if(key == "divideFunction" && typeof argument[key] == "function") {
                     minValue = argument[key];
                     delete argument[key];
                 }
@@ -3000,6 +3010,8 @@ function NumericField() {
     inputElement.multiplier = multiplier;
 
     function mutiplyInSafety(value1, value2) {
+        if(multiplyFunction != null) return multiplyFunction(value1, value2);
+
         if(value1 == null || isNaN(value1) || value2 == null || isNaN(value2)) return value1;
 
         var string1 = value1.toString();
@@ -3040,6 +3052,8 @@ function NumericField() {
     }
 
     function divideInSafety(value1, value2) {
+        if(divideFunction != null) return divideFunction(value1, value2);
+
         if(value1 == null || isNaN(value1) || value2 == null || isNaN(value2)) return value1;
 
         var string1 = value1.toString();
