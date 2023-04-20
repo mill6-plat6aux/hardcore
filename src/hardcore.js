@@ -2909,6 +2909,7 @@ function NumericField() {
     var _arguments = Array.prototype.slice.call(arguments);
 
     var unit;
+    var unitColor = "darkgray";
     var currency = false;
     var multiplier = 1;
     var maxValue;
@@ -2923,6 +2924,9 @@ function NumericField() {
                 var key = keys[j];
                 if(key == "unit" && typeof argument[key] == "string") {
                     unit = argument[key];
+                    delete argument[key];
+                }else if(key == "unitColor" && typeof argument[key] == "string") {
+                    unitColor = argument[key];
                     delete argument[key];
                 }else if(key == "currency" && typeof argument[key] == "boolean") {
                     currency = argument[key];
@@ -2980,8 +2984,8 @@ function NumericField() {
         unitElement.classList.add("unit");
         unitElement.defineStyles({
             "font-size": "10px",
-            "margin-left": "4px",
-            "color": "darkgray"
+            "margin-left": "2px",
+            "color": unitColor
         });
         unitElement.innerText = unit;
         element.after(unitElement);
@@ -3139,6 +3143,7 @@ function NumericField() {
 
     Object.defineProperty(inputElement, "unit", { 
         set: function(newValue) {
+            unit = newValue;
             showUnit(inputElement, newValue);
         }
     });
