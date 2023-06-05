@@ -781,7 +781,7 @@ function HtmlTag() {
             "outline": "none",
             "-webkit-appearance": "none",
             "appearance": "none",
-            "vertical-align": "baseline",
+            "vertical-align": "middle",
             "background-color": "transparent",
             "font-size": "1em"
         });
@@ -2957,6 +2957,7 @@ function NumericField() {
         inputElement = inputElement.querySelector("input");
     }
     inputElement.style.setProperty("text-align", "right");
+    inputElement.style.setProperty("vertical-align", "baseline");
 
     if(unit != undefined) {
         if(ResizeObserver !== undefined) {
@@ -2985,7 +2986,8 @@ function NumericField() {
         unitElement.defineStyles({
             "font-size": "10px",
             "margin-left": "2px",
-            "color": unitColor
+            "color": unitColor,
+            "vertical-align": "baseline"
         });
         unitElement.innerText = unit;
         element.after(unitElement);
