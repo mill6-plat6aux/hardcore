@@ -38,50 +38,97 @@ var HttpConnection = {
     defaultAccessPolicy: "same-origin",
 
     /**
-     * Send a request to the specified URL.
+     * Authorization type
+     * @type {"Basic"|"Bearer"|"Digest"}
+     */
+    authorizationType: "Bearer",
+
+    /**
+     * Authorization credentials
+     * @type {string}
+     */
+    authorization: undefined,
+
+    /**
+     * @overload
      * @param {!string} path 
-     * @param {?object|?FromData} request body data
-     * @param {?string} contentType 
-     * @param {?string} method HTTP method
+     * @param {object|FromData} [request] body data
+     * @param {string} [contentType] 
      * @returns {!Promise} Receive the response data by Promise#then, and Promise#catch is called when a response other than HTTP status code 200 is received.
      */
-    request: function(path, request, contentType, method) {
+    /**
+     * Send a request to the specified URL.
+     * @overload
+     * @param {!string} path 
+     * @param {"GET"|"POST"|"PUT"|"DELETE"|"PATCH"} [method] HTTP method
+     * @param {object|FromData} [requestBody] body data
+     * @param {string} [contentType] 
+     * @returns {!Promise} Receive the response data by Promise#then, and Promise#catch is called when a response other than HTTP status code 200 is received.
+     */
+    request: function(path, method, requestBody, contentType) {
         var self = this;
+
+        if(method != undefined) {
+            if(typeof method == "object") {
+                requestBody = method;
+                method = self.defaultMethod;
+            }
+        }else {
+            method = self.defaultMethod;
+        }
 
         if(path == undefined || typeof path != "string") {
             console.error("The request path is not set.");
             return;
         }
-        if(contentType == undefined && !(request instanceof FormData)) {
+        if(contentType == undefined && !(requestBody instanceof FormData) && method != "GET") {
             contentType = self.defaultContentType;
         }
-        if(method == undefined) {
-            method = self.defaultMethod;
+
+        if(requestBody instanceof Array && !Array.isArray(requestBody)) {
+            requestBody = Array.from(requestBody);
         }
 
-        if(request instanceof Array && !Array.isArray(request)) {
-            request = Array.from(request);
+        function urlencode(requestBody) {
+            var requestString = "";
+            var requestKeys = Object.keys(requestBody);
+            for(var i=0; i<requestKeys.length; i++) {
+                if(i > 0) {
+                    requestString += "&";
+                }
+                requestString += requestKeys[i]+"="+requestBody[requestKeys[i]];
+            }
+            return encodeURI(requestString);
         }
 
         var _request = {
             method: method,
             cache: self.defaultCachePolicy,
             mode: self.defaultAccessPolicy,
-            credentials: self.defaultAccessPolicy
+            headers: {}
         };
-        if(request !== undefined) {
+        if(requestBody !== undefined) {
             if(contentType !== undefined) {
-                if(contentType == "application/json" && typeof request == "object") {
-                    _request.body = JSON.stringify(request);
+                if(contentType == "application/json" && typeof requestBody == "object") {
+                    _request.body = JSON.stringify(requestBody);
+                }else if(contentType == "application/x-www-form-urlencoded" && typeof requestBody == "object") {
+                    _request.body = urlencode(requestBody);
                 }else {
-                    _request.body = request;
+                    _request.body = requestBody;
                 }
             }else {
-                _request.body = request;
+                if(method == "GET") {
+                    path += "?"+urlencode(requestBody);
+                }else {
+                    _request.body = requestBody;
+                }
             }
         }
         if(contentType !== undefined) {
-            _request.headers = { "Content-Type": contentType+"; charset="+self.defaultCharacterSet };
+            _request.headers["Content-Type"] = contentType+"; charset="+self.defaultCharacterSet;
+        }
+        if(self.authorization !== undefined && self.authorizationType !== undefined) {
+            _request.headers["Authorization"] = self.authorizationType+" "+self.authorization;
         }
         return fetch(path, _request).then(function(response) {
             if(response.redirected) {
@@ -140,6 +187,10 @@ var HttpConnection = {
         var message;
         // Bad Request
         if(response.status == 400) {
+            this.globalServerErrorHandler(response);
+        }
+        // Unauthorized
+        else if(response.status == 401) {
             this.globalServerErrorHandler(response);
         }
         // Forbidden

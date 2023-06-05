@@ -781,7 +781,7 @@ function HtmlTag() {
             "outline": "none",
             "-webkit-appearance": "none",
             "appearance": "none",
-            "vertical-align": "middle",
+            "vertical-align": "baseline",
             "background-color": "transparent",
             "font-size": "1em"
         });
@@ -2766,9 +2766,9 @@ function InputComposite() {
     var children;
     var borderColor = "darkgray";
     var labelColor = "darkgray";
-    var labelFontSize = "10px";
+    var labelFontSize = "small";
     var unitColor = "darkgray";
-    var unitFontSize = "10px";
+    var unitFontSize = "small";
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
         if(identifierIndex == -1 && typeof argument == "string") {
@@ -3160,6 +3160,7 @@ function NumericField() {
  * @param {number|string} [settings.fontSize] 
  * @param {string} [settings.boxColor=black] 
  * @param {string} [settings.checkColor=black] 
+ * @param {string} [settings.editable=true] 
  * @param {string} [settings.dataKey] The key for object set in the ViewController or parent View. 
  * @param {function(boolean): void} [changeHandler]
  * @returns {HTMLDivElement}
@@ -3169,6 +3170,7 @@ function Checkbox() {
 
     var label = undefined;
     var checked = false;
+    var editable = true;
     var boxColor = "black";
     var checkColor = "black";
     var fontSize = "1em";
@@ -3185,6 +3187,9 @@ function Checkbox() {
                     label = argument[key];
                     delete argument[key];
                 }else if(key == "checked" && typeof argument[key] == "boolean") {
+                    checked = argument[key];
+                    delete argument[key];
+                }else if(key == "editable" && typeof argument[key] == "boolean") {
                     checked = argument[key];
                     delete argument[key];
                 }else if(key == "fontSize" && (typeof argument[key] == "number" || typeof argument[key] == "string")) {
@@ -3351,6 +3356,7 @@ function Checkbox() {
     drawBox(context);
 
     element.addEventListener("click", function(event) {
+        if(!editable) return;
         var element = event.currentTarget;
         var canvas = element.querySelector("canvas");
         var context = canvas.getContext('2d');
@@ -6336,6 +6342,9 @@ var Controls = {
         if(settings != undefined) {
             if(settings.items != undefined) {
                 reference.items = settings.items;
+            }
+            if(settings.selectedIndex != undefined) {
+                reference.selectedIndex = settings.selectedIndex;
             }
             if(settings.parent != undefined && settings.parent instanceof HTMLElement) {
                 parent = settings.parent;
