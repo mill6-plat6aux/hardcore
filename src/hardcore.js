@@ -3192,7 +3192,7 @@ function Checkbox() {
                     checked = argument[key];
                     delete argument[key];
                 }else if(key == "editable" && typeof argument[key] == "boolean") {
-                    checked = argument[key];
+                    editable = argument[key];
                     delete argument[key];
                 }else if(key == "fontSize" && (typeof argument[key] == "number" || typeof argument[key] == "string")) {
                     fontSize = argument[key];
@@ -3241,6 +3241,8 @@ function Checkbox() {
     if(style == null || style.cursor == null) {
         element.style.setProperty("cursor", "pointer");
     }
+
+    element.editable = editable;
 
     var canvas = document.createElement("canvas");
     canvas.style.setProperty("vertical-align", "bottom");
@@ -3358,8 +3360,8 @@ function Checkbox() {
     drawBox(context);
 
     element.addEventListener("click", function(event) {
-        if(!editable) return;
         var element = event.currentTarget;
+        if(!element.editable) return;
         var canvas = element.querySelector("canvas");
         var context = canvas.getContext('2d');
         context.clearRect(0, 0, canvas.width, canvas.height);
@@ -6777,6 +6779,7 @@ var Controls = {
             }
         }
         
+        var base = document.querySelector("html");
         var parent = document.querySelector("body");
 
         element.style.setProperty("position", "absolute");
@@ -6785,13 +6788,13 @@ var Controls = {
         parent.appendChild(element);
 
         element.style.setProperty("left", (parent.clientWidth/2 - element.offsetWidth/2)+"px");
-        element.style.setProperty("top", parent.clientHeight+"px");
+        element.style.setProperty("top", base.scrollTop+parent.clientHeight+"px");
         var offset = HtmlElementUtil.offset(element, parent);
-        new StyleAnimation(element, "top", {beginValue: offset.top, finishValue: parent.clientHeight/2 - element.offsetHeight/2, duration: duration}).start();
+        new StyleAnimation(element, "top", {beginValue: offset.top, finishValue: base.scrollTop+(parent.clientHeight/2 - element.offsetHeight/2), duration: duration}).start();
         return {
             close: function() {
                 var offset = HtmlElementUtil.offset(element, parent);
-                new StyleAnimation(element, "top", {beginValue: offset.top, finishValue: parent.clientHeight, duration: duration}).start().finish(function() {
+                new StyleAnimation(element, "top", {beginValue: offset.top, finishValue: base.scrollTop+parent.clientHeight, duration: duration}).start().finish(function() {
                     element.remove();
                 });
             }
