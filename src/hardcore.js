@@ -1154,6 +1154,7 @@ function PasswordField() {
     var _arguments = Array.prototype.slice.call(arguments);
 
     var label;
+    var changeHandler;
     for(var i=0; i<_arguments.length; i++) {
         var argument = _arguments[i];
         if(!Array.isArray(argument) && typeof argument == "object") {
@@ -1163,18 +1164,29 @@ function PasswordField() {
                 if(key == "label" && typeof argument[key] == "string") {
                     label = argument[key];
                     delete argument[key];
+                }else if(key == "changeHandler" && typeof argument[key] == "function") {
+                    changeHandler = argument[key];
+                    delete argument[key];
                 }
             }
             break;
         }
     }
 
+    var element;
     if(label == null) {
         _arguments.splice(0, 0, "password");
-        return Input.apply(this, _arguments);
+        element = Input.apply(this, _arguments);
+        if(changeHandler != undefined) {
+            element.addEventListener("change", changeHandler);
+        }
+        return element;
     }else {
         _arguments.splice(0, 0, "password");
-        var element = Input.apply(this, _arguments);
+        element = Input.apply(this, _arguments);
+        if(changeHandler != undefined) {
+            element.addEventListener("change", changeHandler);
+        }
         var inputComposite = InputComposite({label: label}, [element]);
         return inputComposite;
     }
@@ -4435,8 +4447,48 @@ var DateUtil = {
         }
         if(result.includes("M")) {
             var month = date.getMonth()+1;
-            result = result.replace(/MM/, StringUtil.padding(month, "0", 2));
-            result = result.replace(/M/, month);
+            if(/MMMM/.test(result)) {
+                var monthExp;
+                switch(month) {
+                    case 1: monthExp = "January"; break;
+                    case 2: monthExp = "February"; break;
+                    case 3: monthExp = "March"; break;
+                    case 4: monthExp = "April"; break;
+                    case 5: monthExp = "May"; break;
+                    case 6: monthExp = "June"; break;
+                    case 7: monthExp = "July"; break;
+                    case 8: monthExp = "August"; break;
+                    case 9: monthExp = "September"; break;
+                    case 10: monthExp = "October"; break;
+                    case 11: monthExp = "November"; break;
+                    case 12: monthExp = "December"; break;
+                }
+                if(typeof monthExp == "string") {
+                    result = result.replace(/MMMM/, monthExp);
+                }
+            }else if(/MMM/.test(result)) {
+                var shortMonthExp;
+                switch(month) {
+                    case 1: shortMonthExp = "Jan"; break;
+                    case 2: shortMonthExp = "Feb"; break;
+                    case 3: shortMonthExp = "Mar"; break;
+                    case 4: shortMonthExp = "Apr"; break;
+                    case 5: shortMonthExp = "May"; break;
+                    case 6: shortMonthExp = "Jun"; break;
+                    case 7: shortMonthExp = "Jul"; break;
+                    case 8: shortMonthExp = "Aug"; break;
+                    case 9: shortMonthExp = "Sep"; break;
+                    case 10: shortMonthExp = "Oct"; break;
+                    case 11: shortMonthExp = "Nov"; break;
+                    case 12: shortMonthExp = "Dec"; break;
+                }
+                if(typeof shortMonthExp == "string") {
+                    result = result.replace(/MMM/, shortMonthExp);
+                }
+            }else {
+                result = result.replace(/MM/, StringUtil.padding(month, "0", 2));
+                result = result.replace(/M/, month);
+            }
         }
         if(result.includes("d")) {
             var _date = date.getDate();
@@ -4445,31 +4497,34 @@ var DateUtil = {
         }
         if(result.includes("E")) {
             var day = date.getDay();
-            var dayExp;
-            switch(day) {
-                case 0: dayExp = "Sunday"; break;
-                case 1: dayExp = "Monday"; break;
-                case 2: dayExp = "Tuesday"; break;
-                case 3: dayExp = "Wednesday"; break;
-                case 4: dayExp = "Thursday"; break;
-                case 5: dayExp = "Friday"; break;
-                case 6: dayExp = "Saturday"; break;
-            }
-            var shortDayExp;
-            switch(day) {
-                case 0: shortDayExp = "Sun"; break;
-                case 1: shortDayExp = "Mon"; break;
-                case 2: shortDayExp = "Tues"; break;
-                case 3: shortDayExp = "Wed"; break;
-                case 4: shortDayExp = "Thur"; break;
-                case 5: shortDayExp = "Fri"; break;
-                case 6: shortDayExp = "Sat"; break;
-            }
-            if(typeof dayExp == "string") {
-                result = result.replace(/EEEE/, dayExp);
-            }
-            if(typeof shortDayExp == "string") {
-                result = result.replace(/EEE/, shortDayExp);
+            if(/EEEE/.test(result)) {
+                var dayExp;
+                switch(day) {
+                    case 0: dayExp = "Sunday"; break;
+                    case 1: dayExp = "Monday"; break;
+                    case 2: dayExp = "Tuesday"; break;
+                    case 3: dayExp = "Wednesday"; break;
+                    case 4: dayExp = "Thursday"; break;
+                    case 5: dayExp = "Friday"; break;
+                    case 6: dayExp = "Saturday"; break;
+                }
+                if(typeof dayExp == "string") {
+                    result = result.replace(/EEEE/, dayExp);
+                }
+            }else if(/EEE/.test(result)) {
+                var shortDayExp;
+                switch(day) {
+                    case 0: shortDayExp = "Sun"; break;
+                    case 1: shortDayExp = "Mon"; break;
+                    case 2: shortDayExp = "Tues"; break;
+                    case 3: shortDayExp = "Wed"; break;
+                    case 4: shortDayExp = "Thur"; break;
+                    case 5: shortDayExp = "Fri"; break;
+                    case 6: shortDayExp = "Sat"; break;
+                }
+                if(typeof shortDayExp == "string") {
+                    result = result.replace(/EEE/, shortDayExp);
+                }
             }
         }
         if(result.includes("e")) {
