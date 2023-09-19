@@ -1275,6 +1275,7 @@ function DateField() {
     var editable = true;
     var placeholder;
     var style;
+    var height;
     var placeholderStyle;
     var zIndex = 0;
     for(var i=0; i<_arguments.length; i++) {
@@ -1319,6 +1320,9 @@ function DateField() {
                 }else if(key == "style" && typeof argument[key] == "object") {
                     style = argument[key];
                     delete argument[key];
+                }else if(key == "height") {
+                    height = argument[key];
+                    delete argument[key];
                 }else if(key == "placeholderStyle" && typeof argument[key] == "object") {
                     placeholderStyle = argument[key];
                     delete argument[key];
@@ -1337,7 +1341,7 @@ function DateField() {
     var element = View.apply(this, _arguments);
     
     element.styles = {
-        height:32, 
+        height: height != null ? height : 32, 
         "line-height":32,
         cursor: "default",
         display: "inline-block"
