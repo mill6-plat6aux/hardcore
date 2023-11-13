@@ -1275,7 +1275,7 @@ function DateField() {
     var editable = true;
     var placeholder;
     var style;
-    var height;
+    var elementHeight;
     var placeholderStyle;
     var zIndex = 0;
     for(var i=0; i<_arguments.length; i++) {
@@ -1321,7 +1321,7 @@ function DateField() {
                     style = argument[key];
                     delete argument[key];
                 }else if(key == "height") {
-                    height = argument[key];
+                    elementHeight = argument[key];
                     delete argument[key];
                 }else if(key == "placeholderStyle" && typeof argument[key] == "object") {
                     placeholderStyle = argument[key];
@@ -1341,7 +1341,7 @@ function DateField() {
     var element = View.apply(this, _arguments);
     
     element.styles = {
-        height: height != null ? height : 32, 
+        height: elementHeight != null ? elementHeight : 32, 
         "line-height":32,
         cursor: "default",
         display: "inline-block"
@@ -1401,7 +1401,11 @@ function DateField() {
             if(typeof newValue == "number") {
                 value = new Date(newValue);
             }else if(typeof newValue == "string") {
-                value = DateUtil.parse(newValue, format);
+                if(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|(\+|-)[0-9]{2}:[0-9]{2})$/.test(newValue)) {
+                    value = new Date(newValue);
+                }else {
+                    value = DateUtil.parse(newValue, format);
+                }
             }else if(newValue instanceof Date) {
                 value = newValue;
             }
