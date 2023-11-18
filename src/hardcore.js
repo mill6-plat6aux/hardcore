@@ -6874,6 +6874,8 @@ var Controls = {
      * @param {function(): void} cancelHandler
      */
     Message: function(text, type, applyLabel, applyHandler, cancelLabel, cancelHandler) {
+        var autoClosingDelay = 1500;
+
         // irregular arguments
         if(typeof applyLabel == "function") {
             // applyHandler, cancelHandler
@@ -6883,6 +6885,9 @@ var Controls = {
             }
             applyHandler = applyLabel;
             applyLabel = "OK";
+        }else if(typeof applyLabel == "number") {
+            autoClosingDelay = applyLabel;
+            applyLabel = undefined;
         }
 
         var element = document.createElement("div");
@@ -7034,7 +7039,7 @@ var Controls = {
         if(applyHandler == undefined && cancelHandler == undefined) {
             setTimeout(function() {
                 popup.close();
-            }, 1000);
+            }, autoClosingDelay);
         }
     },
 
