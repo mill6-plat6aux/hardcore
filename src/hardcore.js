@@ -2084,6 +2084,7 @@ function FileSelector() {
  * @property {number} [width] Column width
  * @property {Object} [style] Column styles
  * @property {Object} [class] Column CSS class
+ * @property {boolean} [visible] 
  * @property {string} [dataKey] The key for each record of the Array object set in the Table.
  * @property {function(HTMLTableCellElement, any, any): void} [dataHandler] Use this callback if you want to set data directly in a cell.
  * @param {HTMLTableCellElement} dataHandler.cell
@@ -2092,20 +2093,24 @@ function FileSelector() {
  */
 
 /**
+ * @typedef {object} TableSortDefinition
+ * @property {Object} [defaultHeaderCellStyle]
+ * @property {Object} [upperSortHeaderCellStyle]
+ * @property {Object} [lowerSortHeaderCellStyle]
+ * @property {string} [defaultSortDataKey]
+ */
+
+/**
  * Create TABLE element.
  * @param {string} [identifier] 
  * @param {Object} [attributes] 
- * @param {Array.<TableColumnDefinition>} [attributes.data] 
- * @param {Array.<TableColumnDefinition>} [attributes.dataKey] The key for object set in the ViewController or parent View. "." points to the root of the data set in the ViewController or parent View.
+ * @param {Array.<object>} [attributes.data] 
+ * @param {string} [attributes.dataKey] The key for object set in the ViewController or parent View. "." points to the root of the data set in the ViewController or parent View.
  * @param {Array.<TableColumnDefinition>} [attributes.columns] 
  * @param {function(any, number, HTMLTableRowElement): void} [attributes.tapHandler] Select a row handler. The first argument is the selected row data.
  * @param {number} [attributes.rowHeight]
  * @param {boolean} [attributes.animate=false]
- * @param {Object} [attributes.sort]
- * @param {Object} [attributes.sort.defaultHeaderCellStyle]
- * @param {Object} [attributes.sort.upperSortHeaderCellStyle]
- * @param {Object} [attributes.sort.lowerSortHeaderCellStyle]
- * @param {string} [attributes.sort.defaultSortDataKey]
+ * @param {TableSortDefinition} [attributes.sort]
  * @param {Object} [attributes.headerStyle]
  * @param {boolean} [attributes.rowBorder=true]
  * @param {string} [attributes.rowBorderStyle]
@@ -2201,8 +2206,43 @@ function Table() {
 
     element.animate = animate;
 
-    // header
-    if(columns != undefined) {
+    /**
+     * @property {Array<object>} data
+     */
+    Object.defineProperty(element, "data", { 
+        get: function() {
+            return this.bindingData;
+        },
+        set: function(newValue) {
+            loadData(newValue, element, element.columns, tapHandler);
+        }
+    });
+
+    Object.defineProperty(element, "columns", { 
+        get: function() {
+            return this._columns;
+        },
+        set: function(newValue) {
+            this._columns = newValue;
+            loadHeader(this, newValue, sort);
+            loadData(this.data, this, newValue, tapHandler);
+        }
+    });
+
+    element.columns = columns;
+    element.data = data;
+
+    /**
+     * @param {HTMLTableElement} element 
+     * @param {Array<TableColumnDefinition>} columns 
+     * @param {TableSortDefinition} sort 
+     */
+    function loadHeader(element, columns, sort) {
+        var _header = element.querySelector("thead");
+        if(_header != null) _header.remove();
+
+        if(columns == null) return;
+
         var header = TableHeader();
         var row = TableRow();
         row.style.setProperty("cursor", "default");
@@ -2214,6 +2254,7 @@ function Table() {
         }
         for(i=0; i<columns.length; i++) {
             var column = columns[i];
+            if(column.visible != undefined && !column.visible) continue;
             var cell = TableCell();
             if(column.label != undefined) {
                 cell.innerText = column.label;
@@ -2227,7 +2268,7 @@ function Table() {
                 cell.defineStyles(column.style);
             }
             if(sort != null) {
-                setupSorting(cell, sort);
+                setupSorting(cell, row, sort);
             }
             row.appendChild(cell);
         }
@@ -2235,7 +2276,12 @@ function Table() {
         element.append(header);
     }
 
-    function setupSorting(cell, sort) {
+    /**
+     * @param {HTMLTableCellElement} cell 
+     * @param {HTMLTableRowElement} row 
+     * @param {TableSortDefinition} sort 
+     */
+    function setupSorting(cell, row, sort) {
         if(sort.defaultHeaderCellStyle != null) {
             cell.styles = sort.defaultHeaderCellStyle;
         }
@@ -2312,160 +2358,166 @@ function Table() {
         });
     }
 
-    // data binding
-    Object.defineProperty(element, "data", { 
-        get: function() {
-            return this.bindingData;
-        },
-        set: function(newValue) {
-            var element = this;
-            function createRow(record, columns, tapHandler, animate) {
-                var row = TableRow();
-                row.style.setProperty("cursor", "pointer");
-                if(rowHeight != undefined) {
-                    row.style.setProperty("height", rowHeight+"px");
-                    row.style.setProperty("line-height", rowHeight+"px");
+    /**
+     * @param {object} record 
+     * @param {Array<TableColumnDefinition>} columns 
+     * @param {function(any, number, HTMLTableRowElement): void} tapHandler 
+     * @param {boolean} animate 
+     * @returns {HTMLTableRowElement}
+     */
+    function createRow(record, columns, tapHandler, animate) {
+        var row = TableRow();
+        row.style.setProperty("cursor", "pointer");
+        if(rowHeight != undefined) {
+            row.style.setProperty("height", rowHeight+"px");
+            row.style.setProperty("line-height", rowHeight+"px");
+        }
+        if(rowBorderStyle != undefined) {
+            row.style.setProperty("border-bottom", rowBorderStyle);
+        }
+        if(rowHighlightStyle != undefined) {
+            row.addEventListener("mouseenter", function(event) {
+                var row = event.currentTarget;
+                row.originalBackgroundColor = row.style.getPropertyValue("background-color");
+                row.style.setProperty("background-color", rowHighlightStyle);
+            });
+            row.addEventListener("mouseleave", function(event) {
+                var row = event.currentTarget;
+                if(row.originalBackgroundColor != null) {
+                    row.style.setProperty("background-color", row.originalBackgroundColor);
+                    delete row.originalBackgroundColor;
+                }else {
+                    row.style.setProperty("background-color", "inherit");
                 }
-                if(rowBorderStyle != undefined) {
-                    row.style.setProperty("border-bottom", rowBorderStyle);
+            });
+        }
+        if(rowHandler != null) {
+            rowHandler(row, record);
+        }
+        function setValue(value, cell) {
+            if(value == null) {
+                // Safari bug fix
+                cell.innerHTML = "&nbsp;";
+            }else if(typeof value == "string") {
+                if(value.length == 0) {
+                    // Safari bug fix
+                    cell.innerHTML = "&nbsp;";
+                }else {
+                    cell.innerText = value;
                 }
-                if(rowHighlightStyle != undefined) {
-                    row.addEventListener("mouseenter", function(event) {
-                        var row = event.currentTarget;
-                        row.originalBackgroundColor = row.style.getPropertyValue("background-color");
-                        row.style.setProperty("background-color", rowHighlightStyle);
-                    });
-                    row.addEventListener("mouseleave", function(event) {
-                        var row = event.currentTarget;
-                        if(row.originalBackgroundColor != null) {
-                            row.style.setProperty("background-color", row.originalBackgroundColor);
-                            delete row.originalBackgroundColor;
-                        }else {
-                            row.style.setProperty("background-color", "inherit");
-                        }
-                    });
+            }else {
+                cell.innerText = value.toString();
+            }
+        }
+        if(columns != undefined) {
+            for(var i=0; i<columns.length; i++) {
+                var column = columns[i];
+                if(column.visible != undefined && !column.visible) continue;
+                var cell = TableCell();
+                if(column.class != undefined) {
+                    cell.setAttribute("class", column.class);
                 }
-                if(rowHandler != null) {
-                    rowHandler(row, record);
+                if(column.style != undefined) {
+                    cell.defineStyles(column.style);
                 }
-                function setValue(value, cell) {
-                    if(value == null) {
-                        // Safari bug fix
-                        cell.innerHTML = "&nbsp;";
-                    }else if(typeof value == "string") {
-                        if(value.length == 0) {
-                            // Safari bug fix
-                            cell.innerHTML = "&nbsp;";
-                        }else {
-                            cell.innerText = value;
-                        }
+                if(column.dataKey != null) {
+                    var value = record[column.dataKey];
+                    value = value !== undefined ? value : null;
+                    if(column.dataHandler != null) {
+                        column.dataHandler(cell, value, record);
                     }else {
-                        cell.innerText = value.toString();
+                        setValue(value, cell);
                     }
                 }
-                if(columns != undefined) {
-                    for(var i=0; i<columns.length; i++) {
-                        var column = columns[i];
-                        var cell = TableCell();
-                        if(column.class != undefined) {
-                            cell.setAttribute("class", column.class);
-                        }
-                        if(column.style != undefined) {
-                            cell.defineStyles(column.style);
-                        }
-                        if(column.dataKey != null) {
-                            var value = record[column.dataKey];
-                            value = value !== undefined ? value : null;
-                            if(column.dataHandler != null) {
-                                column.dataHandler(cell, value, record);
-                            }else {
-                                setValue(value, cell);
-                            }
-                        }
-                        row.appendChild(cell);
-                    }
-                }
-                if(tapHandler != undefined) {
-                    row.addEventListener("click", function(event) {
-                        var row = event.currentTarget;
-                        var tableBody = element.querySelector("tbody");
-                        var index = tableBody.querySelectorAll("tr").indexOf(row);
-                        tapHandler(data[index], index, row, event);
-                    });
-                }
-                if(animate) {
-                    row.style.setProperty("opacity", "0");
-                    row.style.setProperty("margin-top", "16px");
-                }
-                return row;
+                row.appendChild(cell);
             }
+        }
+        if(tapHandler != undefined) {
+            row.addEventListener("click", function(event) {
+                var row = event.currentTarget;
+                var tableBody = element.querySelector("tbody");
+                var index = tableBody.querySelectorAll("tr").indexOf(row);
+                tapHandler(element.data[index], index, row, event);
+            });
+        }
+        if(animate) {
+            row.style.setProperty("opacity", "0");
+            row.style.setProperty("margin-top", "16px");
+        }
+        return row;
+    }
 
-            var i;
+    /**
+     * @param {Array<object>} newValue 
+     * @param {HTMLTableElement} element 
+     * @param {Array<TableColumnDefinition>} columns 
+     * @param {function(any, number, HTMLTableRowElement): void} tapHandler 
+     * @returns 
+     */
+    function loadData(newValue, element, columns, tapHandler) {
+        if(newValue == null) return;
 
-            var observedArray;
-            if(Array.isArray(newValue)) {
-                observedArray = new ObservedArray(element, createRow, columns, tapHandler);
-                for(i=0; i<newValue.length; i++) {
-                    observedArray.push(newValue[i]);
-                }
-            }else if(newValue instanceof ObservedArray) {
-                observedArray = newValue;
+        var i;
+
+        var observedArray;
+        if(Array.isArray(newValue)) {
+            observedArray = new ObservedArray(element, createRow, tapHandler);
+            for(i=0; i<newValue.length; i++) {
+                observedArray.push(newValue[i]);
             }
+        }else if(newValue instanceof ObservedArray) {
+            observedArray = newValue;
+        }
 
-            element.bindingData = observedArray;
+        element.bindingData = observedArray;
 
-            var tableHeader = element.querySelector("thead");
-            var tableBody = element.querySelector("tbody");
-            if(tableBody != null) {
-                tableBody.remove();
+        var tableHeader = element.querySelector("thead");
+        var tableBody = element.querySelector("tbody");
+        if(tableBody != null) {
+            tableBody.remove();
+        }
+        if(element.bindingData != null) {
+            var data = element.bindingData;
+            tableBody = TableBody();
+            if(ResizeObserver !== undefined) {
+                var resizeObserver = new ResizeObserver(function(observations) {
+                    if(observations.length == 0) return;
+                    var element = observations[0].target;
+                    resizeObserver.disconnect();
+                    tableBody.style.setProperty("height", (element.clientHeight-tableHeader.clientHeight)+"px");
+                });
+                resizeObserver.observe(element);
             }
-            if(element.bindingData != null) {
-                var data = element.bindingData;
-                tableBody = TableBody();
-                if(ResizeObserver !== undefined) {
-                    var resizeObserver = new ResizeObserver(function(observations) {
-                        if(observations.length == 0) return;
-                        var element = observations[0].target;
-                        resizeObserver.disconnect();
-                        tableBody.style.setProperty("height", (element.clientHeight-tableHeader.clientHeight)+"px");
-                    });
-                    resizeObserver.observe(element);
-                }
-                tableBody.style.setProperty("height", (this.clientHeight-tableHeader.clientHeight)+"px");
-                for(i=0; i<data.length; i++) {
-                    var record = data[i];
-                    tableBody.appendChild(createRow(record, columns, tapHandler, element.animate));
-                }
-                element.appendChild(tableBody);
+            tableBody.style.setProperty("height", (element.clientHeight-tableHeader.clientHeight)+"px");
+            for(i=0; i<data.length; i++) {
+                var record = data[i];
+                tableBody.appendChild(createRow(record, columns, tapHandler, element.animate));
+            }
+            element.appendChild(tableBody);
 
-                var showRow;
-                if(element.animate) {
-                    showRow = function(rows, index) {
-                        var row = rows[index];
-                        new FunctionalAnimation(function(progress) {
-                            row.style.setProperty("opacity", progress);
-                            row.style.setProperty("margin-top", (16-16*progress)+"px");
-                        }, FunctionalAnimation.methods.linear, 100).start(100*index);
-                    }
-                    var rows = tableBody.querySelectorAll("tr");
-                    for(i=0; i<rows.length; i++) {
-                        showRow(rows, i);
-                    }
+            var showRow;
+            if(element.animate) {
+                showRow = function(rows, index) {
+                    var row = rows[index];
+                    new FunctionalAnimation(function(progress) {
+                        row.style.setProperty("opacity", progress);
+                        row.style.setProperty("margin-top", (16-16*progress)+"px");
+                    }, FunctionalAnimation.methods.linear, 100).start(100*index);
+                }
+                var rows = tableBody.querySelectorAll("tr");
+                for(i=0; i<rows.length; i++) {
+                    showRow(rows, i);
                 }
             }
         }
-    });
-    if(data != null) {
-        element.data = data;
     }
 
     return element;
 }
 
-function ObservedArray(element, createRow, columns, tapHandler) {
+function ObservedArray(element, createRow, tapHandler) {
     this.element = element;
     this.createRow = createRow;
-    this.columns = columns;
     this.tapHandler = tapHandler;
 }
 ObservedArray.prototype = Object.create(Array.prototype);
@@ -2473,7 +2525,7 @@ ObservedArray.prototype.push = function(record) {
     Array.prototype.push.call(this, record);
     var container = this.element.querySelector("tbody");
     if(container == null) return;
-    container.appendChild(this.createRow(record, this.columns, this.tapHandler, false));
+    container.appendChild(this.createRow(record, this.element.columns, this.tapHandler, false));
 };
 ObservedArray.prototype.splice = function() {
     Array.prototype.splice.apply(this, arguments);
@@ -2513,7 +2565,7 @@ ObservedArray.prototype.splice = function() {
         endIndex = startIndex+deleteCount;
         var recordIndex = 0;
         for(i=startIndex; i<endIndex; i++) {
-            var row = this.createRow(records[recordIndex++], this.columns, this.tapHandler, false);
+            var row = this.createRow(records[recordIndex++], this.element.columns, this.tapHandler, false);
             if(i < rows.length) {
                 rows[i].insertAdjacentElement("beforebegin", row);
             }else {
