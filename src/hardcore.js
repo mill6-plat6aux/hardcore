@@ -6888,9 +6888,12 @@ var Controls = {
         }
 
         var duration = 200;
+        var showHandler;
         if(settings != undefined) {
             if(settings.duration != undefined) {
                 duration = settings.duration;
+            }else if(settings.showHandler != undefined) {
+                showHandler = settings.showHandler;
             }
         }
         
@@ -6905,7 +6908,11 @@ var Controls = {
         element.style.setProperty("left", (parent.clientWidth/2 - element.offsetWidth/2)+"px");
         element.style.setProperty("top", base.scrollTop+parent.clientHeight+"px");
         var offset = HtmlElementUtil.offset(element, parent);
-        new StyleAnimation(element, "top", {beginValue: offset.top, finishValue: base.scrollTop+(parent.clientHeight/2 - element.offsetHeight/2), duration: duration}).start();
+        new StyleAnimation(element, "top", {beginValue: offset.top, finishValue: base.scrollTop+(parent.clientHeight/2 - element.offsetHeight/2), duration: duration}).start().finish(function() {
+            if(showHandler != null) {
+                showHandler();
+            }
+        });
         return {
             close: function() {
                 var offset = HtmlElementUtil.offset(element, parent);
@@ -7064,11 +7071,17 @@ var Controls = {
             applyButton.style.setProperty("margin", "0px 8px 8px 8px");
             applyButton.style.setProperty("font-weight", "600");
             applyButton.style.setProperty("cursor", "pointer");
+            applyButton.setAttribute("tabIndex", "1");
             applyButton.addEventListener("click", function() {
                 applyHandler();
                 if(popup != undefined) {
                     popup.close();
                 }
+            });
+            applyButton.addEventListener("keyup", function(event) {
+                if(event.code == "Enter") {
+                    event.target.dispatchEvent(new MouseEvent("click"));
+                } 
             });
             element.querySelector(".controls").appendChild(applyButton);
         }
@@ -7079,6 +7092,7 @@ var Controls = {
             cancelButton.style.setProperty("margin", "0px 8px 8px 8px");
             cancelButton.style.setProperty("font-weight", "600");
             cancelButton.style.setProperty("cursor", "pointer");
+            applyButton.setAttribute("tabIndex", "2");
             cancelButton.addEventListener("click", function() {
                 cancelHandler();
                 if(popup != undefined) {
@@ -7087,7 +7101,11 @@ var Controls = {
             });
             element.querySelector(".controls").appendChild(cancelButton);
         }
-        popup = this.Popup(element);
+        popup = this.Popup(element, {showHandler: function() {
+            if(applyButton != null) {
+                applyButton.focus();
+            }
+        }});
         if(applyHandler == undefined && cancelHandler == undefined) {
             setTimeout(function() {
                 popup.close();
