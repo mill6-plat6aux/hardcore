@@ -239,6 +239,12 @@ function PopoverViewController() {
     }});
 
     /**
+     * Check if you can close the view.
+     * @type {function(void): Promise<boolean>}
+     */
+    this.dismissibleHandler;
+
+    /**
      * Processing when the view is destroyed.
      * @type {function(void): void}
      */
@@ -366,10 +372,24 @@ PopoverViewController.prototype.showView = function() {
  * @type {function(void): void}
  */
 PopoverViewController.prototype.dismiss = function() {
-    if(this.mask != undefined) {
-        this.mask.remove();
+    if(this.dismissibleHandler != undefined) {
+        var self = this;
+        this.dismissibleHandler().then(function(result) {
+            if(result) {
+                if(self.mask != undefined) {
+                    self.mask.remove();
+                }
+                self.dismissView();
+            }else {
+                return;
+            }
+        });
+    }else {
+        if(this.mask != undefined) {
+            this.mask.remove();
+        }
+        this.dismissView();
     }
-    this.dismissView();
 }
 
 /**
