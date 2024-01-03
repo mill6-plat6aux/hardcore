@@ -278,7 +278,7 @@ PopoverViewController.prototype.showView = function() {
         var self = this;
         var mask = View({style: maskStyle, tapHandler: function(event) {
             if(self.dismissOnOutside) {
-                self.dismiss();
+                self.dismiss(true);
             }
         }});
         this.mask = mask;
@@ -369,10 +369,10 @@ PopoverViewController.prototype.showView = function() {
 /**
  * Dismiss the view.
  * @memberof PopoverViewController
- * @type {function(void): void}
+ * @type {function(boolean): void}
  */
-PopoverViewController.prototype.dismiss = function() {
-    if(this.dismissibleHandler != undefined) {
+PopoverViewController.prototype.dismiss = function(confirmRequired) {
+    if(this.dismissibleHandler != undefined && confirmRequired != null && confirmRequired) {
         var self = this;
         this.dismissibleHandler().then(function(result) {
             if(result) {
