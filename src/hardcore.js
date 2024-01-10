@@ -2959,6 +2959,7 @@ function InputComposite() {
                 innerElement.focus();
             }
         }
+        event.stopPropagation();
     });
 
     return element;
