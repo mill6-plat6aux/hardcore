@@ -3082,7 +3082,7 @@ function NumericField() {
             "color": unitColor,
             "vertical-align": "baseline"
         });
-        unitElement.innerText = unit;
+        unitElement.innerHTML = unit;
         element.after(unitElement);
     }
 
