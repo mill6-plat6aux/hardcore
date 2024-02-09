@@ -3037,7 +3037,7 @@ function NumericField() {
                     multiplyFunction = argument[key];
                     delete argument[key];
                 }else if(key == "divideFunction" && typeof argument[key] == "function") {
-                    minValue = argument[key];
+                    divideFunction = argument[key];
                     delete argument[key];
                 }
             }
