@@ -4138,10 +4138,11 @@ HTMLElement.prototype.offset = function(parentElement) {
  * Validates the input UI contained in the specified HTML element, and displays a browser-standard error if there is a validation error. The validation content follows the various attributes of the input tag.
  * @memberof HTMLElement
  * @type {function(void): boolean}
+ * @param {function(HTMLElement): void} hiddenElementHandler
  * @returns {boolean}
  */
-HTMLElement.prototype.validate = function() {
-    return ValidationUtil.validate(this);
+HTMLElement.prototype.validate = function(hiddenElementHandler) {
+    return ValidationUtil.validate(this, hiddenElementHandler);
 }
 
 /**
@@ -6219,9 +6220,10 @@ var ValidationUtil = {
     /**
      * Validates the input UI contained in the specified HTML element, and displays a browser-standard error if there is a validation error. The validation content follows the various attributes of the input tag.
      * @param {HTMLInputElement|HTMLTextAreaElement} element
+     * @param {function(HTMLElement): void} hiddenElementHandler
      * @returns {boolean}
      */
-    validate: function(element) {
+    validate: function(element, hiddenElementHandler) {
         if(!(element instanceof HTMLElement)) {
             console.error("Element is not HTMLElement.", (element != null && element.toString != undefined ? element.toString() : "null"));
             return;
@@ -6232,6 +6234,17 @@ var ValidationUtil = {
             inputElement.setCustomValidity("");
             inputElement.removeEventListener("input", resetReport);
         }
+        function hiddenParent(element) {
+            var parentElement = element.parentElement;
+            if(parentElement == null) {
+                return null;
+            }else {
+                if(window.getComputedStyle(parentElement).display == "none") {
+                    return parentElement;
+                }
+                return hiddenParent(parentElement);
+            }
+        }
         var inputElements = element.querySelectorAll("input, select, textarea");
         for(var i=0; i<inputElements.length; i++) {
             var inputElement = inputElements[i];
@@ -6240,6 +6253,16 @@ var ValidationUtil = {
                     var message = inputElement.getAttribute("title");
                     if(message != null) {
                         inputElement.setCustomValidity(message);
+                    }
+                    // Warning cannot be displayed if the element is hidden. Call back that decision.
+                    if(hiddenElementHandler != null) {
+                        if(window.getComputedStyle(inputElement).display == "none") {
+                            hiddenElementHandler(inputElement);
+                        }else {
+                            if(hiddenParent(inputElement) != null) {
+                                hiddenElementHandler(inputElement);
+                            }
+                        }
                     }
                     inputElement.reportValidity();
                     inputElement.addEventListener("input", resetReport);
