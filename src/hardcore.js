@@ -5041,14 +5041,14 @@ Rect.prototype = {
         if(target == null) return false
         if(target.x != undefined && target.y != undefined && typeof target.x == "number" && typeof target.y == "number" && 
             target.width != undefined && target.height != undefined && typeof target.width == "number" && typeof target.height == "number") {
-            return (this.x < target.x && this.x + this.width > target.x &&
-                this.y < target.y && this.y + this.height > target.y) ||
-                (this.x < target.x + target.width && this.x + this.width > target.x + target.width &&
-                    this.y < target.y && this.y + this.height > target.y) ||
-                (this.x < target.x + target.width && this.x + this.width > target.x + target.width &&
-                    this.y < target.y + target.height && this.y + this.height > target.y + target.height) ||
-                (this.x < target.x && this.x + this.width > target.x &&
-                    this.y < target.y + target.height && this.y + this.height > target.y + target.height);
+            return (this.x <= target.x && this.x + this.width > target.x &&
+                this.y <= target.y && this.y + this.height > target.y) ||
+                (this.x < target.x + target.width && this.x + this.width >= target.x + target.width &&
+                    this.y <= target.y && this.y + this.height > target.y) ||
+                (this.x < target.x + target.width && this.x + this.width >= target.x + target.width &&
+                    this.y < target.y + target.height && this.y + this.height >= target.y + target.height) ||
+                (this.x <= target.x && this.x + this.width > target.x &&
+                    this.y < target.y + target.height && this.y + this.height >= target.y + target.height);
         }
         return false;
     },
