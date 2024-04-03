@@ -50,6 +50,11 @@ var HttpConnection = {
     authorization: undefined,
 
     /**
+     * @type {object}
+     */
+    additionalHeaders: {},
+
+    /**
      * @overload
      * @param {!string} path 
      * @param {object|FromData} [request] body data
@@ -129,6 +134,11 @@ var HttpConnection = {
         }
         if(self.authorization !== undefined && self.authorizationType !== undefined) {
             _request.headers["Authorization"] = self.authorizationType+" "+self.authorization;
+        }
+        var additionalHeaderKeys = Object.keys(self.additionalHeaders);
+        for(var i=0; i<additionalHeaderKeys.length; i++) {
+            var key = additionalHeaderKeys[i];
+            _request.headers[key] = self.additionalHeaders[key];
         }
         return fetch(path, _request).then(function(response) {
             if(response.redirected) {
