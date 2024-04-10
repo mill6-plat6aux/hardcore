@@ -6975,8 +6975,9 @@ var Controls = {
      * @param {function(): void} applyHandler
      * @param {string} cancelLabel
      * @param {function(): void} cancelHandler
+     * @param {function(): HTMLElement} additionalContentHandler
      */
-    Message: function(text, type, applyLabel, applyHandler, cancelLabel, cancelHandler) {
+    Message: function(text, type, applyLabel, applyHandler, cancelLabel, cancelHandler, additionalContentHandler) {
         var autoClosingDelay = 1500;
 
         // irregular arguments
@@ -7144,6 +7145,12 @@ var Controls = {
                 }
             });
             element.querySelector(".controls").appendChild(cancelButton);
+        }
+        if(additionalContentHandler != undefined) {
+            var additionalContent = additionalContentHandler();
+            if(additionalContent != null && additionalContent instanceof HTMLElement) {
+                element.querySelector(".contents").after(additionalContent);
+            }
         }
         popup = this.Popup(element, {showHandler: function() {
             if(applyButton != null) {
