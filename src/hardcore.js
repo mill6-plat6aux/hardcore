@@ -266,6 +266,58 @@ function PopoverViewController() {
 }
 PopoverViewController.prototype = Object.create(ViewController.prototype);
 
+PopoverViewController.prototype.showTransition = function() {
+    let contents = this.view;
+    contents.style.opacity = 0;
+    let container = this.container;
+    let width = container.offsetWidth;
+    let height = container.offsetHeight;
+    let initialWidth = width*0.8;
+    let initialHeight = height*0.8;
+    container.style.opacity = 0;
+    container.style.width = initialWidth+"px";
+    container.style.height = initialHeight+"px";
+    container.style.left = (window.innerWidth-initialWidth)/2+"px";
+    container.style.top = (window.innerHeight-initialHeight)/2+"px";
+    new FunctionalAnimation(progress => {
+        container.style.opacity = progress;
+        let _width = initialWidth + (width - initialWidth)*progress;
+        let _height = initialHeight + (height - initialHeight)*progress;
+        container.style.width = _width+"px";
+        container.style.height = _height+"px";
+        container.style.left = (window.innerWidth-_width)/2+"px";
+        container.style.top = (window.innerHeight-_height)/2+"px";
+    }, FunctionalAnimation.methods.easeOut, 300).start().finish(() => {
+        container.style.width = "auto";
+        container.style.height = "auto";
+        new FunctionalAnimation(progress => {
+            contents.style.opacity = progress;
+        }, FunctionalAnimation.methods.easeInOut, 300).start();
+    });
+};
+
+PopoverViewController.prototype.dismissTransition = function(completeHandler) {
+    let contents = this.view;
+    let container = this.container;
+    let width = container.offsetWidth;
+    let height = container.offsetHeight;
+    let finalWidth = width*0.8;
+    let finalHeight = height*0.8;
+    new FunctionalAnimation(progress => {
+        contents.style.opacity = 1-progress;
+    }, FunctionalAnimation.methods.easeInOut, 300).start().finish(() => {
+        new FunctionalAnimation(progress => {
+            container.style.opacity = 1-progress;
+            let _width = width - (width - finalWidth)*progress;
+            let _height = height - (height - finalHeight)*progress;
+            container.style.width = _width+"px";
+            container.style.height = _height+"px";
+            container.style.left = (window.innerWidth-_width)/2+"px";
+            container.style.top = (window.innerHeight-_height)/2+"px";
+        }, FunctionalAnimation.methods.easeOut, 300).start().finish(completeHandler);
+    });
+};
+
 PopoverViewController.prototype.showView = function() {
     if(!this.modal) {
         var maskStyle = {
@@ -287,6 +339,8 @@ PopoverViewController.prototype.showView = function() {
 
     this.container.appendChild(this.view);
     this.parent.appendChild(this.container);
+    
+    this.showTransition();
 
     function lauout(parent, view, layout) {
         var parentWidth = parent.clientWidth;
@@ -360,10 +414,12 @@ PopoverViewController.prototype.showView = function() {
  * @protected
  */
  PopoverViewController.prototype.dismissView = function() {
-    if(this.dismissHandler != undefined) {
-        this.dismissHandler();
-    }
-    this.container.remove();
+    this.dismissTransition(() => {
+        if(this.dismissHandler != undefined) {
+            this.dismissHandler();
+        }
+        this.container.remove();
+    });
 };
 
 /**
@@ -6396,7 +6452,9 @@ var HtmlElementUtil = {
                     element.style.setProperty(key, expression);
                 }else if(typeof value != "object") {
                     if(typeof value == "number") {
-                        value = value+"px";
+                        if(key.endsWith("width") || key.endsWith("height") || key.endsWith("top") || key.endsWith("bottom") || key.endsWith("left") || key.endsWith("right") || key.endsWith("position") || key.endsWith("size") || key == "margin" || key == "padding" || key == "border-radius") {
+                            value = value+"px";
+                        }
                     }else if(typeof value == "string") {
                         if(value.endsWith("!important")) {
                             priority = "important";
