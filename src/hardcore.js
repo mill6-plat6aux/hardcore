@@ -4893,6 +4893,8 @@ var StringUtil = {
      */
     currencyString: function(source, decimalPlaces, roundingMode) {
         if(source == null) return "";
+        /** @type {string} */
+        var string;
         if(typeof source != "number") {
             if(typeof source == "string" && source.length == 0) {
                 return "";
@@ -4911,15 +4913,13 @@ var StringUtil = {
             source = source.replace(/９/g, "9");
 
             // comma separated number
-            source = source.replace(/,/g, "");
-
-            source = Number(source);
+            string = source.replace(/,/g, "");
         }
         if(typeof source == "number") {
             if(Number.isNaN(source)) {
                 return "";
             }
-            var string = String(source);
+            string = String(source);
             if(string.includes("e-") && !string.endsWith("e-")) {
                 var eIndex = string.indexOf("e");
                 var exponent = Number(string.substring(eIndex+2));
@@ -4929,44 +4929,43 @@ var StringUtil = {
                 string = source.toFixed(Number(exponent + decimalLenghth));
             }
             if(string.includes(".") && typeof decimalPlaces == "number") {
+                let number = Number(string);
                 var multiplier = Math.pow(10, decimalPlaces);
                 if(roundingMode == null || roundingMode == "round") {
-                    source = Math.round(source * multiplier) / multiplier;
+                    number = Math.round(number * multiplier) / multiplier;
                 }else if(roundingMode == "floor") {
-                    source = Math.floor(source * multiplier) / multiplier;
+                    number = Math.floor(number * multiplier) / multiplier;
                 }else if(roundingMode == "ceil") {
-                    source = Math.ceil(source * multiplier) / multiplier;
+                    number = Math.ceil(number * multiplier) / multiplier;
                 }
-                source = String(source);
-            }else {
-                source = string;
+                string = String(number);
             }
         }
-        if(source.length == 0) return source;
+        if(string.length == 0) return string;
         var result = [];
         var index = 0;
         var i;
         var negative = false;
-        if(source.startsWith("-")) {
+        if(string.startsWith("-")) {
             negative = true;
-            source = source.substring(1);
+            string = string.substring(1);
         }
-        if(source.includes(".")) {
-            for(i=source.length-1; i>=0; i--) {
-                var char = source.charAt(i);
+        if(string.includes(".")) {
+            for(i=string.length-1; i>=0; i--) {
+                var char = string.charAt(i);
                 result.push(char);
                 if(char == ".") {
-                    source = source.substring(0, i);
+                    string = string.substring(0, i);
                     break;
                 }
             }
         }
         index = 0;
-        for(i=source.length-1; i>=0; i--) {
+        for(i=string.length-1; i>=0; i--) {
             if(index != 0 && index % 3 == 0) {
                 result.push(",");
             }
-            result.push(source.charAt(i));
+            result.push(string.charAt(i));
             index++;
         }
         return (negative ? "-" : "") + result.reverse().join("");
