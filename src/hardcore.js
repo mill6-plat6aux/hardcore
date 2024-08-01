@@ -3058,7 +3058,7 @@ function NumericField() {
     var _arguments = Array.prototype.slice.call(arguments);
 
     var unit;
-    var unitColor = "darkgray";
+    var unitColor = "black";
     var currency = false;
     var multiplier = 1;
     var maxValue;
@@ -3133,13 +3133,22 @@ function NumericField() {
         unitElement = document.createElement("span");
         unitElement.classList.add("unit");
         unitElement.defineStyles({
-            "font-size": "10px",
+            "font-size": "small",
             "margin-left": "2px",
             "color": unitColor,
             "vertical-align": "baseline"
         });
         unitElement.innerHTML = unit;
         element.after(unitElement);
+
+        if(ResizeObserver !== undefined) {
+            var resizeObserver = new ResizeObserver(function(observations) {
+                if(observations.length == 0) return;
+                resizeObserver.disconnect();
+                inputElement.style.width = "calc(100% - " + (unitElement.offsetWidth + 4) + "px)";
+            });
+            resizeObserver.observe(unitElement);
+        }
     }
 
     if(currency) {
@@ -3164,7 +3173,7 @@ function NumericField() {
 
     inputElement.multiplier = multiplier;
 
-    function mutiplyInSafety(value1, value2) {
+    function multiplyInSafety(value1, value2) {
         if(multiplyFunction != null) return multiplyFunction(value1, value2);
 
         if(value1 == null || isNaN(value1) || value2 == null || isNaN(value2)) return value1;
@@ -3191,7 +3200,7 @@ function NumericField() {
         if(pointIndex1 >= 0) {
             decimalScale1 = string1.length - pointIndex1 - 1;
             integer1 = value1 * Math.pow(10, decimalScale1);
-            integer1 = Math.floor(integer1);
+            integer1 = Math.round(integer1);
         }
 
         var decimalScale2 = 0;
@@ -3199,7 +3208,7 @@ function NumericField() {
         if(pointIndex2 >= 0) {
             decimalScale2 = string2.length - pointIndex2 - 1;
             integer2 = value2 * Math.pow(10, decimalScale2);
-            integer2 = Math.floor(integer2);
+            integer2 = Math.round(integer2);
         }
 
         var result = integer1 * integer2;
@@ -3233,7 +3242,7 @@ function NumericField() {
         if(pointIndex1 >= 0) {
             decimalScale1 = string1.length - pointIndex1 - 1;
             integer1 = value1 * Math.pow(10, decimalScale1);
-            integer1 = Math.floor(integer1);
+            integer1 = Math.round(integer1);
         }
 
         var decimalScale2 = 0;
@@ -3241,7 +3250,7 @@ function NumericField() {
         if(pointIndex2 >= 0) {
             decimalScale2 = string2.length - pointIndex2 - 1;
             integer2 = value2 * Math.pow(10, decimalScale2);
-            integer2 = Math.floor(integer2);
+            integer2 = Math.round(integer2);
         }
 
         var result = integer1 / integer2;
@@ -3265,7 +3274,9 @@ function NumericField() {
                 return null;
             }
 
-            value = divideInSafety(value, inputElement.multiplier);
+            if(inputElement.multiplier != 1) {
+                value = divideInSafety(value, inputElement.multiplier);
+            }
 
             if(maxValue != null && value > maxValue) {
                 value = maxValue;
@@ -3282,7 +3293,9 @@ function NumericField() {
             if(newValue != null) {
                 value = newValue;
 
-                value = mutiplyInSafety(value, inputElement.multiplier);
+                if(inputElement.multiplier != 1) {
+                    value = multiplyInSafety(value, inputElement.multiplier);
+                }
 
                 if(currency) {
                     value = StringUtil.currencyString(value);
