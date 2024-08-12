@@ -194,45 +194,59 @@ var HttpConnection = {
      * @access private
      */
     handleServerError: function(response) {
-        var message;
-        // Bad Request
-        if(response.status == 400) {
+        if(response.responseText != null) {
             this.globalServerErrorHandler(response);
-        }
-        // Unauthorized
-        else if(response.status == 401) {
-            this.globalServerErrorHandler(response);
-        }
-        // Forbidden
-        else if(response.status == 403) {
-            location.href = "";
-        }
-        // Payload Too Large
-        else if(response.status == 413) {
-            if(navigator.language != null && navigator.language.includes("ja")) {
-                message = "ファイルのサイズが大きすぎます。お手数ですがファイルを編集の上再度アクセスをお願いします。";
-            }else {
-                message = "The file is too large. Please edit the file and access it again.";
+        }else {
+            var message;
+            // Bad Request
+            if(response.status == 400) {
+                if(navigator.language != null && navigator.language.includes("ja")) {
+                    message = "お手数ですが入力内容を見直しください。";
+                }else {
+                    message = "Please review the information you have entered.";
+                }
             }
-            this.globalServerErrorHandler({statusCode: 413, responseText: message});
-        }
-        // Internal Server Error
-        else if(response.status == 500) {
-            if(navigator.language != null && navigator.language.includes("ja")) {
-                message = "サーバでエラーが発生しました。お手数ですが管理者にお問合せください。";
-            }else {
-                message = "An error has occurred on the server. Please contact the administrator for assistance.";
+            // Unauthorized
+            else if(response.status == 401) {
+                if(navigator.language != null && navigator.language.includes("ja")) {
+                    message = "認証をお願いいたします。";
+                }else {
+                    message = "Please authenticate.";
+                }
             }
-            this.globalServerErrorHandler({statusCode: 500, responseText: message});
-        }
-        // Service Unavailable
-        else if(response.status == 503) {
-            if(navigator.language != null && navigator.language.includes("ja")) {
-                message =  "ただいまシステムが混み合っています。しばらく待ってから再度アクセスをお願いいたします。";
-            }else {
-                message = "The system is currently busy. Please wait for a while and access again.";
+            // Forbidden
+            else if(response.status == 403) {
+                if(navigator.language != null && navigator.language.includes("ja")) {
+                    message = "この操作に対する権限がありません。";
+                }else {
+                    message = "You do not have authorization for this operation.";
+                }
             }
-            this.globalServerErrorHandler({statusCode: 503, responseText: message});
+            // Payload Too Large
+            else if(response.status == 413) {
+                if(navigator.language != null && navigator.language.includes("ja")) {
+                    message = "ファイルのサイズが大きすぎます。お手数ですがファイルを編集の上再度アクセスをお願いします。";
+                }else {
+                    message = "The file is too large. Please edit the file and access it again.";
+                }
+            }
+            // Internal Server Error
+            else if(response.status == 500) {
+                if(navigator.language != null && navigator.language.includes("ja")) {
+                    message = "サーバでエラーが発生しました。お手数ですが管理者にお問合せください。";
+                }else {
+                    message = "An error has occurred on the server. Please contact the administrator for assistance.";
+                }
+            }
+            // Service Unavailable
+            else if(response.status == 503) {
+                if(navigator.language != null && navigator.language.includes("ja")) {
+                    message =  "ただいまシステムが混み合っています。しばらく待ってから再度アクセスをお願いいたします。";
+                }else {
+                    message = "The system is currently busy. Please wait for a while and access again.";
+                }
+            }
+            this.globalServerErrorHandler({status: response.status, responseText: message});
         }
     }
 };
