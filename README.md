@@ -24,6 +24,7 @@ sample.data = {};
 * [Sample for ES5](https://github.com/mill6-plat6aux/hardcore/blob/main/Impl-ES5.md)
 * [Sample for ES6](https://github.com/mill6-plat6aux/hardcore/blob/main/Impl-ES6.md)
 * [API Reference](https://mill6-plat6aux.github.io/hardcore/index.html)
+* [Motivation](https://github.com/mill6-plat6aux/hardcore/blob/main/Motivation_en.md)
 * [Motivation (ja)](https://github.com/mill6-plat6aux/hardcore/blob/main/Motivation.md)
 
 ## License
