@@ -4899,20 +4899,19 @@ var StringUtil = {
 
     /**
      * Get a three-digit delimited currency notation string.
-     * @param {number} [source]
+     * @param {number|string} [source]
      * @param {number} [decimalPlaces]
      * @param {"round"|"floor"|"ceil"} [roundingMode]
      * @returns {string}
      */
     currencyString: function(source, decimalPlaces, roundingMode) {
         if(source == null) return "";
+        if(typeof source == "string" && source.length == 0) {
+            return source;
+        }
         /** @type {string} */
         var string;
-        if(typeof source != "number") {
-            if(typeof source == "string" && source.length == 0) {
-                return "";
-            }
-            
+        if(typeof source == "string") {
             // multi-byte string
             source = source.replace(/０/g, "0");
             source = source.replace(/１/g, "1");
@@ -4927,33 +4926,34 @@ var StringUtil = {
 
             // comma separated number
             string = source.replace(/,/g, "");
-        }
-        if(typeof source == "number") {
-            if(Number.isNaN(source)) {
-                return "";
-            }
+        }else {
             string = String(source);
-            if(string.includes("e-") && !string.endsWith("e-")) {
-                var eIndex = string.indexOf("e");
-                var exponent = Number(string.substring(eIndex+2));
-                var base = string.substring(0, eIndex);
-                var decimalIndex = base.indexOf(".");
-                var decimalLenghth = decimalIndex != -1 ? (base.length - decimalIndex - 1) : 0;
-                string = source.toFixed(Number(exponent + decimalLenghth));
-            }
-            if(string.includes(".") && typeof decimalPlaces == "number") {
-                let number = Number(string);
-                var multiplier = Math.pow(10, decimalPlaces);
-                if(roundingMode == null || roundingMode == "round") {
-                    number = Math.round(number * multiplier) / multiplier;
-                }else if(roundingMode == "floor") {
-                    number = Math.floor(number * multiplier) / multiplier;
-                }else if(roundingMode == "ceil") {
-                    number = Math.ceil(number * multiplier) / multiplier;
-                }
-                string = String(number);
-            }
         }
+
+        if(Number.isNaN(Number(source))) {
+            return "";
+        }
+        if(string.includes("e-") && !string.endsWith("e-")) {
+            var eIndex = string.indexOf("e");
+            var exponent = Number(string.substring(eIndex+2));
+            var base = string.substring(0, eIndex);
+            var decimalIndex = base.indexOf(".");
+            var decimalLenghth = decimalIndex != -1 ? (base.length - decimalIndex - 1) : 0;
+            string = source.toFixed(Number(exponent + decimalLenghth));
+        }
+        if(string.includes(".") && typeof decimalPlaces == "number") {
+            let number = Number(string);
+            var multiplier = Math.pow(10, decimalPlaces);
+            if(roundingMode == null || roundingMode == "round") {
+                number = Math.round(number * multiplier) / multiplier;
+            }else if(roundingMode == "floor") {
+                number = Math.floor(number * multiplier) / multiplier;
+            }else if(roundingMode == "ceil") {
+                number = Math.ceil(number * multiplier) / multiplier;
+            }
+            string = String(number);
+        }
+
         if(string.length == 0) return string;
         var result = [];
         var index = 0;
